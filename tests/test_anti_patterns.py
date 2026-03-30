@@ -109,7 +109,7 @@ def test_all_template_placeholders_documented():
         defaults = yaml.safe_load(f)
     documented = set(defaults.get("placeholders", {}).keys())
 
-    # Scan all templates for placeholder usage
+    # Scan all templates for placeholder usage (only check known placeholder names)
     found_placeholders: set[str] = set()
     placeholder_re = re.compile(r"\{\{([A-Z_]+)\}\}")
     for path in TEMPLATES_DIR.rglob("*"):
@@ -120,7 +120,11 @@ def test_all_template_placeholders_documented():
         except UnicodeDecodeError:
             continue
         for match in placeholder_re.finditer(text):
-            found_placeholders.add(match.group(1))
+            name = match.group(1)
+            # Only flag placeholders that look like real ones (exist in documented set
+            # or are undocumented but specific — skip generic "PLACEHOLDER" meta-references)
+            if name != "PLACEHOLDER":
+                found_placeholders.add(name)
 
     undocumented = found_placeholders - documented
     assert undocumented == set(), f"Undocumented placeholders: {undocumented}"
