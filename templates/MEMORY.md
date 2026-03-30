@@ -13,9 +13,10 @@ No experiments completed yet. Run `/helios:train` to begin.
 ## Observations
 
 - Initial model: XGBoost with default hyperparams (n_estimators=100, max_depth=4, lr=0.1)
-- Config file: config.yaml controls all hyperparameters
-- Sweep tool available: `python scripts/sweep.py` for systematic grid search
-- Per-experiment branches: `exp/NNN-description` preserves all variants
+- Config file: `config.yaml` controls all hyperparameters — do not hardcode in train.py
+- Sweep tool: `python scripts/sweep.py` for systematic grid search
+- Per-experiment branches: `exp/NNN-description` preserves all code variants
+- Evaluation is immutable: `prepare.py` and `evaluate.py` are READ-ONLY
 
 ## Failed Approaches
 
@@ -27,3 +28,9 @@ No experiments completed yet. Run `/helios:train` to begin.
 - LightGBM as alternative to XGBoost
 - Feature engineering: add domain-specific features
 - Try different model architectures (RandomForest, MLP)
+
+## Session History
+
+| Session | Experiments | Best Metric | Notes |
+|---------|-------------|-------------|-------|
+| (none) | 0 | N/A | Pipeline initialized, no experiments run |
