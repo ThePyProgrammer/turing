@@ -3,6 +3,7 @@ name: sweep
 description: Generate and run a systematic hyperparameter sweep. Computes the cartesian product of configured parameter ranges and processes the queue sequentially with full experiment logging.
 disable-model-invocation: true
 argument-hint: "[sweep_config.yaml]"
+allowed-tools: Read, Write, Edit, Bash(*), Grep, Glob
 ---
 
 Run a systematic hyperparameter sweep using the sweep configuration.

@@ -3,6 +3,7 @@ name: compare
 description: Compare two ML experiment runs side-by-side — metrics, configuration deltas, and a verdict on which approach is more promising.
 disable-model-invocation: true
 argument-hint: "<exp-id-1> <exp-id-2>"
+allowed-tools: Read, Bash(*), Grep, Glob
 ---
 
 Compare two ML experiment runs side-by-side to understand what changed and why one performed better.

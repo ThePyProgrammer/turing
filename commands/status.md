@@ -2,6 +2,7 @@
 name: status
 description: Show current ML experiment status — best model, recent experiments, convergence state, and trend analysis. Delegates to @ml-evaluator for read-only safety.
 disable-model-invocation: true
+allowed-tools: Read, Bash(*), Grep, Glob
 ---
 
 Show the current state of the ML training pipeline. This is an observation-only operation — no code is modified.
