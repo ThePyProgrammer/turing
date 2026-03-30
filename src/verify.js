@@ -26,7 +26,7 @@ const EXPECTED_COMMANDS = [
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
 
-const EXPECTED_CONFIG = ["defaults.yaml"];
+const EXPECTED_CONFIG = ["defaults.yaml", "lifecycle.toml", "taxonomy.toml"];
 
 let passed = 0;
 let failed = 0;
