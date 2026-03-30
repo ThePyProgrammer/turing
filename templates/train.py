@@ -1,9 +1,15 @@
-# AGENT-EDITABLE: The autoresearch agent modifies this file. See program.md.
+# AGENT-EDITABLE — HYPOTHESIS SPACE.
+#
+# This is the ONLY code file the autoresearch agent should modify.
 # Training code for {{PROJECT_NAME}}.
 # Default implementation: XGBoost classifier.
 #
-# Customize this file for your ML task. The autoresearch agent will
-# iteratively modify this file to improve model performance.
+# The agent iteratively modifies this file to test hypotheses about
+# model architecture, hyperparameters, and feature usage. The evaluation
+# harness (evaluate.py) remains immutable — ensuring all experiments
+# are measured by the same yardstick.
+#
+# See program.md for the full experiment loop protocol.
 
 from __future__ import annotations
 
