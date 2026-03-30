@@ -1,0 +1,14 @@
+# Hyperparameter sweep configuration for {{PROJECT_NAME}}.
+# Each key under 'sweep' maps to a config.yaml dotted path.
+# Values are lists -- sweep.py generates the cartesian product.
+
+sweep:
+  model.hyperparams.n_estimators: [50, 100, 200]
+  model.hyperparams.max_depth: [3, 4, 6, 8]
+  model.hyperparams.learning_rate: [0.01, 0.05, 0.1]
+
+# Base config to overlay sweep values onto
+base_config: "config.yaml"
+
+# Output queue file
+output: "experiments/queue.yaml"

@@ -1,0 +1,42 @@
+# {{PROJECT_NAME}} ML Pipeline Configuration
+# Edit this file to change hyperparameters. The autoresearch agent
+# modifies this file for hyperparameter experiments.
+
+data:
+  source: "{{DATA_SOURCE}}"
+  splits_dir: "data/splits"
+  target_column: "label"  # Column name for the prediction target
+  split_ratios:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+  random_state: 42
+
+evaluation:
+  primary_metric: "{{TARGET_METRIC}}"
+  metrics: ["{{TARGET_METRIC}}", "f1_weighted", "accuracy"]
+  # Set to true for metrics where lower is better (mae, mse, rmse, loss)
+  # Set to false for metrics where higher is better (accuracy, f1, auc)
+  lower_is_better: false  # {{METRIC_DIRECTION}} -- change to true if lower is better
+
+convergence:
+  patience: 3                    # Consecutive non-improvements before stopping
+  improvement_threshold: 0.005   # 0.5% relative improvement required
+
+model:
+  type: "xgboost"
+  hyperparams:
+    n_estimators: 100
+    max_depth: 4
+    learning_rate: 0.1
+    objective: "multi:softmax"
+    num_class: 2        # Adjust for your number of classes
+    eval_metric: "mlogloss"
+    verbosity: 0
+
+output:
+  models_dir: "models"
+  best_model_dir: "models/best"
+  archive_dir: "models/archive"
+  experiment_log: "experiments/log.jsonl"
+  results_tsv: "experiments/results.tsv"
