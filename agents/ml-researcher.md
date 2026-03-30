@@ -4,7 +4,6 @@ description: Autonomous ML research agent that implements the autoresearch exper
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: inherit
 memory: project
-permissionMode: acceptEdits
 maxTurns: 200
 ---
 
