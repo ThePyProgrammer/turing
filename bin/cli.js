@@ -30,4 +30,17 @@ program
     await verify(opts);
   });
 
+program
+  .command("init [name] [dir]")
+  .description("Scaffold ML project (CLI mode, non-Claude-Code usage)")
+  .action(async (name, dir) => {
+    const { execSync } = await import("child_process");
+    const { dirname, join } = await import("path");
+    const { fileURLToPath } = await import("url");
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const script = join(__dirname, "turing-init.sh");
+    const args = [name, dir].filter(Boolean).join(" ");
+    execSync(`bash "${script}" ${args}`, { stdio: "inherit" });
+  });
+
 program.parse();
