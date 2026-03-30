@@ -1,4 +1,4 @@
-# Helios Plugin Defaults
+# Turing Plugin Defaults
 #
 # Fallback values used when a scaffolded project's config.yaml is missing keys.
 # These represent conservative starting points — the autoresearch agent will
@@ -27,7 +27,7 @@ data:
     test: 0.15
   random_state: 42
 
-# Template placeholders — resolved during /helios:init scaffolding
+# Template placeholders — resolved during /turing:init scaffolding
 placeholders:
   PROJECT_NAME: "Name of the ML project (e.g., sentiment, churn)"
   TARGET_METRIC: "Primary metric to optimize (e.g., accuracy, f1, mae)"

@@ -70,7 +70,7 @@ The "every experiment is logged" invariant — including discarded experiments �
 
 - JSONL is verbose for simple scans (hence the TSV companion)
 - No query language — complex analysis requires loading into Python/pandas
-- Log file grows unboundedly over many experiments (manageable at Helios scale)
+- Log file grows unboundedly over many experiments (manageable at Turing scale)
 
 ### Neutral
 

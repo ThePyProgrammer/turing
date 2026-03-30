@@ -10,7 +10,7 @@
 
 ## Context
 
-Helios encodes domain knowledge in two forms: agent prompts (natural language instructions) and structured data (experiment types, lifecycle states, failure classifications). When domain knowledge is embedded in agent prompts, it has several problems:
+Turing encodes domain knowledge in two forms: agent prompts (natural language instructions) and structured data (experiment types, lifecycle states, failure classifications). When domain knowledge is embedded in agent prompts, it has several problems:
 
 1. **Duplication** — the same categories appear in multiple agent definitions
 2. **Inconsistency** — agents may classify the same thing differently

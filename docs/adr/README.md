@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for the Helios ML research harness. Each ADR documents a significant architectural decision — the context, the options considered, the decision made, and the consequences accepted.
+This directory contains Architecture Decision Records (ADRs) for the Turing ML research harness. Each ADR documents a significant architectural decision — the context, the options considered, the decision made, and the consequences accepted.
 
 ## Lifecycle
 

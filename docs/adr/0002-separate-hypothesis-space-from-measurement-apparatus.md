@@ -10,9 +10,9 @@
 
 ## Context
 
-Helios automates the ML experiment loop: an AI agent iteratively modifies training code, runs experiments, and decides whether to keep or discard the results. The fundamental risk of this automation is that an agent with access to both the training code *and* the evaluation code can — deliberately or through optimization pressure — game its own metrics.
+Turing automates the ML experiment loop: an AI agent iteratively modifies training code, runs experiments, and decides whether to keep or discard the results. The fundamental risk of this automation is that an agent with access to both the training code *and* the evaluation code can — deliberately or through optimization pressure — game its own metrics.
 
-This is not a theoretical concern. In reinforcement learning, reward hacking is a well-documented phenomenon: agents find ways to maximize the reward signal without achieving the intended objective. In the Helios context, the equivalent risk is an agent that modifies `evaluate.py` to make its results look better — changing what "accuracy" means between experiments, overfitting the evaluation function, or introducing subtle bugs that inflate metrics.
+This is not a theoretical concern. In reinforcement learning, reward hacking is a well-documented phenomenon: agents find ways to maximize the reward signal without achieving the intended objective. In the Turing context, the equivalent risk is an agent that modifies `evaluate.py` to make its results look better — changing what "accuracy" means between experiments, overfitting the evaluation function, or introducing subtle bugs that inflate metrics.
 
 The deeper epistemological principle is older than software: the entity that generates hypotheses must not be the entity that evaluates them. This is the foundation of the double-blind protocol in experimental science, the separation of prosecution and judiciary in law, and the principle of independent auditing in finance.
 
@@ -53,7 +53,7 @@ Trade-offs: detects violations after the fact but doesn't prevent them. The dama
 
 The separation maps directly to the structure of controlled experiments in science: the experimental variable (model code, hyperparameters) is the hypothesis; the measurement protocol (data splits, metrics computation) is the apparatus. Changing both simultaneously invalidates the experiment.
 
-Prompt-level enforcement is a deliberate choice over runtime enforcement. Helios runs in Claude Code, where the agent operates under human oversight — the user can see every file modification. The architectural boundary serves as a cognitive guardrail for the agent and a verifiable invariant for the human. If Helios were ever deployed in a fully unsupervised setting, this decision should be revisited (see ADR-0003 on capability boundaries).
+Prompt-level enforcement is a deliberate choice over runtime enforcement. Turing runs in Claude Code, where the agent operates under human oversight — the user can see every file modification. The architectural boundary serves as a cognitive guardrail for the agent and a verifiable invariant for the human. If Turing were ever deployed in a fully unsupervised setting, this decision should be revisited (see ADR-0003 on capability boundaries).
 
 The specific enforcement points are:
 1. Template headers: every file is labeled as `MEASUREMENT APPARATUS — READ-ONLY` or `HYPOTHESIS SPACE — AGENT-EDITABLE`

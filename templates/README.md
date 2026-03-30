@@ -4,7 +4,7 @@
 
 ## Overview
 
-This pipeline uses the [Helios](https://github.com/ThePyProgrammer/helios) autoresearch pattern — an AI agent iteratively trains, evaluates, and improves models by modifying `train.py` while the evaluation infrastructure (`prepare.py`, `evaluate.py`) remains immutable.
+This pipeline uses the [Turing](https://github.com/ThePyProgrammer/turing) autoresearch pattern — an AI agent iteratively trains, evaluates, and improves models by modifying `train.py` while the evaluation infrastructure (`prepare.py`, `evaluate.py`) remains immutable.
 
 **Primary metric:** {{TARGET_METRIC}} ({{METRIC_DIRECTION}} is better)
 
@@ -51,8 +51,8 @@ The agent follows `program.md`. It:
 5. Keeps improvements, discards regressions
 6. Repeats until convergence
 
-To start: `/helios:train` in Claude Code.
-For hands-off mode: `/loop 5m /helios:train`
+To start: `/turing:train` in Claude Code.
+For hands-off mode: `/loop 5m /turing:train`
 
 ## Directory Structure
 

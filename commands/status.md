@@ -20,4 +20,4 @@ Show the current state of the ML training pipeline. This is an observation-only 
    - **Trend:** improving, plateauing, or regressing?
    - **Recommendation:** continue training, try a different approach, or declare convergence
 
-3. **If no experiments exist:** report that the pipeline is ready but untrained. Suggest `/helios:train`.
+3. **If no experiments exist:** report that the pipeline is ready but untrained. Suggest `/turing:train`.

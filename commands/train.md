@@ -52,7 +52,7 @@ Use `@ml-evaluator` for analysis tasks. It is read-only (no Write/Edit) and cann
 
 For fully hands-off training:
 ```
-/loop 5m /helios:train
+/loop 5m /turing:train
 ```
 
 The Stop hook automatically detects convergence and halts the loop. Recommended intervals:

@@ -41,4 +41,4 @@ Run a systematic hyperparameter sweep using the sweep configuration.
 
 ## Rules
 
-Follow the same safety constraints as `/helios:train` — see `rules/loop-protocol.md`.
+Follow the same safety constraints as `/turing:train` — see `rules/loop-protocol.md`.

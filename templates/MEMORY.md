@@ -8,7 +8,7 @@ Primary metric: {{TARGET_METRIC}} ({{METRIC_DIRECTION}} is better).
 
 ## Best Result
 
-No experiments completed yet. Run `/helios:train` to begin.
+No experiments completed yet. Run `/turing:train` to begin.
 
 ## Observations
 

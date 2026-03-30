@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Helios installation verifier.
+ * Turing installation verifier.
  *
  * Checks that all expected files are in place and reports status.
  *
@@ -16,7 +16,7 @@ const homeDir = process.env.HOME || process.env.USERPROFILE;
 const targetBase = isGlobal ? join(homeDir, ".claude") : ".claude";
 
 const EXPECTED_COMMANDS = [
-  "helios.md",
+  "turing.md",
   "init.md",
   "train.md",
   "status.md",
@@ -39,23 +39,23 @@ function check(label, path) {
   else failed++;
 }
 
-console.log("Helios Installation Verification");
+console.log("Turing Installation Verification");
 console.log(`Checking: ${targetBase}`);
 console.log("");
 
 console.log("Commands:");
 for (const cmd of EXPECTED_COMMANDS) {
-  check(cmd, join(targetBase, "commands", "helios", cmd));
+  check(cmd, join(targetBase, "commands", "turing", cmd));
 }
 
 console.log("\nAgents:");
 for (const agent of EXPECTED_AGENTS) {
-  check(agent, join(targetBase, "agents", "helios", agent));
+  check(agent, join(targetBase, "agents", "turing", agent));
 }
 
 console.log("\nConfig:");
 for (const cfg of EXPECTED_CONFIG) {
-  check(cfg, join(targetBase, "config", "helios", cfg));
+  check(cfg, join(targetBase, "config", "turing", cfg));
 }
 
 console.log("");

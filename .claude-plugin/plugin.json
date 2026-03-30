@@ -1,12 +1,12 @@
 {
-  "name": "helios",
+  "name": "turing",
   "version": "2.0.0",
   "description": "Autonomous ML research harness — the autoresearch loop as a formal protocol. 6 commands, 2 specialized agents, structured experiment lifecycle with convergence detection, immutable evaluation infrastructure, and safety guardrails that separate the hypothesis space from the measurement apparatus. Inspired by Karpathy's autoresearch and the scientific method itself.",
   "author": {
     "name": "Prannaya Gupta"
   },
-  "homepage": "https://github.com/ThePyProgrammer/helios",
-  "repository": "https://github.com/ThePyProgrammer/helios",
+  "homepage": "https://github.com/ThePyProgrammer/turing",
+  "repository": "https://github.com/ThePyProgrammer/turing",
   "license": "MIT",
   "keywords": [
     "ml",

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Helios CLI init script.
+# Turing CLI init script.
 # Quick-start for scaffolding an ML project outside of Claude Code.
 #
 # Usage:
-#   helios-init [project_name] [ml_dir]
+#   turing-init [project_name] [ml_dir]
 #
-# This script copies Helios templates to the specified directory
+# This script copies Turing templates to the specified directory
 # and prints instructions for completing the setup.
 
 set -euo pipefail
@@ -18,7 +18,7 @@ PROJECT_NAME="${1:-my-ml-project}"
 ML_DIR="${2:-.}"
 
 echo "╔══════════════════════════════════════════╗"
-echo "║     Helios ML Research Harness           ║"
+echo "║     Turing ML Research Harness           ║"
 echo "║     Autonomous Experiment Infrastructure ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
@@ -29,7 +29,7 @@ echo ""
 # Check templates exist
 if [[ ! -d "$TEMPLATES_DIR" ]]; then
     echo "Error: Templates not found at ${TEMPLATES_DIR}" >&2
-    echo "Ensure the Helios plugin is installed correctly." >&2
+    echo "Ensure the Turing plugin is installed correctly." >&2
     exit 1
 fi
 
@@ -120,5 +120,5 @@ echo "  5. Start training:"
 echo "     python train.py > run.log 2>&1"
 echo ""
 echo "  Or use Claude Code:"
-echo "     /helios:train          (single session)"
-echo "     /loop 5m /helios:train (fully autonomous)"
+echo "     /turing:train          (single session)"
+echo "     /loop 5m /turing:train (fully autonomous)"

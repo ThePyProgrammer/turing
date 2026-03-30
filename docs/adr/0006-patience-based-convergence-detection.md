@@ -56,7 +56,7 @@ The improvement threshold (default 0.5% relative) prevents the agent from counti
 
 ### Positive
 
-- Fully autonomous operation with `/loop 5m /helios:train` — convergence halts the loop
+- Fully autonomous operation with `/loop 5m /turing:train` — convergence halts the loop
 - Configurable per project: `convergence.patience` and `convergence.improvement_threshold`
 - Exit code 2 integrates with Claude Code's loop halt mechanism
 - Simple enough to implement in a 50-line bash script

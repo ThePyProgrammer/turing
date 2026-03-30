@@ -1,30 +1,30 @@
-# helios
+# turing
 
 *"The purpose of computing is insight, not numbers."* — Richard Hamming
 
 ---
 
-An autonomous ML research harness for Claude Code. Helios implements the autoresearch pattern — an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
+An autonomous ML research harness for Claude Code. Turing implements the autoresearch pattern — an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
 
-The name references the Greek sun god, but the real reference is to what Helios does: it watches everything, measures everything, and brings clarity to the landscape below.
+The name references Alan Turing — the person who first asked whether machines could think, then built the framework for answering the question. Turing the plugin does what Turing the person formalized: it defines a computational process, executes it mechanically, and determines whether the result constitutes an improvement.
 
 Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch) and [snoglobe/helios](https://github.com/snoglobe/helios).
 
 ## Table of Contents
 
-- [The Problem Helios Solves](#the-problem-helios-solves)
+- [The Problem Turing Solves](#the-problem-turing-solves)
 - [Philosophical Foundations](#philosophical-foundations)
-- [How Helios Works](#how-helios-works)
+- [How Turing Works](#how-turing-works)
 - [Commands](#commands)
 - [The Agent Architecture](#the-agent-architecture)
 - [The Immutable Evaluation Invariant](#the-immutable-evaluation-invariant)
 - [Convergence Detection](#convergence-detection)
 - [The Config DSL](#the-config-dsl)
 - [Installation](#installation)
-- [Architecture of Helios Itself](#architecture-of-helios-itself)
+- [Architecture of Turing Itself](#architecture-of-turing-itself)
 - [Intellectual Heritage](#intellectual-heritage)
 
-## The Problem Helios Solves
+## The Problem Turing Solves
 
 > "An experiment is a question which science poses to Nature, and a measurement is the recording of Nature's answer." — Max Planck
 
@@ -32,7 +32,7 @@ The central activity of machine learning research is the experiment loop: change
 
 The tragedy is not that this is slow — it is that the process is structurally unsound. When a human researcher modifies both the training code *and* the evaluation code in the same session, the experiment is no longer a controlled experiment. When experiment results are tracked in notebook cells rather than structured logs, reproducibility is aspirational. When a promising direction is abandoned because the researcher forgot what they tried three hours ago, the search is not even a search — it is a random walk with amnesia.
 
-Helios does not replace the researcher's judgment. It replaces the researcher's *discipline* — or more precisely, it makes discipline the default rather than an act of willpower. The experiment loop is formalized. The evaluation harness is immutable. Every experiment is logged. Every code variant is preserved. Convergence is detected automatically. The researcher's role shifts from "person who types hyperparameters and reads loss curves" to "person who decides what hypotheses are worth testing."
+Turing does not replace the researcher's judgment. It replaces the researcher's *discipline* — or more precisely, it makes discipline the default rather than an act of willpower. The experiment loop is formalized. The evaluation harness is immutable. Every experiment is logged. Every code variant is preserved. Convergence is detected automatically. The researcher's role shifts from "person who types hyperparameters and reads loss curves" to "person who decides what hypotheses are worth testing."
 
 This is the same insight that drove Karpathy's autoresearch: the experiment loop is mechanical enough to automate, but the automation must be *safe* — it must not be able to game its own metrics.
 
@@ -42,11 +42,11 @@ This is the same insight that drove Karpathy's autoresearch: the experiment loop
 
 > "The first principle is that you must not fool yourself — and you are the easiest person to fool." — Richard Feynman
 
-Helios is built on a specific epistemological claim: **the entity that generates hypotheses must not be the entity that evaluates them**. This is not a software engineering pattern — it is the methodological foundation of modern science, and it predates software by centuries.
+Turing is built on a specific epistemological claim: **the entity that generates hypotheses must not be the entity that evaluates them**. This is not a software engineering pattern — it is the methodological foundation of modern science, and it predates software by centuries.
 
 In experimental physics, the [double-blind protocol](https://en.wikipedia.org/wiki/Blinded_experiment) ensures that the experimenter's expectations cannot influence the measurement. In ML, the equivalent risk is more insidious: an agent that can modify both `train.py` and `evaluate.py` can — deliberately or through optimization pressure — find metrics that look good but don't reflect genuine model improvement. It can overfit the evaluation function. It can inadvertently change what "accuracy" means between experiments, making comparison meaningless.
 
-Helios enforces this separation architecturally:
+Turing enforces this separation architecturally:
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -74,7 +74,7 @@ Helios enforces this separation architecturally:
 └──────────────────────────────────────────────────────┘
 ```
 
-This is the load-bearing architectural invariant. Everything else in Helios — the git discipline, the convergence detection, the experiment logging — is scaffolding around this single idea.
+This is the load-bearing architectural invariant. Everything else in Turing — the git discipline, the convergence detection, the experiment logging — is scaffolding around this single idea.
 
 ### On the Scientific Method as a Control Loop
 
@@ -90,17 +90,17 @@ The autoresearch experiment loop is not an engineering heuristic. It is a formal
 
 Each iteration of this loop is an experiment in the scientific sense: a controlled manipulation of one variable (the hypothesis) with all other variables held constant (the evaluation infrastructure). The agent doesn't just iterate — it does science.
 
-The key insight from [Karl Popper's philosophy of science](https://en.wikipedia.org/wiki/Karl_Popper#Philosophy_of_science) is that hypotheses gain credibility not by accumulating confirmations but by surviving attempts at falsification. In the Helios context, a model configuration gains credibility not because it produces good numbers, but because it produces *better* numbers than the previous best — measured by the same immutable yardstick.
+The key insight from [Karl Popper's philosophy of science](https://en.wikipedia.org/wiki/Karl_Popper#Philosophy_of_science) is that hypotheses gain credibility not by accumulating confirmations but by surviving attempts at falsification. In the Turing context, a model configuration gains credibility not because it produces good numbers, but because it produces *better* numbers than the previous best — measured by the same immutable yardstick.
 
 ### On Experiment Tracking as Institutional Memory
 
 > "Those who cannot remember the past are condemned to repeat it." — George Santayana
 
-ML experiment tracking is typically an afterthought — notebook cells with outputs, a spreadsheet someone maintains for a week, or a Weights & Biases dashboard that nobody checks after the paper is submitted. Helios treats experiment history as a first-class artifact for a specific reason: **the agent needs to remember what it tried.**
+ML experiment tracking is typically an afterthought — notebook cells with outputs, a spreadsheet someone maintains for a week, or a Weights & Biases dashboard that nobody checks after the paper is submitted. Turing treats experiment history as a first-class artifact for a specific reason: **the agent needs to remember what it tried.**
 
 An LLM agent without persistent memory is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain) — its next action depends only on its current state, not on the path that led there. This is catastrophically inefficient for optimization: the agent will re-try failed approaches, abandon promising directions, and fail to recognize when it has converged.
 
-Helios addresses this with three complementary memory systems:
+Turing addresses this with three complementary memory systems:
 
 | System | Format | Purpose | Persistence |
 |--------|--------|---------|-------------|
@@ -114,7 +114,7 @@ The JSONL log is the ground truth. The agent memory is the working set. The git 
 
 Most ML workflows don't detect convergence — the researcher just stops when they get bored, run out of compute budget, or decide the results are "good enough." This is the optimization equivalent of declaring victory by exhaustion.
 
-Helios implements formal convergence detection because autonomous agents cannot get bored:
+Turing implements formal convergence detection because autonomous agents cannot get bored:
 
 ```
 convergence:
@@ -127,10 +127,10 @@ The convergence criterion is simple: if the last N experiments (where N = patien
 The Stop hook (`scripts/stop-hook.sh`) implements this check and returns exit code 2 to signal convergence to the Claude Code loop system, enabling fully hands-off operation:
 
 ```
-/loop 5m /helios:train
+/loop 5m /turing:train
 ```
 
-## How Helios Works
+## How Turing Works
 
 ### The Experiment Lifecycle
 
@@ -170,7 +170,7 @@ Transitions are validated against the state machine. You cannot evaluate a propo
 
 ### The Project Structure
 
-After `/helios:init` scaffolds a project:
+After `/turing:init` scaffolds a project:
 
 ```
 your-project/
@@ -208,35 +208,35 @@ your-project/
 
 | Command | Purpose |
 |---------|---------|
-| `/helios:init` | Scaffold a new ML project with the full autoresearch harness — creates the separation between measurement apparatus and hypothesis space |
+| `/turing:init` | Scaffold a new ML project with the full autoresearch harness — creates the separation between measurement apparatus and hypothesis space |
 
 ### Experiment Loop
 
 | Command | Agent | Purpose |
 |---------|-------|---------|
-| `/helios:train [N]` | @ml-researcher | Run the autonomous experiment loop (optional max iterations) |
-| `/helios:sweep` | @ml-researcher | Generate and run systematic hyperparameter sweep via cartesian product |
+| `/turing:train [N]` | @ml-researcher | Run the autonomous experiment loop (optional max iterations) |
+| `/turing:sweep` | @ml-researcher | Generate and run systematic hyperparameter sweep via cartesian product |
 
 ### Analysis
 
 | Command | Agent | Purpose |
 |---------|-------|---------|
-| `/helios:status` | @ml-evaluator | Show experiment status, best model, convergence state |
-| `/helios:compare <a> <b>` | @ml-evaluator | Side-by-side experiment comparison with causal analysis |
+| `/turing:status` | @ml-evaluator | Show experiment status, best model, convergence state |
+| `/turing:compare <a> <b>` | @ml-evaluator | Side-by-side experiment comparison with causal analysis |
 
 ### Router
 
 | Command | Purpose |
 |---------|---------|
-| `/helios` | Thin dispatcher — detects ML intent and routes to the appropriate sub-command |
+| `/turing` | Thin dispatcher — detects ML intent and routes to the appropriate sub-command |
 
 ## The Agent Architecture
 
-Helios decomposes the experiment loop into two agents with complementary capabilities and a strict capability boundary:
+Turing decomposes the experiment loop into two agents with complementary capabilities and a strict capability boundary:
 
 ```
 ┌───────────────────────────────────────────────────────┐
-│                    HELIOS ROUTER                       │
+│                    TURING ROUTER                       │
 │             (thin dispatcher, ~40 lines)               │
 └──────────┬────────────────────────────┬───────────────┘
            │                            │
@@ -274,19 +274,19 @@ The evaluator's read-only constraint is not a limitation — it is a feature. In
 
 > "I often say that when you can measure what you are speaking about, and express it in numbers, you know something about it; but when you cannot measure it, when you cannot express it in numbers, your knowledge is of a meagre and unsatisfactory kind." — Lord Kelvin
 
-The most important design decision in Helios is that `prepare.py` and `evaluate.py` are READ-ONLY. The agent cannot modify them. This is the mechanism by which experiment results remain comparable across iterations.
+The most important design decision in Turing is that `prepare.py` and `evaluate.py` are READ-ONLY. The agent cannot modify them. This is the mechanism by which experiment results remain comparable across iterations.
 
 Consider the failure mode: an agent discovers that switching from XGBoost to a neural network improves accuracy from 0.82 to 0.87. But it also changed `evaluate.py` to use micro-averaged F1 instead of macro-averaged F1 because the neural network performs better on the majority class. Was the improvement real? You cannot know. The measurement changed between experiments. The comparison is meaningless.
 
-Helios prevents this structurally. The evaluation function is fixed at project initialization. Every experiment is measured by the same yardstick. Comparisons are always valid. The agent can propose any hypothesis it wants about the training process — model architecture, hyperparameters, feature engineering, regularization — but it cannot change the definition of success.
+Turing prevents this structurally. The evaluation function is fixed at project initialization. Every experiment is measured by the same yardstick. Comparisons are always valid. The agent can propose any hypothesis it wants about the training process — model architecture, hyperparameters, feature engineering, regularization — but it cannot change the definition of success.
 
-This mirrors the structure of well-designed ML benchmarks: GLUE, ImageNet, and SQuAD define fixed evaluation protocols precisely because changing the evaluation mid-benchmark would invalidate all results. Helios applies the same principle at the project level.
+This mirrors the structure of well-designed ML benchmarks: GLUE, ImageNet, and SQuAD define fixed evaluation protocols precisely because changing the evaluation mid-benchmark would invalidate all results. Turing applies the same principle at the project level.
 
 ## Convergence Detection
 
 Convergence detection answers the question: "should I keep searching or has the current approach been exhausted?"
 
-Helios uses a patience-based criterion analogous to [early stopping](https://en.wikipedia.org/wiki/Early_stopping) in gradient descent:
+Turing uses a patience-based criterion analogous to [early stopping](https://en.wikipedia.org/wiki/Early_stopping) in gradient descent:
 
 1. After each experiment, compute the relative improvement over the prior best
 2. If the improvement is below the threshold, increment the non-improvement counter
@@ -305,14 +305,14 @@ This is a conservative heuristic, not an optimal stopping rule. It can be fooled
 The `/loop` integration enables fully autonomous operation:
 
 ```
-/loop 5m /helios:train
+/loop 5m /turing:train
 ```
 
 The Stop hook (`scripts/stop-hook.sh`) runs after each training iteration and returns exit code 2 when convergence is detected, signaling the loop system to halt. The agent reads MEMORY.md at each iteration start, maintaining continuity across loop cycles.
 
 ## The Config DSL
 
-Helios encodes domain knowledge as structured data rather than prose instructions. This is an application of the principle that **data outlives code** — when the experiment lifecycle rules or classification categories need to change, you edit a TOML file, not an agent prompt.
+Turing encodes domain knowledge as structured data rather than prose instructions. This is an application of the principle that **data outlives code** — when the experiment lifecycle rules or classification categories need to change, you edit a TOML file, not an agent prompt.
 
 | Config | What it encodes | Why it matters |
 |--------|----------------|----------------|
@@ -326,23 +326,23 @@ This is a lightweight [domain-specific language](https://en.wikipedia.org/wiki/D
 
 ```bash
 # Via Claude Code plugin (recommended)
-claude plugin add /path/to/helios
+claude plugin add /path/to/turing
 
 # Via npm
-npm install -g claude-helios
-claude-helios install --global
+npm install -g claude-turing
+claude-turing install --global
 
 # Verify installation
-claude-helios verify
+claude-turing verify
 ```
 
 Or from source:
 
 ```bash
-cd ~/ThePyProgrammer/helios
+cd ~/ThePyProgrammer/turing
 npm install
 npm link
-claude-helios install --global
+claude-turing install --global
 ```
 
 The installer deploys 6 commands, 2 agents, and 3 config files to `~/.claude/`, and inserts a managed section into CLAUDE.md with the command reference.
@@ -351,25 +351,25 @@ The installer deploys 6 commands, 2 agents, and 3 config files to `~/.claude/`, 
 
 ```bash
 # 1. Initialize a new ML project
-/helios:init
+/turing:init
 
 # 2. Follow the prompts (project name, metric, data location)
 
 # 3. Add your training data
 
 # 4. Start the autonomous experiment loop
-/helios:train
+/turing:train
 
 # 5. For fully hands-off training:
-/loop 5m /helios:train
+/loop 5m /turing:train
 ```
 
-## Architecture of Helios Itself
+## Architecture of Turing Itself
 
 ```
-helios/
+turing/
 ├── commands/              6 skill files
-│   ├── helios.md          Thin router (intent detection + dispatch)
+│   ├── turing.md          Thin router (intent detection + dispatch)
 │   ├── init.md            Project scaffolding
 │   ├── train.md           Autonomous experiment loop
 │   ├── status.md          Experiment status display
@@ -404,16 +404,16 @@ helios/
 │   └── postinstall.js     npm postinstall hook
 ├── bin/                   CLI entry points
 │   ├── cli.sh             Unified CLI (install/verify/init)
-│   └── helios-init.sh     Direct project scaffolding
+│   └── turing-init.sh     Direct project scaffolding
 └── .claude-plugin/        Plugin registration
     └── plugin.json        Plugin metadata
 ```
 
-Helios practices what it preaches: the plugin itself maintains the separation between infrastructure (commands, agents, config, src) and templates (the project scaffolding that gets copied into user projects). The commands are thin dispatchers. The agents have single responsibilities. Domain knowledge lives in config, not in prompts.
+Turing practices what it preaches: the plugin itself maintains the separation between infrastructure (commands, agents, config, src) and templates (the project scaffolding that gets copied into user projects). The commands are thin dispatchers. The agents have single responsibilities. Domain knowledge lives in config, not in prompts.
 
 ## Intellectual Heritage
 
-Helios draws on several traditions, spanning experimental methodology, optimization theory, and software architecture:
+Turing draws on several traditions, spanning experimental methodology, optimization theory, and software architecture:
 
 - **[The Scientific Method](https://en.wikipedia.org/wiki/Scientific_method)** — the experiment loop is a formalization of hypothesize-experiment-measure-decide, the core pattern of empirical inquiry since [Francis Bacon](https://en.wikipedia.org/wiki/Novum_Organum) (1620)
 
@@ -447,4 +447,4 @@ MIT
 
 *"In God we trust. All others must bring data."* — W. Edwards Deming
 
-*Helios brings the data.*
+*Turing computes the answer.*

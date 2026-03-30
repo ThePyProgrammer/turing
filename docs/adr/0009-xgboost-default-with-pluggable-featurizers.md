@@ -10,7 +10,7 @@
 
 ## Context
 
-Helios needs a default model that works out of the box for the widest range of ML tasks. The scaffolded `train.py` must include a working training pipeline that the autoresearch agent can immediately iterate on. The default must be:
+Turing needs a default model that works out of the box for the widest range of ML tasks. The scaffolded `train.py` must include a working training pipeline that the autoresearch agent can immediately iterate on. The default must be:
 
 1. **Reliable**: works on tabular data without extensive preprocessing
 2. **Fast**: trains in seconds to minutes, not hours

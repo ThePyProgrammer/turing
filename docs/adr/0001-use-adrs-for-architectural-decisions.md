@@ -10,7 +10,7 @@
 
 ## Context
 
-Helios is built on several non-obvious architectural decisions — the separation between hypothesis space and measurement apparatus, the two-agent capability boundary, the TOML config DSL, the patience-based convergence protocol. These decisions are load-bearing: changing any of them would require rethinking significant portions of the system.
+Turing is built on several non-obvious architectural decisions — the separation between hypothesis space and measurement apparatus, the two-agent capability boundary, the TOML config DSL, the patience-based convergence protocol. These decisions are load-bearing: changing any of them would require rethinking significant portions of the system.
 
 Currently, these decisions are documented implicitly — scattered across the README, agent definitions, and code comments. A new contributor reading the codebase must reconstruct the rationale from fragments. Worse, there is no mechanism to detect when a code change violates one of these decisions, or to revisit a decision when circumstances change.
 
@@ -50,7 +50,7 @@ Trade-offs: new contributors must reconstruct rationale by reading everything. N
 
 ADRs were introduced by Michael Nygard in 2011 as a lightweight alternative to heavyweight architecture documentation. The key insight is that decisions — not diagrams or component lists — are the most valuable architectural artifact. A decision captures *why* the system is the way it is, not just *what* it is.
 
-Helios has a small but dense decision surface: 10 decisions that deeply constrain the system's behavior. This is exactly the scale where ADRs provide maximum value — few enough to maintain rigorously, impactful enough to warrant formal documentation.
+Turing has a small but dense decision surface: 10 decisions that deeply constrain the system's behavior. This is exactly the scale where ADRs provide maximum value — few enough to maintain rigorously, impactful enough to warrant formal documentation.
 
 ## Consequences
 

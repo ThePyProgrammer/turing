@@ -1,11 +1,11 @@
 ---
 name: init
-description: Initialize a new ML project with the Helios autoresearch harness. Scaffolds the full experiment infrastructure — immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment.
+description: Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure — immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment.
 disable-model-invocation: true
 argument-hint: "[project_name]"
 ---
 
-Scaffold a new ML project with the Helios autoresearch harness. This creates the separation between the measurement apparatus (READ-ONLY) and the hypothesis space (AGENT-EDITABLE) that makes autonomous experimentation trustworthy.
+Scaffold a new ML project with the Turing autoresearch harness. This creates the separation between the measurement apparatus (READ-ONLY) and the hypothesis space (AGENT-EDITABLE) that makes autonomous experimentation trustworthy.
 
 ## Interactive Setup
 
@@ -20,7 +20,7 @@ Ask the user for the following (or accept from `$ARGUMENTS` if provided as JSON)
 
 ## Scaffolding Steps
 
-1. **Locate Helios plugin templates.** Search for them at the plugin's installed location under `templates/`. Use Glob to find: `~/.claude/plugins/*/templates/` or check the npm global installation.
+1. **Locate Turing plugin templates.** Search for them at the plugin's installed location under `templates/`. Use Glob to find: `~/.claude/plugins/*/templates/` or check the npm global installation.
 
 2. **Copy templates** to the ML directory, replacing all `{{PLACEHOLDER}}` markers:
    - `prepare.py` — data loading and splitting (READ-ONLY infrastructure)
@@ -69,12 +69,12 @@ Ask the user for the following (or accept from `$ARGUMENTS` if provided as JSON)
 
 9. **Report** what was created:
    - The separation: READ-ONLY (`prepare.py`, `evaluate.py`) vs AGENT-EDITABLE (`train.py`)
-   - Next steps: add data, run `python prepare.py`, then `/helios:train`
+   - Next steps: add data, run `python prepare.py`, then `/turing:train`
    - The safety model: why immutable evaluation matters
 
 ## Template Location
 
-Templates are at the Helios plugin installation path under `templates/`. Use Glob:
+Templates are at the Turing plugin installation path under `templates/`. Use Glob:
 ```
 ~/.claude/plugins/*/templates/
 ```

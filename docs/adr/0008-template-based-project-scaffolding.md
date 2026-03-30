@@ -10,12 +10,12 @@
 
 ## Context
 
-Helios is a plugin that scaffolds ML project infrastructure into user repositories. The scaffolded files need to be customized per project — metric names, data paths, task descriptions, and directory locations differ for every project. The scaffolding mechanism must balance two concerns:
+Turing is a plugin that scaffolds ML project infrastructure into user repositories. The scaffolded files need to be customized per project — metric names, data paths, task descriptions, and directory locations differ for every project. The scaffolding mechanism must balance two concerns:
 
 1. **Customizability**: every project is different
 2. **Consistency**: the autoresearch protocol requires specific file structures, naming, and behavior
 
-The challenge is that Helios is a Claude Code plugin (markdown commands + agent definitions) without a runtime — it cannot execute arbitrary code at scaffold time. The scaffolding is done by the `/helios:init` command, which is an LLM agent following instructions.
+The challenge is that Turing is a Claude Code plugin (markdown commands + agent definitions) without a runtime — it cannot execute arbitrary code at scaffold time. The scaffolding is done by the `/turing:init` command, which is an LLM agent following instructions.
 
 ## Options Considered
 
@@ -62,7 +62,7 @@ Templates are shipped as complete, runnable files (not fragments) so they can be
 - Templates are inspectable: `cat templates/train.py` shows exactly what will be scaffolded
 - No build step or runtime required
 - The agent can verify scaffolding by grepping for remaining `{{` markers
-- Both CLI (`helios-init`) and Claude Code (`/helios:init`) use the same templates
+- Both CLI (`turing-init`) and Claude Code (`/turing:init`) use the same templates
 
 ### Negative
 
@@ -72,11 +72,11 @@ Templates are shipped as complete, runnable files (not fragments) so they can be
 
 ### Neutral
 
-- Adding a new placeholder requires updating templates, defaults.yaml, init.md, and helios-init.sh
+- Adding a new placeholder requires updating templates, defaults.yaml, init.md, and turing-init.sh
 
 ## References
 
 - `templates/` directory — all template files
 - `config/defaults.yaml` — placeholder definitions and descriptions
 - `commands/init.md` — scaffolding instructions
-- `bin/helios-init.sh` — CLI scaffolding script
+- `bin/turing-init.sh` — CLI scaffolding script

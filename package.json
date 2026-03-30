@@ -1,12 +1,12 @@
 {
-  "name": "claude-helios",
+  "name": "claude-turing",
   "version": "2.0.0",
   "type": "module",
   "description": "Autonomous ML research harness for Claude Code. The autoresearch loop as a formal protocol — iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, immutable evaluation infrastructure, and safety guardrails.",
   "bin": {
-    "helios": "./bin/helios-init.sh",
-    "helios-init": "./bin/helios-init.sh",
-    "claude-helios": "./bin/cli.sh"
+    "turing": "./bin/turing-init.sh",
+    "turing-init": "./bin/turing-init.sh",
+    "claude-turing": "./bin/cli.sh"
   },
   "main": "src/index.js",
   "scripts": {
@@ -40,13 +40,13 @@
   "author": {
     "name": "Prannaya Gupta"
   },
-  "homepage": "https://github.com/ThePyProgrammer/helios",
+  "homepage": "https://github.com/ThePyProgrammer/turing",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ThePyProgrammer/helios.git"
+    "url": "git+https://github.com/ThePyProgrammer/turing.git"
   },
   "bugs": {
-    "url": "https://github.com/ThePyProgrammer/helios/issues"
+    "url": "https://github.com/ThePyProgrammer/turing/issues"
   },
   "license": "MIT",
   "engines": {

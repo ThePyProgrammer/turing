@@ -10,13 +10,13 @@
 
 ## Context
 
-Helios is a Claude Code plugin consisting of markdown commands, markdown agent definitions, TOML/YAML config, Python templates, and shell scripts. It must be distributable to users who may install it via:
+Turing is a Claude Code plugin consisting of markdown commands, markdown agent definitions, TOML/YAML config, Python templates, and shell scripts. It must be distributable to users who may install it via:
 
-1. Direct path: `claude plugin add /path/to/helios`
-2. npm: `npm install -g claude-helios`
+1. Direct path: `claude plugin add /path/to/turing`
+2. npm: `npm install -g claude-turing`
 3. Claude Code marketplace (future)
 
-The distribution must deploy commands to `~/.claude/commands/helios/`, agents to `~/.claude/agents/helios/`, and templates to an accessible location. It must also update the user's CLAUDE.md with a command reference.
+The distribution must deploy commands to `~/.claude/commands/turing/`, agents to `~/.claude/agents/turing/`, and templates to an accessible location. It must also update the user's CLAUDE.md with a command reference.
 
 ## Options Considered
 
@@ -36,7 +36,7 @@ Trade-offs: no Node.js dependency. But shell scripts are harder to make cross-pl
 
 Distribute as a Python package since the templates are Python.
 
-Trade-offs: aligns with the ML ecosystem. But Helios is a Claude Code plugin, not a Python library — the primary consumers are Claude Code commands, not Python imports. pip distribution would confuse the packaging semantics.
+Trade-offs: aligns with the ML ecosystem. But Turing is a Claude Code plugin, not a Python library — the primary consumers are Claude Code commands, not Python imports. pip distribution would confuse the packaging semantics.
 
 ### Option 4: Direct Git Clone Only
 
@@ -52,16 +52,16 @@ Trade-offs: simplest. But no version management, no automated updates, and the u
 
 The Claude Code plugin ecosystem is Node.js-based (`.claude-plugin/plugin.json`, `package.json`). npm is the natural distribution channel. The three-file installer (`install.js`, `verify.js`, `postinstall.js`) follows the pattern established by the blueprint plugin.
 
-The installer manages a section in CLAUDE.md using idempotent markers (`<!-- helios:managed-start -->` / `<!-- helios:managed-end -->`), allowing repeated installations to update rather than duplicate the command reference.
+The installer manages a section in CLAUDE.md using idempotent markers (`<!-- turing:managed-start -->` / `<!-- turing:managed-end -->`), allowing repeated installations to update rather than duplicate the command reference.
 
-`bin/cli.sh` provides a unified CLI (`claude-helios install/verify/init/help`) for npm consumers, while `bin/helios-init.sh` provides direct scaffolding for non-Claude-Code usage.
+`bin/cli.sh` provides a unified CLI (`claude-turing install/verify/init/help`) for npm consumers, while `bin/turing-init.sh` provides direct scaffolding for non-Claude-Code usage.
 
 ## Consequences
 
 ### Positive
 
-- `npm install -g claude-helios` provides one-command global installation
-- `claude-helios verify` confirms installation completeness
+- `npm install -g claude-turing` provides one-command global installation
+- `claude-turing verify` confirms installation completeness
 - CLAUDE.md section is managed with idempotent markers — safe to re-run
 - Version management via npm (semver, `npm update`)
 - Both global (`~/.claude/`) and local (`./.claude/`) installation supported

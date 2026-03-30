@@ -20,4 +20,4 @@ Compare two ML experiment runs side-by-side to understand what changed and why o
    - **Causal analysis:** which changes likely caused the metric difference
    - **Verdict:** which approach is more promising for future experiments
 
-3. **If either ID is missing:** report the error and suggest `/helios:status` to see available experiment IDs.
+3. **If either ID is missing:** report the error and suggest `/turing:status` to see available experiment IDs.

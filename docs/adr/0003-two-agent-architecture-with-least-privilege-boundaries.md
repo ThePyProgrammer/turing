@@ -10,7 +10,7 @@
 
 ## Context
 
-Helios needs to perform two fundamentally different kinds of work:
+Turing needs to perform two fundamentally different kinds of work:
 
 1. **Research**: modify training code, run experiments, decide whether to keep or discard results. This requires Write, Edit, and Bash capabilities and is inherently risky — every modification could break the pipeline.
 
