@@ -1,5 +1,8 @@
 # Helios Plugin Defaults
-# These are fallback values used when project config.yaml is missing keys.
+#
+# Fallback values used when a scaffolded project's config.yaml is missing keys.
+# These represent conservative starting points — the autoresearch agent will
+# explore the parameter space from here.
 
 convergence:
   patience: 3                    # Consecutive non-improvements before stopping
@@ -24,7 +27,7 @@ data:
     test: 0.15
   random_state: 42
 
-# Template placeholders and their descriptions
+# Template placeholders — resolved during /helios:init scaffolding
 placeholders:
   PROJECT_NAME: "Name of the ML project (e.g., sentiment, churn)"
   TARGET_METRIC: "Primary metric to optimize (e.g., accuracy, f1, mae)"
@@ -32,3 +35,11 @@ placeholders:
   ML_DIR: "Directory for ML files relative to project root"
   DATA_SOURCE: "Path to training data file"
   METRIC_DIRECTION: "lower or higher — which direction is better"
+
+# Agent configuration
+agents:
+  researcher:
+    max_turns: 200
+    memory_path: ".claude/agent-memory/ml-researcher/MEMORY.md"
+  evaluator:
+    max_turns: 50
