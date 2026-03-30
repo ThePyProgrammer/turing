@@ -1,7 +1,7 @@
 {
   "name": "helios",
-  "version": "1.0.0",
-  "description": "Autonomous ML research harness for Claude Code. Iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, and safety guardrails. Inspired by karpathy/autoresearch.",
+  "version": "2.0.0",
+  "description": "Autonomous ML research harness — the autoresearch loop as a formal protocol. 6 commands, 2 specialized agents, structured experiment lifecycle with convergence detection, immutable evaluation infrastructure, and safety guardrails that separate the hypothesis space from the measurement apparatus. Inspired by Karpathy's autoresearch and the scientific method itself.",
   "author": {
     "name": "Prannaya Gupta"
   },
@@ -17,6 +17,16 @@
     "autonomous-training",
     "convergence-detection",
     "model-evaluation",
+    "scientific-method",
+    "experiment-lifecycle",
+    "hypothesis-testing",
+    "reproducibility",
+    "immutable-evaluation",
+    "feature-engineering",
+    "gradient-boosting",
+    "hyperparameter-sweep",
+    "model-selection",
+    "experiment-logging",
     "claude-code",
     "plugin",
     "ai-agents"
