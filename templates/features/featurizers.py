@@ -1,13 +1,14 @@
 """Feature engineering strategies for the {{PROJECT_NAME}} ML pipeline.
 
-Provides pluggable featurizers that the autoresearch agent can compose
-and configure in experiments. Each featurizer implements fit/transform
-following a scikit-learn-like interface.
+READ-ONLY — INFRASTRUCTURE.
 
-Customize these featurizers for your specific data and features.
-The autoresearch agent uses get_default_featurizer() to obtain
-the feature pipeline. It can modify train.py to use different
-combinations of featurizers.
+The autoresearch agent does not modify this file directly. Instead, it
+modifies how train.py *uses* the featurizers — composing them differently,
+selecting different column subsets, or adding preprocessing in train.py.
+
+Provides pluggable featurizers following a scikit-learn-like fit/transform
+interface. The CompositeFeaturizer chains multiple featurizers, concatenating
+their output columns.
 
 Exports:
   - BaseFeaturizer: Abstract base class.
