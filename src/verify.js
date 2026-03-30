@@ -5,63 +5,91 @@
  * Checks that all expected files are in place and reports status.
  *
  * Usage:
- *   node src/verify.js [--global]
+ *   node src/verify.js [--scope global|project]
  */
 
-import { existsSync } from "fs";
+import { access } from "fs/promises";
 import { join } from "path";
-
-const isGlobal = process.argv.includes("--global");
-const homeDir = process.env.HOME || process.env.USERPROFILE;
-const targetBase = isGlobal ? join(homeDir, ".claude") : ".claude";
+import { getTargetPaths } from "./paths.js";
 
 const EXPECTED_COMMANDS = [
-  "turing.md",
-  "init.md",
-  "train.md",
-  "status.md",
-  "compare.md",
-  "sweep.md",
+  "SKILL.md",
+  "init/SKILL.md",
+  "train/SKILL.md",
+  "status/SKILL.md",
+  "compare/SKILL.md",
+  "sweep/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
 
 const EXPECTED_CONFIG = ["defaults.yaml", "lifecycle.toml", "taxonomy.toml"];
 
-let passed = 0;
-let failed = 0;
-
-function check(label, path) {
-  const exists = existsSync(path);
-  const status = exists ? "\x1b[32m✓\x1b[0m" : "\x1b[31m✗\x1b[0m";
-  console.log(`  ${status} ${label}`);
-  if (exists) passed++;
-  else failed++;
+async function fileExists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-console.log("Turing Installation Verification");
-console.log(`Checking: ${targetBase}`);
-console.log("");
+export async function verify(opts = {}) {
+  const scopes = opts.scope ? [opts.scope] : ["global", "project"];
+  let found = false;
 
-console.log("Commands:");
-for (const cmd of EXPECTED_COMMANDS) {
-  check(cmd, join(targetBase, "commands", "turing", cmd));
+  for (const scope of scopes) {
+    const paths = getTargetPaths(scope);
+    const exists = await fileExists(join(paths.commands, "SKILL.md"));
+    if (!exists) continue;
+    found = true;
+
+    console.log(`\n✓ turing found (${scope}): ${paths.commands}\n`);
+
+    let missing = 0;
+
+    console.log("Commands:");
+    for (const cmd of EXPECTED_COMMANDS) {
+      const ok = await fileExists(join(paths.commands, cmd));
+      console.log(`  ${ok ? "✓" : "✗"} commands/${cmd}`);
+      if (!ok) missing++;
+    }
+
+    console.log("\nAgents:");
+    for (const agent of EXPECTED_AGENTS) {
+      const ok = await fileExists(join(paths.agents, agent));
+      console.log(`  ${ok ? "✓" : "✗"} agents/${agent}`);
+      if (!ok) missing++;
+    }
+
+    console.log("\nConfig:");
+    for (const cfg of EXPECTED_CONFIG) {
+      const ok = await fileExists(join(paths.config, cfg));
+      console.log(`  ${ok ? "✓" : "✗"} config/${cfg}`);
+      if (!ok) missing++;
+    }
+
+    // Check CLAUDE.md
+    const claudeOk = await fileExists(paths.claudeMd);
+    console.log(`\n  ${claudeOk ? "✓" : "✗"} CLAUDE.md`);
+
+    console.log(
+      `\n  ${missing === 0 ? "✓ Installation complete" : `✗ ${missing} files missing — run claude-turing install`}\n`,
+    );
+  }
+
+  if (!found) {
+    console.log("\n✗ turing not found. Run: claude-turing install\n");
+  }
 }
 
-console.log("\nAgents:");
-for (const agent of EXPECTED_AGENTS) {
-  check(agent, join(targetBase, "agents", "turing", agent));
-}
-
-console.log("\nConfig:");
-for (const cfg of EXPECTED_CONFIG) {
-  check(cfg, join(targetBase, "config", "turing", cfg));
-}
-
-console.log("");
-console.log(`${passed} passed, ${failed} failed`);
-
-if (failed > 0) {
-  console.log("\nRun 'node src/install.js' to fix missing files.");
-  process.exit(1);
+// Direct execution
+const isDirectRun =
+  process.argv[1] &&
+  import.meta.url.endsWith(process.argv[1].replace(/^.*\//, ""));
+if (isDirectRun) {
+  const scopeIdx = process.argv.indexOf("--scope");
+  verify({
+    scope: scopeIdx !== -1 ? process.argv[scopeIdx + 1] : undefined,
+  });
 }
