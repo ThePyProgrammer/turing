@@ -1,0 +1,24 @@
+# Blueprint State — Session Memory
+#
+# Tracks the current state of the ADR system for contextual suggestions.
+# Updated automatically by blueprint commands.
+
+[paths]
+adr_directory = "docs/adr"
+architecture_doc = "docs/ARCHITECTURE.md"
+project_root = "."
+
+[timestamps]
+last_adr_created = "2026-03-31"
+last_audit = ""
+last_evaluation = ""
+last_retro = ""
+
+[counts]
+total_adrs = 10
+accepted = 10
+proposed = 0
+rejected = 0
+deferred = 0
+deprecated = 0
+superseded = 0

@@ -1,0 +1,58 @@
+# ADR Relationship Graph
+#
+# Encodes dependencies and relationships between ADRs.
+# Used by /blueprint:impact for incremental conflict detection.
+
+[nodes]
+"ADR-0001" = { title = "Use ADRs for architectural decisions", status = "Accepted" }
+"ADR-0002" = { title = "Separate hypothesis space from measurement apparatus", status = "Accepted" }
+"ADR-0003" = { title = "Two-agent architecture with least-privilege boundaries", status = "Accepted" }
+"ADR-0004" = { title = "TOML config DSL for domain knowledge", status = "Accepted" }
+"ADR-0005" = { title = "Git-disciplined experiment lifecycle", status = "Accepted" }
+"ADR-0006" = { title = "Patience-based convergence detection", status = "Accepted" }
+"ADR-0007" = { title = "JSONL append-only experiment logging", status = "Accepted" }
+"ADR-0008" = { title = "Template-based project scaffolding", status = "Accepted" }
+"ADR-0009" = { title = "XGBoost default with pluggable featurizers", status = "Accepted" }
+"ADR-0010" = { title = "Claude Code plugin distribution", status = "Accepted" }
+
+[[edges]]
+from = "ADR-0003"
+to = "ADR-0002"
+type = "implements"
+description = "Agent capability boundary is the agent-level implementation of hypothesis-measurement separation"
+
+[[edges]]
+from = "ADR-0006"
+to = "ADR-0007"
+type = "depends-on"
+description = "Convergence detection reads the JSONL experiment log to count non-improvements"
+
+[[edges]]
+from = "ADR-0005"
+to = "ADR-0002"
+type = "supports"
+description = "Git discipline (commit before, revert on failure) preserves the measurement-hypothesis boundary across experiments"
+
+[[edges]]
+from = "ADR-0008"
+to = "ADR-0002"
+type = "implements"
+description = "Template headers label files as MEASUREMENT APPARATUS or HYPOTHESIS SPACE"
+
+[[edges]]
+from = "ADR-0008"
+to = "ADR-0009"
+type = "depends-on"
+description = "Templates include the default XGBoost training pipeline"
+
+[[edges]]
+from = "ADR-0010"
+to = "ADR-0008"
+type = "depends-on"
+description = "npm installer deploys the templates directory"
+
+[[edges]]
+from = "ADR-0009"
+to = "ADR-0002"
+type = "supports"
+description = "Featurizer pipeline is READ-ONLY, agent modifies how train.py uses it"
