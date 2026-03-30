@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Hyperparameter sweep tool for the autoresearch pipeline.
 
-Generates cartesian product of sweep parameters and writes an experiment queue.
-The agent processes the queue sequentially, one experiment per iteration.
+Systematic exploration of the hyperparameter space via cartesian product.
+Generates all combinations of configured parameter ranges and writes a
+persistent queue that the agent processes sequentially.
+
+This is grid search, not random search or Bayesian optimization — deliberate
+simplicity for reproducibility and interpretability. Every point in the grid
+is evaluated, making the results a complete map of the explored region.
 
 Usage:
     python scripts/sweep.py [sweep_config.yaml]
