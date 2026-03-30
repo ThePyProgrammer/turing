@@ -67,7 +67,13 @@ Ask the user for the following (or accept from `$ARGUMENTS` if provided as JSON)
    mkdir -p {{ML_DIR}}/{data/splits,experiments,models/best,models/archive}
    ```
 
-9. **Report** what was created:
+9. **Verify all placeholders were replaced:**
+   ```bash
+   cd {{ML_DIR}} && python3 scripts/verify_placeholders.py .
+   ```
+   If any unreplaced `{{PLACEHOLDER}}` markers remain, the script will list them. Fix before proceeding — unreplaced placeholders produce code that runs but silently does the wrong thing.
+
+10. **Report** what was created:
    - The separation: READ-ONLY (`prepare.py`, `evaluate.py`) vs AGENT-EDITABLE (`train.py`)
    - Next steps: add data, run `python prepare.py`, then `/turing:train`
    - The safety model: why immutable evaluation matters
