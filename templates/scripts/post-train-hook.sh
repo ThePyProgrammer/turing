@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 # Post-training hook for the autoresearch pipeline.
-# Called after train.py runs (via Claude Code PostToolUse hook).
-# Parses metrics from run.log and appends to experiments/log.jsonl.
+#
+# Fired by Claude Code PostToolUse hook after train.py executes.
+# Parses metrics from run.log (between --- delimiters) and appends
+# a structured entry to experiments/log.jsonl.
+#
+# This hook ensures that every training run is logged, even if the
+# agent forgets to call log_experiment.py explicitly. Belt and suspenders.
 
 set -euo pipefail
 

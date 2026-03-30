@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
-# Stop hook for the autoresearch pipeline.
-# Called by Claude Code Stop hook to detect convergence.
+# Convergence detection hook for the autoresearch pipeline.
+#
+# Fired by Claude Code Stop hook after each training iteration.
 # Reads experiments/log.jsonl and checks if the last N experiments
-# show insufficient improvement over the best prior result.
+# (where N = convergence.patience from config.yaml) show insufficient
+# improvement over the best prior result.
+#
+# This implements a discrete analogue of early stopping from gradient
+# descent, adapted for the experiment loop context.
 #
 # Exit codes:
 #   0 = not converged, agent should continue
-#   2 = converged, agent should stop
+#   2 = converged, agent should stop (signals /loop to halt)
 
 set -euo pipefail
 
