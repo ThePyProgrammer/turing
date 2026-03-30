@@ -1,8 +1,11 @@
 """Data preparation module for the {{PROJECT_NAME}} ML pipeline.
 
-READ-ONLY: This file is part of the fixed infrastructure. The autoresearch
-agent MUST NOT modify this file. Changes to data loading, splitting, or
-configuration loading belong here and are managed by the development team.
+READ-ONLY — MEASUREMENT APPARATUS.
+
+This file is part of the immutable evaluation infrastructure. The autoresearch
+agent MUST NOT modify this file under any circumstances. Consistent data
+preparation across experiments ensures that observed metric changes reflect
+genuine model improvements, not data handling artifacts.
 
 Provides:
   - load_config: Load YAML experiment configuration.
