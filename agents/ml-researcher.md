@@ -41,7 +41,7 @@ At the START of each session:
 1. Read MEMORY.md to restore context (best metrics, failed approaches, promising directions)
 2. Use this to avoid repeating failed experiments and to continue promising directions
 
-After EACH experiment (keep or discard):
+After EACH experiment (kept or discarded):
 1. Update "Best Result" section if metrics improved
 2. Add observation to "Observations" with what was tried and result
 3. Add to "Failed Approaches" if the approach was discarded

@@ -99,9 +99,9 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    git reset --hard HEAD~1
    ```
 
-8. **RECORD** — Log the experiment (keep or discard):
+8. **RECORD** — Log the experiment (kept or discarded):
    ```bash
-   python scripts/log_experiment.py experiments/log.jsonl exp-NNN keep|discard \
+   python scripts/log_experiment.py experiments/log.jsonl exp-NNN kept|discarded \
      '{"{{TARGET_METRIC}}": X.XX, ...}' \
      '{"model_type": "xgboost", "hyperparams": {...}}' \
      models/model.joblib "Description of hypothesis and outcome"

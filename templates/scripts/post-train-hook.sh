@@ -85,7 +85,7 @@ print(get_next_experiment_id('$EXPERIMENT_LOG'))
 python scripts/log_experiment.py \
     "$EXPERIMENT_LOG" \
     "$NEXT_ID" \
-    "keep" \
+    "kept" \
     "$METRICS_JSON" \
     "$CONFIG_JSON" \
     "models/model.joblib" \

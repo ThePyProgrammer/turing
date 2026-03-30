@@ -88,7 +88,7 @@ def log_experiment(
     metrics: dict,
     model_path: str,
     description: str,
-    status: str = "keep",
+    status: str = "kept",
     git_commit: str | None = None,
 ) -> None:
     """Append one experiment entry to the JSONL log.
@@ -100,7 +100,7 @@ def log_experiment(
         metrics: Dict with metric values.
         model_path: Path to saved model artifact.
         description: Human-readable experiment description.
-        status: "keep" or "discard".
+        status: "kept" or "discarded".
         git_commit: Optional git commit hash.
     """
     path = Path(log_path)
@@ -153,7 +153,7 @@ def get_best_experiment(log_path: str, primary_metric: str = "accuracy", lower_i
             except json.JSONDecodeError:
                 continue
 
-            if entry.get("status") != "keep":
+            if entry.get("status") != "kept":
                 continue
 
             value = entry.get("metrics", {}).get(primary_metric)

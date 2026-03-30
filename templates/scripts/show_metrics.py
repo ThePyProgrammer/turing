@@ -50,7 +50,7 @@ def find_best(experiments: list[dict], primary_metric: str, lower_is_better: boo
     best_value = float("inf") if lower_is_better else float("-inf")
 
     for exp in experiments:
-        if exp.get("status") != "keep":
+        if exp.get("status") != "kept":
             continue
         value = exp.get("metrics", {}).get(primary_metric)
         if value is None:
