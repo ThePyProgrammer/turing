@@ -1,6 +1,6 @@
 ---
 name: sweep
-description: Generate and run a hyperparameter sweep across configured parameter ranges.
+description: Generate and run a systematic hyperparameter sweep. Computes the cartesian product of configured parameter ranges and processes the queue sequentially with full experiment logging.
 disable-model-invocation: true
 argument-hint: "[sweep_config.yaml]"
 ---
@@ -9,27 +9,27 @@ Run a systematic hyperparameter sweep using the sweep configuration.
 
 ## Steps
 
-1. Check for sweep config:
+1. **Activate environment:**
    ```bash
    source .venv/bin/activate
    ```
 
-2. If `$ARGUMENTS` is provided, use it as the sweep config path. Otherwise default to `sweep_config.yaml`.
+2. **Resolve config:** Use `$ARGUMENTS` as sweep config path, or default to `sweep_config.yaml`.
 
-3. Generate the sweep queue (if not already generated):
+3. **Generate queue** (if not already generated):
    ```bash
    python scripts/sweep.py [sweep_config.yaml]
    ```
 
-4. Check queue status:
+4. **Check queue status:**
    ```bash
    python scripts/sweep.py --status
    ```
 
-5. Process the queue sequentially:
-   - Get next pending experiment: `python scripts/sweep.py --next`
+5. **Process queue sequentially:**
+   - Get next: `python scripts/sweep.py --next`
    - Apply config overrides to `config.yaml`
-   - Create an experiment branch: `git checkout -b exp/NNN-description`
+   - Create experiment branch: `git checkout -b exp/NNN-description`
    - Run training: `python train.py > run.log 2>&1`
    - Parse metrics: `grep -A 10 "^---" run.log | head -10`
    - Log the experiment
@@ -37,8 +37,8 @@ Run a systematic hyperparameter sweep using the sweep configuration.
    - If improved, merge to main. If not, return to main.
    - Repeat until queue is empty
 
-6. Report final results with best configuration found.
+6. **Report** final results with best configuration found.
 
 ## Rules
 
-Follow the same safety rules as `/helios:train` -- see `rules/loop-protocol.md`.
+Follow the same safety constraints as `/helios:train` — see `rules/loop-protocol.md`.
