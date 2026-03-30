@@ -80,10 +80,10 @@ Sequential numbering, zero-padded to 4 digits. The number never changes, even if
 | [0008](0008-template-based-project-scaffolding.md) | Template-based project scaffolding with placeholder substitution | Accepted | Architecture Pattern | 2026-03-31 |
 | [0009](0009-xgboost-default-with-pluggable-featurizers.md) | XGBoost as default model with pluggable featurizer pipeline | Accepted | Technology Choice | 2026-03-31 |
 | [0010](0010-claude-code-plugin-distribution.md) | Claude Code plugin distribution with npm installer | Accepted | Deployment Strategy | 2026-03-31 |
-| [0011](0011-establish-testing-strategy.md) | Establish testing strategy for plugin infrastructure | Proposed | Process | 2026-03-31 |
-| [0012](0012-extract-convergence-detection-to-python.md) | Extract convergence detection from shell to testable Python | Proposed | Architecture Pattern | 2026-03-31 |
-| [0013](0013-standardize-experiment-status-vocabulary.md) | Standardize experiment status vocabulary to match lifecycle.toml | Proposed | Architecture Pattern | 2026-03-31 |
-| [0014](0014-enforce-placeholder-verification.md) | Enforce placeholder substitution verification after scaffolding | Proposed | Architecture Pattern | 2026-03-31 |
+| [0011](0011-establish-testing-strategy.md) | Establish testing strategy for plugin infrastructure | Accepted | Process | 2026-03-31 |
+| [0012](0012-extract-convergence-detection-to-python.md) | Extract convergence detection from shell to testable Python | Accepted | Architecture Pattern | 2026-03-31 |
+| [0013](0013-standardize-experiment-status-vocabulary.md) | Standardize experiment status vocabulary to match lifecycle.toml | Accepted | Architecture Pattern | 2026-03-31 |
+| [0014](0014-enforce-placeholder-verification.md) | Enforce placeholder substitution verification after scaffolding | Accepted | Architecture Pattern | 2026-03-31 |
 | [0015](0015-document-metric-output-contract.md) | Extract metric output format into documented contract | Proposed | Architecture Pattern | 2026-03-31 |
 | [0016](0016-unify-scaffolding-implementation.md) | Unify scaffolding into a single implementation | Proposed | Architecture Pattern | 2026-03-31 |
 

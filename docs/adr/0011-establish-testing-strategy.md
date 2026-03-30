@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| **Status** | Proposed |
+| **Status** | Accepted |
 | **Date** | 2026-03-31 |
 | **Author** | Prannaya Gupta |
 | **Supersedes** | (none) |
