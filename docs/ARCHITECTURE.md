@@ -109,17 +109,20 @@ turing/
 │       ├── __init__.py
 │       └── conftest.py        Deterministic test fixtures with sample data.
 │
-├── src/                       ← INSTALLER LAYER (3 files)
+├── src/                       ← INSTALLER LAYER (5 files)
 │   │                            npm deployment machinery. See ADR-0010.
 │   │
+│   ├── paths.js               Path resolution for global/project scopes.
+│   │                          Single source of truth — used by install and verify.
+│   ├── claude-md.js           CLAUDE.md managed section with idempotent markers.
 │   ├── install.js             Deploys commands/agents/config to ~/.claude/.
-│   │                          Manages CLAUDE.md section with idempotent markers.
+│   │                          Uses SKILL.md nested directory pattern.
 │   ├── verify.js              Checks all expected files are in place.
 │   └── postinstall.js         npm postinstall — shows setup instructions.
 │
 ├── bin/                       ← CLI LAYER (2 files)
-│   ├── cli.sh                 Unified CLI: install | verify | init | help.
-│   │                          Entry point for `npx claude-turing`.
+│   ├── cli.js                 Unified CLI: install | verify | init | help.
+│   │                          Entry point for `npx claude-turing`. Uses commander.
 │   └── turing-init.sh         Direct scaffolding for non-Claude-Code usage.
 │
 ├── docs/                      ← DOCUMENTATION LAYER

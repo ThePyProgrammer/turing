@@ -398,12 +398,14 @@ turing/
 │   ├── features/          Feature engineering templates
 │   ├── scripts/           Utility scripts (logging, metrics, sweeps)
 │   └── tests/             Test fixture templates
-├── src/                   Installation machinery
+├── src/                   Installation machinery (5 files)
+│   ├── paths.js           Path resolution for global/project scopes
+│   ├── claude-md.js       CLAUDE.md managed section (idempotent markers)
 │   ├── install.js         Deploy to ~/.claude/
 │   ├── verify.js          Check installation completeness
 │   └── postinstall.js     npm postinstall hook
 ├── bin/                   CLI entry points
-│   ├── cli.sh             Unified CLI (install/verify/init)
+│   ├── cli.js             Unified CLI (install/verify/init). Uses commander.
 │   └── turing-init.sh     Direct project scaffolding
 └── .claude-plugin/        Plugin registration
     └── plugin.json        Plugin metadata
