@@ -1,0 +1,34 @@
+# Helios Plugin Defaults
+# These are fallback values used when project config.yaml is missing keys.
+
+convergence:
+  patience: 3                    # Consecutive non-improvements before stopping
+  improvement_threshold: 0.005   # 0.5% relative improvement required
+
+evaluation:
+  primary_metric: "accuracy"
+  metrics: ["accuracy", "f1_weighted"]
+  lower_is_better: false
+
+model:
+  type: "xgboost"
+  hyperparams:
+    n_estimators: 100
+    max_depth: 4
+    learning_rate: 0.1
+
+data:
+  split_ratios:
+    train: 0.70
+    val: 0.15
+    test: 0.15
+  random_state: 42
+
+# Template placeholders and their descriptions
+placeholders:
+  PROJECT_NAME: "Name of the ML project (e.g., sentiment, churn)"
+  TARGET_METRIC: "Primary metric to optimize (e.g., accuracy, f1, mae)"
+  TASK_DESCRIPTION: "What the model does (e.g., Predict customer churn)"
+  ML_DIR: "Directory for ML files relative to project root"
+  DATA_SOURCE: "Path to training data file"
+  METRIC_DIRECTION: "lower or higher — which direction is better"
