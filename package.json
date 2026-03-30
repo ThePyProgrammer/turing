@@ -1,13 +1,22 @@
 {
   "name": "claude-helios",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Autonomous ML research harness for Claude Code. Iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, and safety guardrails.",
+  "description": "Autonomous ML research harness for Claude Code. The autoresearch loop as a formal protocol — iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, immutable evaluation infrastructure, and safety guardrails.",
   "bin": {
-    "helios": "./bin/helios-init.sh"
+    "helios": "./bin/helios-init.sh",
+    "helios-init": "./bin/helios-init.sh",
+    "claude-helios": "./bin/cli.sh"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "install-global": "node src/install.js --global",
+    "verify": "node src/verify.js",
+    "postinstall": "node src/postinstall.js"
   },
   "files": [
     "bin/",
+    "src/",
     ".claude-plugin/",
     "commands/",
     "agents/",
@@ -15,9 +24,32 @@
     "config/"
   ],
   "keywords": [
-    "ml", "machine-learning", "autoresearch", "experiment-tracking",
-    "hyperparameter-tuning", "autonomous-training", "convergence-detection",
-    "model-evaluation", "claude-code", "plugin", "ai-agents"
+    "ml",
+    "machine-learning",
+    "autoresearch",
+    "experiment-tracking",
+    "hyperparameter-tuning",
+    "autonomous-training",
+    "convergence-detection",
+    "model-evaluation",
+    "scientific-method",
+    "claude-code",
+    "plugin",
+    "ai-agents"
   ],
-  "license": "MIT"
+  "author": {
+    "name": "Prannaya Gupta"
+  },
+  "homepage": "https://github.com/ThePyProgrammer/helios",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThePyProgrammer/helios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ThePyProgrammer/helios/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
