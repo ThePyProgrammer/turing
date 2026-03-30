@@ -56,3 +56,70 @@ from = "ADR-0009"
 to = "ADR-0002"
 type = "supports"
 description = "Featurizer pipeline is READ-ONLY, agent modifies how train.py uses it"
+
+# Proposed ADRs from architecture evaluation (2026-03-31)
+[nodes."ADR-0011"]
+title = "Establish testing strategy for plugin infrastructure"
+status = "Proposed"
+
+[nodes."ADR-0012"]
+title = "Extract convergence detection from shell to testable Python"
+status = "Proposed"
+
+[nodes."ADR-0013"]
+title = "Standardize experiment status vocabulary"
+status = "Proposed"
+
+[nodes."ADR-0014"]
+title = "Enforce placeholder substitution verification"
+status = "Proposed"
+
+[nodes."ADR-0015"]
+title = "Extract metric output format into documented contract"
+status = "Proposed"
+
+[nodes."ADR-0016"]
+title = "Unify scaffolding into a single implementation"
+status = "Proposed"
+
+[[edges]]
+from = "ADR-0011"
+to = "ADR-0002"
+type = "enforces"
+description = "Testing strategy must verify hypothesis-measurement separation invariant"
+
+[[edges]]
+from = "ADR-0011"
+to = "ADR-0006"
+type = "enforces"
+description = "Testing strategy must verify convergence detection"
+
+[[edges]]
+from = "ADR-0012"
+to = "ADR-0006"
+type = "refines"
+description = "Extracts convergence logic from bash to testable Python module"
+
+[[edges]]
+from = "ADR-0013"
+to = "ADR-0004"
+type = "enforces"
+description = "Standardizes runtime code to use lifecycle.toml vocabulary"
+
+[[edges]]
+from = "ADR-0014"
+to = "ADR-0008"
+type = "refines"
+description = "Adds verification step to template scaffolding system"
+
+[[edges]]
+from = "ADR-0016"
+to = "ADR-0008"
+type = "refines"
+description = "Merges dual scaffolding paths into single implementation"
+
+[[edges]]
+from = "ADR-0016"
+to = "ADR-0014"
+type = "depends-on"
+description = "Unified scaffolding would integrate placeholder verification"

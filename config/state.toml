@@ -11,13 +11,13 @@ project_root = "."
 [timestamps]
 last_adr_created = "2026-03-31"
 last_audit = ""
-last_evaluation = ""
+last_evaluation = "2026-03-31"
 last_retro = ""
 
 [counts]
-total_adrs = 10
+total_adrs = 16
 accepted = 10
-proposed = 0
+proposed = 6
 rejected = 0
 deferred = 0
 deprecated = 0
