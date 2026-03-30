@@ -6,109 +6,94 @@
  * Optionally inserts a managed section into the project's CLAUDE.md.
  *
  * Usage:
- *   node src/install.js [--global]
- *
- * --global: Install to ~/.claude/ (user-wide) instead of ./.claude/ (project-local)
+ *   node src/install.js [--global] [--project]
  */
 
-import { existsSync, mkdirSync, cpSync, readFileSync, writeFileSync } from "fs";
+import { readdir, copyFile, mkdir } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { getTargetPaths } from "./paths.js";
+import { updateClaudeMd } from "./claude-md.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, "..");
 
-const isGlobal = process.argv.includes("--global");
-const homeDir = process.env.HOME || process.env.USERPROFILE;
-const targetBase = isGlobal ? join(homeDir, ".claude") : ".claude";
+// Single source of truth for sub-commands (DRY — used for dirs and file copy)
+const SUB_COMMANDS = ["init", "train", "status", "compare", "sweep"];
 
-const MANAGED_HEADER = "<!-- turing:managed-start -->";
-const MANAGED_FOOTER = "<!-- turing:managed-end -->";
+export async function install(opts = {}) {
+  const scope = opts.global ? "global" : opts.project ? "project" : "global";
+  const paths = getTargetPaths(scope);
 
-function copyDir(src, dest) {
-  if (!existsSync(src)) return;
-  mkdirSync(dest, { recursive: true });
-  cpSync(src, dest, { recursive: true });
-}
-
-function generateClaudeMdSection() {
-  return `${MANAGED_HEADER}
-## Turing ML Research Harness
-
-| Command | Purpose |
-|---------|---------|
-| \`/turing\` | Router — detects ML intent and routes to sub-commands |
-| \`/turing:init\` | Scaffold a new ML project with autoresearch harness |
-| \`/turing:train [N]\` | Run autonomous experiment loop (optional max iterations) |
-| \`/turing:status\` | Show experiment status, best model, convergence state |
-| \`/turing:compare <a> <b>\` | Side-by-side experiment comparison |
-| \`/turing:sweep\` | Generate and run hyperparameter sweep |
-
-| Agent | Purpose |
-|-------|---------|
-| \`@ml-researcher\` | Autonomous training agent (Read/Write/Edit/Bash) |
-| \`@ml-evaluator\` | Read-only analysis agent (Read/Bash only) |
-${MANAGED_FOOTER}`;
-}
-
-function updateClaudeMd(claudeMdPath) {
-  const section = generateClaudeMdSection();
-
-  if (!existsSync(claudeMdPath)) {
-    writeFileSync(claudeMdPath, section + "\n");
-    console.log(`  Created ${claudeMdPath}`);
-    return;
-  }
-
-  let content = readFileSync(claudeMdPath, "utf-8");
-  const startIdx = content.indexOf(MANAGED_HEADER);
-  const endIdx = content.indexOf(MANAGED_FOOTER);
-
-  if (startIdx !== -1 && endIdx !== -1) {
-    content =
-      content.slice(0, startIdx) +
-      section +
-      content.slice(endIdx + MANAGED_FOOTER.length);
-  } else {
-    content = content.trimEnd() + "\n\n" + section + "\n";
-  }
-
-  writeFileSync(claudeMdPath, content);
-  console.log(`  Updated ${claudeMdPath}`);
-}
-
-function install() {
   console.log("Turing ML Research Harness — Installer");
-  console.log(`Target: ${targetBase} (${isGlobal ? "global" : "local"})`);
+  console.log(`Target: ${paths.commands} (${scope})`);
   console.log("");
 
-  // Copy commands
-  const commandsSrc = join(PLUGIN_ROOT, "commands");
-  const commandsDest = join(targetBase, "commands", "turing");
-  copyDir(commandsSrc, commandsDest);
-  console.log(`  Commands -> ${commandsDest}`);
+  // Create directories for each sub-command + agents + config
+  for (const subDir of ["", "agents", "config", "rules", ...SUB_COMMANDS]) {
+    await mkdir(join(paths.commands, subDir), { recursive: true });
+  }
+
+  // Copy root command (router) as SKILL.md
+  await copyFile(
+    join(PLUGIN_ROOT, "commands", "turing.md"),
+    join(paths.commands, "SKILL.md"),
+  );
+  console.log("  Router -> SKILL.md");
+
+  // Copy sub-commands as <name>/SKILL.md
+  for (const cmd of SUB_COMMANDS) {
+    await copyFile(
+      join(PLUGIN_ROOT, "commands", `${cmd}.md`),
+      join(paths.commands, cmd, "SKILL.md"),
+    );
+  }
+  console.log(`  ${SUB_COMMANDS.length} commands installed`);
+
+  // Copy rules
+  await copyFile(
+    join(PLUGIN_ROOT, "commands", "rules", "loop-protocol.md"),
+    join(paths.commands, "rules", "loop-protocol.md"),
+  );
+  console.log("  Rules installed");
 
   // Copy agents
-  const agentsSrc = join(PLUGIN_ROOT, "agents");
-  const agentsDest = join(targetBase, "agents", "turing");
-  copyDir(agentsSrc, agentsDest);
-  console.log(`  Agents   -> ${agentsDest}`);
+  const agentFiles = await readdir(join(PLUGIN_ROOT, "agents"));
+  for (const file of agentFiles) {
+    await copyFile(
+      join(PLUGIN_ROOT, "agents", file),
+      join(paths.agents, file),
+    );
+  }
+  console.log(`  ${agentFiles.length} agents installed`);
 
-  // Copy config
-  const configSrc = join(PLUGIN_ROOT, "config");
-  const configDest = join(targetBase, "config", "turing");
-  copyDir(configSrc, configDest);
-  console.log(`  Config   -> ${configDest}`);
+  // Copy config (static schema files only)
+  const CONFIG_FILES = ["defaults.yaml", "lifecycle.toml", "taxonomy.toml"];
+  for (const file of CONFIG_FILES) {
+    await copyFile(
+      join(PLUGIN_ROOT, "config", file),
+      join(paths.config, file),
+    );
+  }
+  console.log(`  ${CONFIG_FILES.length} config files installed`);
 
   // Update CLAUDE.md
-  const claudeMdPath = isGlobal
-    ? join(homeDir, ".claude", "CLAUDE.md")
-    : "CLAUDE.md";
-  updateClaudeMd(claudeMdPath);
+  await updateClaudeMd(paths.claudeMd);
+  console.log("  CLAUDE.md updated");
 
   console.log("");
-  console.log("Installation complete. Run /turing:init to scaffold an ML project.");
+  console.log(
+    `Installation complete. Run /turing:init to scaffold an ML project.`,
+  );
 }
 
-install();
+// Direct execution
+const isDirectRun =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url).endsWith(process.argv[1].replace(/^.*\//, ""));
+if (isDirectRun) {
+  install({
+    global: process.argv.includes("--global"),
+    project: process.argv.includes("--project"),
+  });
+}
