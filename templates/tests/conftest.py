@@ -1,7 +1,8 @@
 """Shared test fixtures for the {{PROJECT_NAME}} ML pipeline tests.
 
-Customize these fixtures with sample data matching your ML task.
-The autoresearch agent uses these fixtures when running tests.
+These fixtures provide deterministic sample data for testing the
+pipeline components. Customize with records matching your actual
+data schema — the autoresearch agent uses these when running tests.
 """
 
 from __future__ import annotations
