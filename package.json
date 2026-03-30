@@ -1,0 +1,23 @@
+{
+  "name": "claude-helios",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Autonomous ML research harness for Claude Code. Iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, and safety guardrails.",
+  "bin": {
+    "helios": "./bin/helios-init.sh"
+  },
+  "files": [
+    "bin/",
+    ".claude-plugin/",
+    "commands/",
+    "agents/",
+    "templates/",
+    "config/"
+  ],
+  "keywords": [
+    "ml", "machine-learning", "autoresearch", "experiment-tracking",
+    "hyperparameter-tuning", "autonomous-training", "convergence-detection",
+    "model-evaluation", "claude-code", "plugin", "ai-agents"
+  ],
+  "license": "MIT"
+}

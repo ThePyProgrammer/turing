@@ -1,0 +1,24 @@
+{
+  "name": "helios",
+  "version": "1.0.0",
+  "description": "Autonomous ML research harness for Claude Code. Iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, and safety guardrails. Inspired by karpathy/autoresearch.",
+  "author": {
+    "name": "Prannaya Gupta"
+  },
+  "homepage": "https://github.com/ThePyProgrammer/helios",
+  "repository": "https://github.com/ThePyProgrammer/helios",
+  "license": "MIT",
+  "keywords": [
+    "ml",
+    "machine-learning",
+    "autoresearch",
+    "experiment-tracking",
+    "hyperparameter-tuning",
+    "autonomous-training",
+    "convergence-detection",
+    "model-evaluation",
+    "claude-code",
+    "plugin",
+    "ai-agents"
+  ]
+}
