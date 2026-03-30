@@ -1,7 +1,8 @@
 """Display experiment metrics from experiments/log.jsonl.
 
-Reads the JSONL log and prints a table of experiments,
-highlighting the current best by primary metric.
+Reads the JSONL experiment log and prints a formatted table,
+highlighting the current best by primary metric. This is the
+agent's primary observation tool at the start of each loop iteration.
 """
 
 from __future__ import annotations

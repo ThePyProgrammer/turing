@@ -1,10 +1,12 @@
 """Experiment logging utility for the autoresearch pipeline.
 
-Appends structured JSONL entries to experiments/log.jsonl.
-Each entry records: experiment_id, timestamp, git_commit, status, config, metrics,
+The ground truth record of all experiments — kept and discarded alike.
+Appends structured JSONL entries to experiments/log.jsonl with full
+metadata: experiment_id, timestamp, git_commit, status, config, metrics,
 model_path, and description.
 
 Also maintains a TSV summary at experiments/results.tsv for quick reference.
+Every experiment is logged. No information is lost.
 """
 
 from __future__ import annotations

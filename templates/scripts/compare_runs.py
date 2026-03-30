@@ -1,5 +1,9 @@
 """Side-by-side comparison of two experiments.
 
+Shows configuration deltas and metric differences between two experiments,
+enabling the agent (or human) to understand which changes caused which
+metric movements.
+
 Usage: python scripts/compare_runs.py exp-001 exp-002 [--log path/to/log.jsonl]
 """
 
