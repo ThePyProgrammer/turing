@@ -1,0 +1,37 @@
+# Experiment Classification Taxonomy
+#
+# Structured vocabulary for categorizing experiments, failure modes,
+# and model architectures. Agents use these categories consistently
+# across sessions — classification by data, not by English judgment.
+
+[experiment_types]
+hyperparameter = "Change model hyperparameters (lr, depth, n_estimators, etc.)"
+architecture   = "Change model type or structure (XGBoost -> LightGBM, add layers)"
+feature        = "Change feature engineering (add/remove/transform features)"
+data           = "Change data handling (augmentation, sampling, preprocessing)"
+ensemble       = "Combine multiple models"
+regularization = "Change regularization strategy (dropout, weight decay, early stopping)"
+
+[failure_modes]
+overfitting      = "Val metrics significantly worse than train metrics"
+underfitting     = "Both train and val metrics poor"
+convergence      = "Metrics plateaued — no improvement for N iterations"
+instability      = "Metrics oscillate across runs with same config"
+data_leakage     = "Suspiciously high metrics suggesting information leak"
+resource_limit   = "OOM, timeout, or disk space exhaustion"
+numerical        = "NaN/Inf in gradients, loss, or predictions"
+implementation   = "Bug in train.py causing incorrect training"
+
+[model_families]
+gradient_boosting = ["xgboost", "lightgbm", "catboost", "sklearn_gbdt"]
+random_forest     = ["sklearn_rf", "extra_trees"]
+linear            = ["logistic_regression", "ridge", "lasso", "elastic_net"]
+neural_network    = ["mlp", "cnn", "rnn", "transformer"]
+ensemble          = ["voting", "stacking", "blending"]
+baseline          = ["dummy", "majority_class", "mean_prediction"]
+
+[severity_levels]
+critical = "Experiment cannot run at all"
+major    = "Experiment runs but produces invalid/unreliable results"
+minor    = "Experiment runs correctly but with suboptimal configuration"
+info     = "Observation for future reference, no action required"

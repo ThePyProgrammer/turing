@@ -1,0 +1,31 @@
+# Experiment Lifecycle State Machine
+#
+# Each experiment transitions through these states. The autoresearch
+# agent validates transitions against this data — not English prose.
+#
+# This is a formal encoding of the scientific method applied to ML:
+# hypothesize -> execute -> observe -> decide -> record.
+
+[states]
+proposed   = { description = "Hypothesis formed, changes committed, not yet run" }
+running    = { description = "Training in progress" }
+evaluating = { description = "Training complete, metrics being computed" }
+kept       = { description = "Improvement confirmed, merged to main" }
+discarded  = { description = "No improvement, reverted" }
+converged  = { description = "Training loop terminated — convergence detected" }
+
+[transitions]
+# from -> [valid next states]
+proposed   = ["running"]
+running    = ["evaluating", "discarded"]     # discarded if training crashes
+evaluating = ["kept", "discarded"]
+kept       = ["proposed"]                     # next iteration starts new hypothesis
+discarded  = ["proposed"]                     # next iteration starts new hypothesis
+
+[requirements]
+# Preconditions for each transition
+"proposed -> running"    = "Changes committed to git, venv activated"
+"running -> evaluating"  = "train.py completed without error, run.log exists"
+"evaluating -> kept"     = "Primary metric improved over prior best"
+"evaluating -> discarded" = "Primary metric did not improve"
+"running -> discarded"   = "Training crashed or timed out"
