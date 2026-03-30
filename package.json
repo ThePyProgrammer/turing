@@ -4,14 +4,10 @@
   "type": "module",
   "description": "Autonomous ML research harness for Claude Code. The autoresearch loop as a formal protocol — iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, immutable evaluation infrastructure, and safety guardrails.",
   "bin": {
-    "turing": "./bin/turing-init.sh",
-    "turing-init": "./bin/turing-init.sh",
-    "claude-turing": "./bin/cli.sh"
+    "turing": "./bin/cli.js",
+    "claude-turing": "./bin/cli.js"
   },
-  "main": "src/index.js",
   "scripts": {
-    "install-global": "node src/install.js --global",
-    "verify": "node src/verify.js",
     "postinstall": "node src/postinstall.js"
   },
   "files": [
@@ -51,5 +47,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "commander": "^13.0.0"
   }
 }
