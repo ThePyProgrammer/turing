@@ -1,17 +1,17 @@
 # ARCHITECTURE.md
 
-*A bird's-eye view of the Helios codebase, following [matklad's philosophy](https://matklad.github.io/2021/02/06/ARCHITECTURE.md.html): if you maintain this document, you save every future contributor 30 minutes of spelunking.*
+*A bird's-eye view of the Turing codebase, following [matklad's philosophy](https://matklad.github.io/2021/02/06/ARCHITECTURE.md.html): if you maintain this document, you save every future contributor 30 minutes of spelunking.*
 
 This document describes the high-level architecture. For **why** things are the way they are, see the [ADRs](adr/README.md). This document describes **what** and **where**.
 
 ## One-Paragraph Summary
 
-Helios is a Claude Code plugin that scaffolds ML experiment infrastructure into user projects, then provides AI agents that autonomously iterate through an experiment loop. The system enforces a strict separation between the **hypothesis space** (agent-modifiable training code) and the **measurement apparatus** (immutable evaluation code) — this is the load-bearing invariant documented in [ADR-0002](adr/0002-separate-hypothesis-space-from-measurement-apparatus.md). Two agents with distinct capability boundaries ([ADR-0003](adr/0003-two-agent-architecture-with-least-privilege-boundaries.md)) execute the loop and analyze results. Domain knowledge is encoded in TOML config files ([ADR-0004](adr/0004-toml-config-dsl-for-domain-knowledge.md)), not agent prompts.
+Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into user projects, then provides AI agents that autonomously iterate through an experiment loop. The system enforces a strict separation between the **hypothesis space** (agent-modifiable training code) and the **measurement apparatus** (immutable evaluation code) — this is the load-bearing invariant documented in [ADR-0002](adr/0002-separate-hypothesis-space-from-measurement-apparatus.md). Two agents with distinct capability boundaries ([ADR-0003](adr/0003-two-agent-architecture-with-least-privilege-boundaries.md)) execute the loop and analyze results. Domain knowledge is encoded in TOML config files ([ADR-0004](adr/0004-toml-config-dsl-for-domain-knowledge.md)), not agent prompts.
 
 ## Codemap
 
 ```
-helios/
+turing/
 │
 ├── commands/                  ← SKILL LAYER (6 files)
 │   │                            Thin dispatchers. Each command is a markdown
@@ -19,7 +19,7 @@ helios/
 │   │                            lives here — commands orchestrate agents and
 │   │                            shell commands.
 │   │
-│   ├── helios.md              Router. Intent detection → dispatch to sub-command.
+│   ├── turing.md              Router. Intent detection → dispatch to sub-command.
 │   ├── init.md                Scaffolding orchestration. Reads templates,
 │   │                          replaces placeholders, creates venv.
 │   ├── train.md               Experiment loop entry point. Delegates to
@@ -66,7 +66,7 @@ helios/
 │
 ├── templates/                 ← SCAFFOLDING LAYER (15+ files)
 │   │                            Complete, runnable files with {{PLACEHOLDER}}
-│   │                            markers. Copied to user projects by /helios:init.
+│   │                            markers. Copied to user projects by /turing:init.
 │   │                            See ADR-0008.
 │   │
 │   │  ┌─ MEASUREMENT APPARATUS (READ-ONLY after scaffolding) ──┐
@@ -119,8 +119,8 @@ helios/
 │
 ├── bin/                       ← CLI LAYER (2 files)
 │   ├── cli.sh                 Unified CLI: install | verify | init | help.
-│   │                          Entry point for `npx claude-helios`.
-│   └── helios-init.sh         Direct scaffolding for non-Claude-Code usage.
+│   │                          Entry point for `npx claude-turing`.
+│   └── turing-init.sh         Direct scaffolding for non-Claude-Code usage.
 │
 ├── docs/                      ← DOCUMENTATION LAYER
 │   ├── ARCHITECTURE.md        This file.
@@ -165,7 +165,7 @@ These are the rules that must not be broken. They are documented formally in the
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  USER / CLAUDE CODE                                     │
-│  Invokes /helios:* commands                             │
+│  Invokes /turing:* commands                             │
 └────────────────────────┬────────────────────────────────┘
                          │ skill invocation
                          ▼
@@ -218,7 +218,7 @@ These are the rules that must not be broken. They are documented formally in the
 
 ### Placeholder Substitution
 
-The `{{PLACEHOLDER}}` system ([ADR-0008](adr/0008-template-based-project-scaffolding.md)) affects every file in `templates/`. Six placeholders are defined in `config/defaults.yaml` and resolved by `commands/init.md` (Claude Code) or `bin/helios-init.sh` (CLI). Unreplaced placeholders are detectable by grepping for `{{`.
+The `{{PLACEHOLDER}}` system ([ADR-0008](adr/0008-template-based-project-scaffolding.md)) affects every file in `templates/`. Six placeholders are defined in `config/defaults.yaml` and resolved by `commands/init.md` (Claude Code) or `bin/turing-init.sh` (CLI). Unreplaced placeholders are detectable by grepping for `{{`.
 
 ### Hook Integration
 
@@ -226,7 +226,7 @@ Two Claude Code hooks bridge the plugin into the runtime:
 - **PostToolUse** → `scripts/post-train-hook.sh`: auto-logs metrics after training
 - **Stop** → `scripts/stop-hook.sh`: convergence detection, exit code 2 halts `/loop`
 
-Both hooks are configured in `.claude/settings.local.json` during `/helios:init`.
+Both hooks are configured in `.claude/settings.local.json` during `/turing:init`.
 
 ### Agent Memory
 
