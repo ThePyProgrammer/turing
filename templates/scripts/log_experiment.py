@@ -92,6 +92,8 @@ def log_experiment(
     git_commit: str | None = None,
     parent_experiment: str | None = None,
     hypothesis_id: str | None = None,
+    family: str | None = None,
+    tags: list[str] | None = None,
 ) -> None:
     """Append one experiment entry to the JSONL log.
 
@@ -106,6 +108,8 @@ def log_experiment(
         git_commit: Optional git commit hash.
         parent_experiment: Optional parent experiment ID (for dependency tree).
         hypothesis_id: Optional hypothesis ID (links to hypotheses.yaml).
+        family: Optional experiment family for strategic grouping.
+        tags: Optional list of tags for categorization.
     """
     path = Path(log_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -117,6 +121,8 @@ def log_experiment(
         "status": status,
         "parent_experiment": parent_experiment,
         "hypothesis_id": hypothesis_id,
+        "family": family,
+        "tags": tags or [],
         "config": config,
         "metrics": metrics,
         "model_path": model_path,
@@ -187,6 +193,8 @@ def main() -> None:
     positional = []
     parent = None
     hypothesis = None
+    family = None
+    tags_str = None
     i = 1
     while i < len(sys.argv):
         if sys.argv[i] == "--parent" and i + 1 < len(sys.argv):
@@ -194,6 +202,12 @@ def main() -> None:
             i += 2
         elif sys.argv[i] == "--hypothesis" and i + 1 < len(sys.argv):
             hypothesis = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--family" and i + 1 < len(sys.argv):
+            family = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--tags" and i + 1 < len(sys.argv):
+            tags_str = sys.argv[i + 1]
             i += 2
         else:
             positional.append(sys.argv[i])
@@ -203,7 +217,7 @@ def main() -> None:
         print(
             "Usage: python scripts/log_experiment.py <log_path> <experiment_id> "
             "<status> <metrics_json> <config_json> <model_path> <description> "
-            "[--parent <exp-id>] [--hypothesis <hyp-id>]"
+            "[--parent <exp-id>] [--hypothesis <hyp-id>] [--family <name>] [--tags <a,b,c>]"
         )
         sys.exit(1)
 
@@ -215,6 +229,8 @@ def main() -> None:
     model_path = positional[5]
     description = " ".join(positional[6:])
 
+    tags = [t.strip() for t in tags_str.split(",")] if tags_str else None
+
     log_experiment(
         log_path=log_path,
         experiment_id=experiment_id,
@@ -225,6 +241,8 @@ def main() -> None:
         status=status,
         parent_experiment=parent,
         hypothesis_id=hypothesis,
+        family=family,
+        tags=tags,
     )
     print(f"Logged {experiment_id} ({status})")
 
