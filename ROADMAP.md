@@ -925,7 +925,7 @@ Constants across all AERO workflows:
 
 ## Phase 9: Semantic Experiment Memory (Inspired by AERO)
 
-*Give the agent a FAISS index instead of a text file.*
+*Give the agent a TF-IDF index instead of a text file.*
 
 ### What AERO Demonstrates
 
@@ -987,12 +987,12 @@ AERO's `experiment_designer/search.py` demonstrates the full pipeline including 
 | 17 | Experiment families | 6.3 | **High** | Planned | — |
 | 18 | Failure clustering | 6.4 | **Medium** | Planned | — |
 | 19 | Research mode selection | 6.5 | **Medium** | Planned | — |
-| 20 | Literature-informed model selection `/turing:suggest` | 7.1 | **High** | Planned | — |
-| 21 | Experiment design scaffolding `/turing:design` | 7.2 | **Medium** | Planned | — |
-| 22 | Literature-grounded briefing `/turing:brief --deep` | 7.3 | **Medium** | Planned | — |
+| 20 | Literature-informed model selection `/turing:suggest` | 7.1 | **High** | **DONE** | 17 |
+| 21 | Experiment design scaffolding `/turing:design` | 7.2 | **Medium** | **DONE** | — |
+| 22 | Literature-grounded briefing `/turing:brief --deep` | 7.3 | **Medium** | **DONE** | — |
 | 23 | Research plan generation `/turing:init --plan` | 7.4 | **Low** | Planned | — |
-| 24 | Critique loops for hypothesis generation | 8.1 | **High** | Planned | — |
+| 24 | Critique loops for hypothesis generation | 8.1 | **High** | **DONE** | 20 |
 | 25 | Critique loops for briefing reports | 8.2 | **Low** | Planned | — |
-| 26 | Semantic experiment index (FAISS) | 9.1 | **Medium** | Planned | — |
+| 26 | Semantic experiment index (TF-IDF) | 9.1 | **Medium** | **DONE** | 21 |
 
-Phases 1-4 complete (143 tests). Phase 5 (anti-cheating) is next. Phase 6 (MemoryLab-inspired) follows. Phases 7-9 (AERO-inspired) build literature grounding, critique loops, and semantic memory on top of the existing infrastructure.
+Phases 1-4 complete. Phase 5 (anti-cheating) is next. Phase 6 (MemoryLab-inspired) follows. Phases 7-9 (AERO-inspired): 7.1-7.3 done (suggest, design, brief --deep), 8.1 done (critique engine), 9.1 done (semantic index). Total: 274 tests passing.
