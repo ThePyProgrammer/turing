@@ -321,6 +321,7 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | Command | What it does |
 |---------|-------------|
 | `/turing:validate [--auto]` | Check metric stability — auto-configure multi-run if noisy |
+| `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
 | `/turing:report` | Generate research report |
 | `/turing:poster` | Generate research poster |
@@ -389,6 +390,32 @@ After N experiments with no meaningful improvement, the agent stops and reports 
 
 For noisy metrics, `/turing:validate` runs the pipeline multiple times and measures variance. If the coefficient of variation exceeds 5%, it auto-configures multi-run evaluation so the agent can't be rewarded for lucky single runs.
 
+## Cost-Performance Frontier
+
+> *"This model is 2% better but takes 10x longer to train. Is that worth it?"*
+
+The briefing now surfaces [Pareto-optimal](https://en.wikipedia.org/wiki/Pareto_efficiency) experiments — the efficient set where no other experiment is both faster AND has a better metric. The cost report tells you the tradeoff in plain language:
+
+```
+Best metric: exp-012 (accuracy=0.893, 2400s)
+Best efficiency: exp-003 (accuracy=0.871, 3s)
+The 2.5% improvement costs 800x more compute.
+```
+
+Run `python scripts/cost_frontier.py` directly, or read the "Cost-Performance Analysis" section in `/turing:brief`.
+
+## Model Cards
+
+When it's time to ship, `/turing:card` generates a standardized model card documenting:
+- Model type, framework, training time
+- Performance metrics (all configured metrics)
+- Training data source and split ratios
+- Limitations (including overfit detection)
+- Intended use and ethical considerations (user fills these in)
+- Artifact contract version for production consumers
+
+Inspired by [Google's Model Cards](https://arxiv.org/abs/1810.03993) and [Hugging Face model cards](https://huggingface.co/docs/hub/model-cards).
+
 ## Installation
 
 ```bash
@@ -424,7 +451,7 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-15 commands, 2 agents, 8 config files, 25 template scripts, model registry, artifact contract, 338 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+16 commands, 2 agents, 8 config files, 30 template scripts, model registry, artifact contract, cost-performance frontier, model cards, 345 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
