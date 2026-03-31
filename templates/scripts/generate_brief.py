@@ -212,6 +212,23 @@ def detect_environment_drift(experiments: list[dict]) -> list[str]:
     return warnings
 
 
+def load_diagnoses(diag_dir: str = "experiments/diagnoses") -> list[dict]:
+    """Load all diagnosis reports from YAML files."""
+    path = Path(diag_dir)
+    if not path.exists():
+        return []
+    diagnoses = []
+    for f in sorted(path.glob("*-diagnosis.yaml")):
+        try:
+            with open(f) as fh:
+                diag = yaml.safe_load(fh)
+                if diag and isinstance(diag, dict):
+                    diagnoses.append(diag)
+        except (yaml.YAMLError, OSError):
+            continue
+    return diagnoses
+
+
 def load_seed_studies(seed_dir: str = "experiments/seed_studies") -> list[dict]:
     """Load all seed study results from YAML files."""
     path = Path(seed_dir)
@@ -260,6 +277,7 @@ def format_brief(
     cost_frontier: list | None = None,
     seed_studies: list[dict] | None = None,
     reproductions: list[dict] | None = None,
+    diagnoses: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -436,6 +454,22 @@ def format_brief(
         if failed:
             lines.extend(["", f"*{len(failed)} experiment(s) failed reproducibility checks.*"])
 
+    # Diagnoses (error analysis)
+    if diagnoses:
+        lines.extend(["", "## Error Analysis", ""])
+        for diag in diagnoses:
+            exp_id = diag.get("experiment_id", "?")
+            modes = diag.get("failure_modes", [])
+            if modes:
+                lines.append(f"**{exp_id}** — {len(modes)} failure mode(s):")
+                for mode in modes[:3]:
+                    lines.append(f"- {mode.get('id', '?')}: {mode.get('description', 'N/A')}")
+                if len(modes) > 3:
+                    lines.append(f"  *...and {len(modes) - 3} more (see full diagnosis)*")
+        auto_hyps = sum(len(d.get("auto_hypotheses", [])) for d in diagnoses)
+        if auto_hyps:
+            lines.append(f"\n*{auto_hyps} auto-generated hypotheses from failure analysis.*")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -495,9 +529,10 @@ def generate_brief(
     cost_records = load_cost_data(log_path, metric)
     pareto = compute_pareto_frontier(cost_records, lower_is_better) if cost_records else []
 
-    # Load seed studies and reproduction reports
+    # Load seed studies, reproduction reports, and diagnoses
     seed_studies = load_seed_studies()
     reproductions = load_reproductions()
+    diagnoses = load_diagnoses()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -506,6 +541,7 @@ def generate_brief(
         cost_frontier=pareto if cost_records else None,
         seed_studies=seed_studies if seed_studies else None,
         reproductions=reproductions if reproductions else None,
+        diagnoses=diagnoses if diagnoses else None,
     )
 
 
