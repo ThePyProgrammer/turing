@@ -28,6 +28,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "mode", "explore", "exploit", "replicate", "strategy" | `/turing:mode` | Strategy |
 | "preflight", "resources", "VRAM", "memory", "can I run", "OOM", "GPU" | `/turing:preflight` | Check |
 | "card", "model card", "document model", "model documentation" | `/turing:card` | Document |
+| "diagnose", "error analysis", "failure modes", "where does it fail", "confusion matrix" | `/turing:diagnose` | Analyze |
+| "ablate", "ablation", "remove component", "which features matter", "component impact" | `/turing:ablate` | Analyze |
+| "frontier", "pareto", "tradeoff", "tradeoffs", "multi-objective", "which model is best" | `/turing:frontier` | Analyze |
 
 ## Sub-commands
 
@@ -52,6 +55,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:mode <mode>` | Set research strategy (explore/exploit/replicate) | (inline) |
 | `/turing:preflight` | Pre-flight resource check (VRAM/RAM/disk) | (inline) |
 | `/turing:card` | Generate standardized model card (type, performance, data, limitations, contract) | (inline) |
+| `/turing:diagnose [exp-id]` | Error analysis: failure modes, confused pairs, feature-range bias | (inline) |
+| `/turing:ablate [--components]` | Ablation study: remove components, measure impact, flag dead weight | (inline) |
+| `/turing:frontier [--metrics]` | Pareto frontier: multi-objective tradeoff visualization | (inline) |
 
 ## Proactive Detection
 
