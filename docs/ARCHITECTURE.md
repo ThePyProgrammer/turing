@@ -13,130 +13,159 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 ```
 turing/
 │
-├── commands/                  ← SKILL LAYER (6 files)
+├── commands/                  ← SKILL LAYER (15 files)
 │   │                            Thin dispatchers. Each command is a markdown
 │   │                            skill file consumed by Claude Code. No logic
 │   │                            lives here — commands orchestrate agents and
 │   │                            shell commands.
 │   │
-│   ├── turing.md              Router. Intent detection → dispatch to sub-command.
-│   ├── init.md                Scaffolding orchestration. Reads templates,
-│   │                          replaces placeholders, creates venv.
-│   ├── train.md               Experiment loop entry point. Delegates to
-│   │                          @ml-researcher agent.
-│   ├── status.md              Read-only status display. Runs show_metrics.py.
-│   ├── compare.md             Side-by-side experiment comparison.
-│   ├── sweep.md               Hyperparameter sweep orchestration.
+│   │  ┌─ CORE COMMANDS ──────────────────────────────────────┐
+│   ├── turing.md              │ Router. Intent detection → dispatch.         │
+│   ├── init.md                │ Project scaffolding (delegates to scaffold.py)│
+│   ├── train.md               │ Experiment loop. Delegates to @ml-researcher.│
+│   ├── status.md              │ Read-only status. Runs show_metrics.py.      │
+│   ├── compare.md             │ Side-by-side experiment comparison.          │
+│   ├── sweep.md               │ Hyperparameter sweep orchestration.          │
+│   │                          └─────────────────────────────────────────────┘
+│   │  ┌─ TASTE-LEVERAGE COMMANDS ────────────────────────────┐
+│   ├── try.md                 │ Inject hypothesis (free-text or archetype).  │
+│   ├── brief.md               │ Research intelligence report.                │
+│   ├── suggest.md             │ Literature-grounded model suggestions.       │
+│   ├── design.md              │ Structured experiment design from hypothesis.│
+│   ├── mode.md                │ Research strategy (explore/exploit/replicate).│
+│   │                          └─────────────────────────────────────────────┘
+│   │  ┌─ REPORTING COMMANDS ─────────────────────────────────┐
+│   ├── logbook.md             │ Generate HTML experiment logbook.            │
+│   ├── poster.md              │ Generate research poster.                    │
+│   ├── report.md              │ Generate research report.                    │
+│   ├── validate.md            │ Metric stability validation.                │
+│   │                          └─────────────────────────────────────────────┘
 │   └── rules/
 │       └── loop-protocol.md   Safety constraints for the experiment loop.
 │                              Contains the access control matrix (ADR-0002).
 │
 ├── agents/                    ← AGENT LAYER (2 files)
-│   │                            Agent definitions with tool access, turn limits,
-│   │                            and behavioral instructions.
 │   │
 │   ├── ml-researcher.md       WRITER agent. Read/Write/Edit/Bash/Grep/Glob.
 │   │                          200 max turns. Has persistent memory.
 │   │                          Modifies train.py and config.yaml.
-│   │                          THE agent that runs the experiment loop.
 │   │
 │   └── ml-evaluator.md        READER agent. Read/Bash/Grep/Glob only.
 │                              50 max turns. No Write, no Edit.
 │                              Structural guarantee: cannot modify code.
-│                              Analyzes results for status/compare commands.
 │
-├── config/                    ← DOMAIN KNOWLEDGE LAYER (3 files)
-│   │                            Structured data encoding system-wide vocabulary.
-│   │                            TOML for domain knowledge, YAML for defaults.
-│   │                            See ADR-0004.
+├── config/                    ← DOMAIN KNOWLEDGE LAYER (8 files)
+│   │                            TOML for domain knowledge, YAML for defaults
+│   │                            and complex nested structures. See ADR-0004.
 │   │
-│   ├── defaults.yaml          Fallback values when project config.yaml is
-│   │                          missing keys. Conservative starting points.
-│   │                          Also defines template placeholders.
-│   │
-│   ├── lifecycle.toml         Experiment state machine:
-│   │                          proposed → running → evaluating → kept/discarded
-│   │                          Transition requirements documented as data.
-│   │
-│   └── taxonomy.toml          Classification system:
-│                              - experiment_types (hyperparameter, architecture, ...)
-│                              - failure_modes (overfitting, underfitting, ...)
-│                              - model_families (gradient_boosting, linear, ...)
-│                              - severity_levels (critical, major, minor, info)
+│   ├── defaults.yaml          Fallback hyperparameters and placeholders.
+│   ├── lifecycle.toml         Experiment state machine (ADR-0006).
+│   ├── taxonomy.toml          Experiment types, failure modes, model families.
+│   ├── experiment_archetypes.yaml  8 structured experiment strategies.
+│   ├── novelty_aliases.yaml   Token normalization for novelty guard.
+│   ├── task_taxonomy.yaml     ML task classification system.
+│   ├── relationships.toml     ADR dependency graph (blueprint).
+│   └── state.toml             Blueprint session state.
 │
-├── templates/                 ← SCAFFOLDING LAYER (15+ files)
+├── templates/                 ← SCAFFOLDING LAYER (30+ files)
 │   │                            Complete, runnable files with {{PLACEHOLDER}}
 │   │                            markers. Copied to user projects by /turing:init.
-│   │                            See ADR-0008.
 │   │
-│   │  ┌─ MEASUREMENT APPARATUS (READ-ONLY after scaffolding) ──┐
-│   ├── prepare.py             │ Data loading, stratified splitting.          │
-│   ├── evaluate.py            │ Metrics computation, parseable output.       │
-│   │                          └─────────────────────────────────────────────┘
-│   │
-│   │  ┌─ HYPOTHESIS SPACE (AGENT-EDITABLE) ────────────────────┐
-│   ├── train.py               │ Default XGBoost pipeline. THE file the       │
-│   │                          │ agent modifies. See ADR-0009.                │
-│   │                          └─────────────────────────────────────────────┘
-│   │
-│   │  ┌─ INFRASTRUCTURE ──────────────────────────────────────┐
-│   ├── config.yaml            │ Project-specific hyperparameters.            │
-│   ├── sweep_config.yaml      │ Cartesian product sweep parameters.          │
-│   ├── program.md             │ Agent protocol: the experiment loop.          │
-│   ├── README.md              │ Per-project README template.                  │
-│   ├── MEMORY.md              │ Agent memory bootstrap template.              │
-│   ├── requirements.txt       │ Python deps (xgboost, lightgbm, sklearn).    │
-│   ├── pyproject.toml         │ pytest config.                                │
-│   │                          └─────────────────────────────────────────────┘
-│   │
+│   │  ┌─ MEASUREMENT APPARATUS (HIDDEN/READ-ONLY) ────────────┐
+│   ├── prepare.py             │ Data loading, stratified splitting.           │
+│   ├── evaluate.py            │ Metrics computation + behavioral probes.      │
+│   │                          └──────────────────────────────────────────────┘
+│   │  ┌─ HYPOTHESIS SPACE (AGENT-EDITABLE) ───────────────────┐
+│   ├── train.py               │ Default XGBoost pipeline + seed/env pinning.  │
+│   │                          └──────────────────────────────────────────────┘
+│   │  ┌─ INFRASTRUCTURE ─────────────────────────────────────────┐
+│   ├── config.yaml            │ Hyperparameters, eval settings, constraints.   │
+│   ├── sweep_config.yaml      │ Cartesian product sweep parameters.            │
+│   ├── program.md             │ Agent protocol: the experiment loop.            │
+│   ├── README.md, MEMORY.md   │ Per-project docs and agent memory template.    │
+│   ├── requirements.txt       │ Python deps.                                   │
+│   ├── pyproject.toml         │ pytest config.                                 │
+│   │                          └───────────────────────────────────────────────┘
 │   ├── features/
-│   │   ├── __init__.py
-│   │   └── featurizers.py     Pluggable feature pipeline: BaseFeaturizer →
-│   │                          NumericFeaturizer, CategoricalFeaturizer →
-│   │                          CompositeFeaturizer. fit/transform interface.
+│   │   └── featurizers.py     Pluggable feature pipeline (fit/transform).
 │   │
-│   ├── scripts/
-│   │   ├── __init__.py
-│   │   ├── log_experiment.py  Append-only JSONL + TSV logging. See ADR-0007.
-│   │   ├── show_metrics.py    Tabular display of experiment history.
-│   │   ├── compare_runs.py    Side-by-side experiment comparison.
-│   │   ├── sweep.py           Cartesian product queue generation + management.
-│   │   ├── post-train-hook.sh Claude Code PostToolUse hook — auto-logs metrics.
-│   │   └── stop-hook.sh       Claude Code Stop hook — convergence detection.
-│   │                          Returns exit code 2 to halt /loop. See ADR-0006.
-│   │
+│   ├── scripts/               22 Python scripts + 2 bash hooks
+│   │   │
+│   │   │  ┌─ CORE LOOP ──────────────────────────────────────┐
+│   │   ├── turing_io.py       │ Shared data loaders (JSONL, YAML, config).  │
+│   │   ├── log_experiment.py  │ Append-only JSONL + TSV logging (ADR-0007). │
+│   │   ├── parse_metrics.py   │ Canonical metric parser (ADR-0015).         │
+│   │   ├── check_convergence.py│ Convergence detection (ADR-0006/0012).     │
+│   │   ├── manage_hypotheses.py│ Hypothesis queue + archetype expansion.    │
+│   │   ├── novelty_guard.py   │ History-aware duplicate detection.          │
+│   │   ├── synthesize_decision.py│ Post-run verdict + auto-queue.          │
+│   │   ├── update_state.py    │ Structured experiment state (YAML).         │
+│   │   │                      └─────────────────────────────────────────────┘
+│   │   │  ┌─ ANALYSIS / REPORTING ────────────────────────────┐
+│   │   ├── show_metrics.py    │ Experiment metrics table + diff display.    │
+│   │   ├── compare_runs.py    │ Side-by-side experiment comparison.         │
+│   │   ├── generate_brief.py  │ Research briefing with failure clustering.  │
+│   │   ├── generate_logbook.py│ HTML experiment logbook.                    │
+│   │   ├── show_experiment_tree.py│ Dependency tree visualization.          │
+│   │   ├── show_families.py   │ Per-family performance summaries.           │
+│   │   ├── experiment_index.py│ TF-IDF semantic experiment search.          │
+│   │   ├── show_environment.py│ Environment snapshot display.               │
+│   │   │                      └─────────────────────────────────────────────┘
+│   │   │  ┌─ INFRASTRUCTURE ──────────────────────────────────┐
+│   │   ├── scaffold.py        │ Unified project scaffolding (ADR-0016).     │
+│   │   ├── sweep.py           │ Hyperparameter sweep queue.                 │
+│   │   ├── verify_placeholders.py│ Post-scaffold placeholder check.         │
+│   │   ├── validate_stability.py│ Metric variance + auto-fix.              │
+│   │   ├── statistical_compare.py│ Multi-run Mann-Whitney U tests.         │
+│   │   ├── suggest_next.py    │ Bayesian surrogate suggestions.             │
+│   │   ├── critique_hypothesis.py│ Hypothesis quality scoring.             │
+│   │   ├── post-train-hook.sh │ PostToolUse hook — auto-logs metrics.       │
+│   │   └── stop-hook.sh       │ Stop hook — convergence detection.          │
+│   │                          └─────────────────────────────────────────────┘
 │   └── tests/
-│       ├── __init__.py
-│       └── conftest.py        Deterministic test fixtures with sample data.
+│       └── conftest.py        Deterministic test fixtures (template for users).
+│
+├── tests/                     ← PLUGIN TEST SUITE (332 tests)
+│   │                            Tests the plugin's template code, not user projects.
+│   ├── test_evaluate.py       Measurement apparatus (20 tests)
+│   ├── test_convergence.py    Convergence detection (19 tests)
+│   ├── test_novelty_guard.py  Novelty guard (25 tests)
+│   ├── test_log_experiment.py Experiment logging (14 tests)
+│   ├── test_hypotheses.py     Hypothesis queue (14 tests)
+│   ├── test_decisions.py      Decision packets (20 tests)
+│   ├── test_prepare.py        Data preparation (13 tests)
+│   ├── test_featurizers.py    Feature pipeline (13 tests)
+│   ├── test_integration.py    Cross-module contracts (5 tests)
+│   ├── test_turing_io.py      Shared data loaders (17 tests)
+│   └── ...                    + archetypes, brief, families, scaffold, etc.
 │
 ├── src/                       ← INSTALLER LAYER (5 files)
 │   │                            npm deployment machinery. See ADR-0010.
-│   │
 │   ├── paths.js               Path resolution for global/project scopes.
-│   │                          Single source of truth — used by install and verify.
 │   ├── claude-md.js           CLAUDE.md managed section with idempotent markers.
-│   ├── install.js             Deploys commands/agents/config to ~/.claude/.
-│   │                          Uses SKILL.md nested directory pattern.
-│   ├── verify.js              Checks all expected files are in place.
-│   └── postinstall.js         npm postinstall — shows setup instructions.
+│   ├── install.js             Deploys 14 commands, 2 agents, 8 configs.
+│   ├── verify.js              Validates installation completeness.
+│   └── postinstall.js         npm postinstall — setup instructions.
 │
 ├── bin/                       ← CLI LAYER (2 files)
 │   ├── cli.js                 Unified CLI: install | verify | init | help.
-│   │                          Entry point for `npx claude-turing`. Uses commander.
-│   └── turing-init.sh         Direct scaffolding for non-Claude-Code usage.
+│   └── turing-init.sh         Direct scaffolding (delegates to scaffold.py).
 │
 ├── docs/                      ← DOCUMENTATION LAYER
 │   ├── ARCHITECTURE.md        This file.
-│   └── adr/                   Architecture Decision Records (10 ADRs).
+│   └── adr/                   16 Architecture Decision Records.
 │       ├── README.md          Lifecycle, index, principles.
 │       ├── template.md        ADR template.
-│       └── 0001-*.md ...      Individual decisions.
+│       └── 0001-0016-*.md     Individual decisions.
 │
 ├── .claude-plugin/
-│   └── plugin.json            Claude Code plugin registration metadata.
+│   └── plugin.json            Plugin registration (14 commands, 2 agents).
 │
 ├── package.json               npm package definition.
-├── README.md                  Philosophical README for the plugin itself.
+├── CONTRIBUTING.md            Command/script/config authoring conventions.
+├── README.md                  Philosophical README.
+├── ROADMAP.md                 Feature roadmap (phases 1-9 complete).
+├── V1_RELEASE_BLOCKERS.md     Release readiness tracker.
 ├── LICENSE                    MIT.
 └── .gitignore
 ```
