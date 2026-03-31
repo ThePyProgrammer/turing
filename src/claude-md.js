@@ -21,6 +21,7 @@ Autonomous ML research harness. The autoresearch loop as a formal protocol.
 | \`/turing:validate\` | Check metric stability, auto-fix if noisy |
 | \`/turing:try <hypothesis>\` | Inject a hypothesis into the experiment queue |
 | \`/turing:brief\` | Generate research intelligence report |
+| \`/turing:preflight\` | Pre-flight resource check (VRAM/RAM/disk) |
 
 ### Agents
 

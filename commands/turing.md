@@ -23,6 +23,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "suggest", "what model", "recommend", "which architecture", "literature" | `/turing:suggest` | Research |
 | "design", "plan experiment", "how should I test", "experiment design" | `/turing:design` | Design |
 | "mode", "explore", "exploit", "replicate", "strategy" | `/turing:mode` | Strategy |
+| "preflight", "resources", "VRAM", "memory", "can I run", "OOM", "GPU" | `/turing:preflight` | Check |
 
 ## Sub-commands
 
@@ -42,6 +43,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:poster` | Single-page HTML research poster | (inline) |
 | `/turing:report` | Structured markdown research report | (inline) |
 | `/turing:mode <mode>` | Set research strategy (explore/exploit/replicate) | (inline) |
+| `/turing:preflight` | Pre-flight resource check (VRAM/RAM/disk) | (inline) |
 
 ## Proactive Detection
 
