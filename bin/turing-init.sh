@@ -1,136 +1,57 @@
 #!/usr/bin/env bash
 # Turing CLI init script.
-# Quick-start for scaffolding an ML project outside of Claude Code.
+# Thin wrapper around scripts/scaffold.py — the unified scaffolding
+# implementation that both CLI and Claude Code use.
 #
 # Usage:
 #   turing-init [project_name] [ml_dir]
+#   turing-init --interactive
 #
-# This script copies Turing templates to the specified directory
-# and prints instructions for completing the setup.
+# For Claude Code usage, use /turing:init instead.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
 TEMPLATES_DIR="${PLUGIN_DIR}/templates"
+SCAFFOLD_SCRIPT="${TEMPLATES_DIR}/scripts/scaffold.py"
 
-PROJECT_NAME="${1:-my-ml-project}"
-ML_DIR="${2:-.}"
+# Check scaffold script exists
+if [[ ! -f "$SCAFFOLD_SCRIPT" ]]; then
+    echo "Error: scaffold.py not found at ${SCAFFOLD_SCRIPT}" >&2
+    echo "Ensure the Turing plugin is installed correctly." >&2
+    exit 1
+fi
 
 echo "╔══════════════════════════════════════════╗"
 echo "║     Turing ML Research Harness           ║"
 echo "║     Autonomous Experiment Infrastructure ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
-echo "Project:   ${PROJECT_NAME}"
-echo "Directory: ${ML_DIR}"
-echo ""
 
-# Check templates exist
-if [[ ! -d "$TEMPLATES_DIR" ]]; then
-    echo "Error: Templates not found at ${TEMPLATES_DIR}" >&2
-    echo "Ensure the Turing plugin is installed correctly." >&2
-    exit 1
+# If no args or --interactive, run interactive mode
+if [[ $# -eq 0 ]] || [[ "${1:-}" == "--interactive" ]]; then
+    python3 "$SCAFFOLD_SCRIPT" --interactive --templates-dir "$TEMPLATES_DIR" --no-venv
+    echo ""
+    echo "  To set up the virtual environment:"
+    echo "    cd <ml_dir> && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
+    exit 0
 fi
 
-# Create target directory
-mkdir -p "${ML_DIR}"
+# Positional args mode: turing-init <project_name> [ml_dir]
+PROJECT_NAME="${1:-my-ml-project}"
+ML_DIR="${2:-ml/${PROJECT_NAME}}"
 
-# Copy template files
-echo "Scaffolding project..."
-echo ""
-
-echo "  [measurement apparatus — READ-ONLY]"
-cp "${TEMPLATES_DIR}/prepare.py" "${ML_DIR}/"
-echo "    prepare.py"
-cp "${TEMPLATES_DIR}/evaluate.py" "${ML_DIR}/"
-echo "    evaluate.py"
-
-echo ""
-echo "  [hypothesis space — AGENT-EDITABLE]"
-cp "${TEMPLATES_DIR}/train.py" "${ML_DIR}/"
-echo "    train.py"
-cp "${TEMPLATES_DIR}/config.yaml" "${ML_DIR}/"
-echo "    config.yaml"
+python3 "$SCAFFOLD_SCRIPT" \
+    --project-name "$PROJECT_NAME" \
+    --target-metric "accuracy" \
+    --metric-direction "higher" \
+    --task-description "ML task for ${PROJECT_NAME}" \
+    --ml-dir "$ML_DIR" \
+    --data-source "data/training.csv" \
+    --templates-dir "$TEMPLATES_DIR" \
+    --no-venv --no-hooks
 
 echo ""
-echo "  [infrastructure]"
-cp "${TEMPLATES_DIR}/sweep_config.yaml" "${ML_DIR}/"
-cp "${TEMPLATES_DIR}/program.md" "${ML_DIR}/"
-cp "${TEMPLATES_DIR}/README.md" "${ML_DIR}/"
-cp "${TEMPLATES_DIR}/requirements.txt" "${ML_DIR}/"
-cp "${TEMPLATES_DIR}/pyproject.toml" "${ML_DIR}/"
-cp "${TEMPLATES_DIR}/MEMORY.md" "${ML_DIR}/"
-echo "    sweep_config.yaml, program.md, README.md"
-echo "    requirements.txt, pyproject.toml, MEMORY.md"
-
-mkdir -p "${ML_DIR}/features"
-cp "${TEMPLATES_DIR}/features/__init__.py" "${ML_DIR}/features/"
-cp "${TEMPLATES_DIR}/features/featurizers.py" "${ML_DIR}/features/"
-echo "    features/"
-
-mkdir -p "${ML_DIR}/scripts"
-cp "${TEMPLATES_DIR}/scripts/__init__.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/log_experiment.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/show_metrics.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/compare_runs.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/sweep.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/post-train-hook.sh" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/stop-hook.sh" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/check_convergence.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/verify_placeholders.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/manage_hypotheses.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/generate_brief.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/show_experiment_tree.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/statistical_compare.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/suggest_next.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/update_state.py" "${ML_DIR}/scripts/"
-cp "${TEMPLATES_DIR}/scripts/parse_metrics.py" "${ML_DIR}/scripts/"
-echo "    scripts/"
-
-mkdir -p "${ML_DIR}/tests"
-cp "${TEMPLATES_DIR}/tests/__init__.py" "${ML_DIR}/tests/"
-cp "${TEMPLATES_DIR}/tests/conftest.py" "${ML_DIR}/tests/"
-echo "    tests/"
-
-# Create data directories
-mkdir -p "${ML_DIR}/data/splits"
-mkdir -p "${ML_DIR}/experiments"
-mkdir -p "${ML_DIR}/models/best"
-mkdir -p "${ML_DIR}/models/archive"
-echo "    data/, experiments/, models/"
-
-# Make shell scripts executable
-chmod +x "${ML_DIR}/scripts/post-train-hook.sh"
-chmod +x "${ML_DIR}/scripts/stop-hook.sh"
-
-echo ""
-echo "Scaffolding complete."
-echo ""
-echo "Next steps:"
-echo ""
-echo "  1. Replace {{PLACEHOLDER}} markers in copied files:"
-echo "     {{PROJECT_NAME}}     -> your project name"
-echo "     {{TARGET_METRIC}}    -> primary metric (accuracy, f1, mae)"
-echo "     {{TASK_DESCRIPTION}} -> what your model does"
-echo "     {{ML_DIR}}           -> relative path to this directory"
-echo "     {{DATA_SOURCE}}      -> path to your training data"
-echo "     {{METRIC_DIRECTION}} -> 'lower' or 'higher'"
-echo ""
-echo "  2. Verify all placeholders were replaced:"
-echo "     cd ${ML_DIR} && python3 scripts/verify_placeholders.py ."
-echo ""
-echo "  3. Add your training data"
-echo ""
-echo "  4. Set up the virtual environment:"
-echo "     cd ${ML_DIR} && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
-echo ""
-echo "  5. Create data splits:"
-echo "     python prepare.py"
-echo ""
-echo "  6. Start training:"
-echo "     python train.py > run.log 2>&1"
-echo ""
-echo "  Or use Claude Code:"
-echo "     /turing:train          (single session)"
-echo "     /loop 5m /turing:train (fully autonomous)"
+echo "Note: Run with --interactive for full setup (metric, data source, etc.)"
+echo "Or use Claude Code: /turing:init"
