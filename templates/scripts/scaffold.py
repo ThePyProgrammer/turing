@@ -47,6 +47,7 @@ TEMPLATE_FILES = [
     "README.md",
     "MEMORY.md",
     "model_registry.yaml",
+    "model_contract.md",
     "requirements.txt",
     "pyproject.toml",
 ]
