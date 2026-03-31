@@ -1,0 +1,127 @@
+# Structured Experiment Archetypes
+#
+# Pre-defined experiment strategies that give the agent (and human)
+# structured starting points instead of ad-hoc free text.
+#
+# Usage:
+#   /turing:try archetype:model_comparison
+#   /turing:try archetype:feature_sweep
+#   python scripts/manage_hypotheses.py add --archetype model_comparison
+#
+# Each archetype defines: what to do, in what order, and what to measure.
+# The agent fills in project-specific details (metric, model type, etc.)
+# from config.yaml at execution time.
+
+archetypes:
+  model_comparison:
+    name: "Systematic Model Comparison"
+    description: "Compare multiple model families with identical preprocessing to find the best architecture for this task"
+    steps:
+      - "Train all candidate models with identical data splits and preprocessing"
+      - "Use cross-validation (5-fold) for each model"
+      - "Compare on primary metric + secondary metrics"
+      - "Run statistical comparison (paired t-test or Wilcoxon) between top 2"
+      - "Report: comparison table, statistical significance, recommendation"
+    suggested_models:
+      - "xgboost"
+      - "lightgbm"
+      - "random_forest"
+      - "logistic_regression"
+      - "mlp"
+    when_to_use: "Early in a project when you haven't established which model family works best"
+    expected_experiments: 5
+    family_tag: "model-comparison"
+
+  hyperparameter_sweep:
+    name: "Hyperparameter Grid Sweep"
+    description: "Systematically explore the hyperparameter space of the current best model"
+    steps:
+      - "Define parameter ranges based on current best config"
+      - "Generate cartesian product queue via sweep_config.yaml"
+      - "Run all combinations sequentially"
+      - "Identify top 3 configurations"
+      - "Run statistical validation on top 3 (multi-seed)"
+    when_to_use: "After selecting a model family, before fine-tuning"
+    expected_experiments: 15-36
+    family_tag: "hyperparameter-sweep"
+
+  feature_sweep:
+    name: "Feature Engineering Exploration"
+    description: "Systematically add and evaluate feature transformations one at a time"
+    steps:
+      - "Establish baseline with current features"
+      - "Add polynomial interaction features — evaluate"
+      - "Add target encoding for high-cardinality categoricals — evaluate"
+      - "Add binning for continuous features — evaluate"
+      - "Remove low-importance features (bottom 20%) — evaluate"
+      - "Combine the improvements that helped independently"
+    when_to_use: "When model architecture is settled but performance plateaus"
+    expected_experiments: 6-10
+    family_tag: "feature-engineering"
+
+  regularization_search:
+    name: "Regularization Optimization"
+    description: "Find the optimal regularization strength to minimize overfitting"
+    steps:
+      - "Measure current train/val gap (overfit_gap metric)"
+      - "If gap > 0.05: increase regularization (max_depth down, min_child_weight up, dropout up)"
+      - "If gap < 0.01: decrease regularization (model may be underfitting)"
+      - "Binary search: try 3-4 regularization levels"
+      - "Plot train/val gap vs regularization strength"
+      - "Select the configuration with smallest gap that doesn't sacrifice val performance"
+    when_to_use: "When train metrics are much better than val metrics (overfit_gap > 0.05)"
+    expected_experiments: 4-6
+    family_tag: "regularization"
+
+  ensemble_construction:
+    name: "Ensemble Model Construction"
+    description: "Combine top-performing models into an ensemble for improved stability and accuracy"
+    steps:
+      - "Select top 3 diverse models (different families preferred)"
+      - "Try soft voting ensemble — evaluate"
+      - "Try stacking with a simple meta-learner (logistic regression) — evaluate"
+      - "Try blending (average predictions on holdout) — evaluate"
+      - "Compare ensemble vs best individual model"
+      - "Run multi-seed validation on the best ensemble"
+    when_to_use: "Late-stage optimization when individual models have plateaued"
+    expected_experiments: 4-6
+    family_tag: "ensemble"
+
+  learning_rate_schedule:
+    name: "Learning Rate Schedule Optimization"
+    description: "Trade off learning rate against number of estimators for gradient boosting models"
+    steps:
+      - "Start with current lr and n_estimators"
+      - "Try lr/2 with 2x n_estimators"
+      - "Try lr/5 with 5x n_estimators"
+      - "Try lr/10 with 10x n_estimators"
+      - "Find the sweet spot where val performance peaks before overfitting"
+    when_to_use: "For gradient boosting models (XGBoost, LightGBM) after initial hyperparameter selection"
+    expected_experiments: 4-5
+    family_tag: "lr-schedule"
+
+  data_quality_audit:
+    name: "Data Quality Investigation"
+    description: "Investigate whether data quality issues are limiting model performance"
+    steps:
+      - "Check class balance — if imbalanced, try SMOTE or class weights"
+      - "Check for label noise — train on 90% of data, predict the held-out 10%, flag disagreements"
+      - "Check for data leakage — verify no future information in features"
+      - "Check feature distributions — identify outliers, missing value patterns"
+      - "Try robust preprocessing — winsorize outliers, impute missing values differently"
+    when_to_use: "When model performance is unexpectedly poor or unstable across seeds"
+    expected_experiments: 3-5
+    family_tag: "data-quality"
+
+  ablation_study:
+    name: "Feature Ablation Study"
+    description: "Remove features one at a time to understand their individual contribution"
+    steps:
+      - "Train baseline with all features — record metric"
+      - "For each feature group: remove it, retrain, record metric delta"
+      - "Rank features by importance (metric drop when removed)"
+      - "Identify features that hurt performance (metric improves when removed)"
+      - "Train final model without harmful features"
+    when_to_use: "When you have many features and want to understand which matter"
+    expected_experiments: "N+1 where N is the number of feature groups"
+    family_tag: "ablation"
