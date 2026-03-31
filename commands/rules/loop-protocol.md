@@ -74,6 +74,16 @@ The researcher agent's Bash access is restricted to a whitelist of necessary com
 
 The agent's Read tool is separately governed by the file access tiers above — hidden files are denied at the tool level.
 
+## Reproducibility Rules
+
+Every experiment must be fully reproducible. The training template handles this automatically, but the agent must not subvert it:
+
+- **NEVER use unseeded randomness.** All random state flows from `config.yaml → data.random_state`. The `pin_all_seeds()` function in `train.py` sets stdlib `random`, `numpy`, `PYTHONHASHSEED`, and `torch`/`cuda` seeds from this single source.
+- **NEVER modify seeds mid-experiment.** If you need a different seed, use `--seed` flag for multi-run comparison (Phase 2.1). Do not hardcode seeds in `train.py`.
+- **Environment is captured automatically.** `train_metadata.json` records python version, package versions, platform, GPU info, and a config hash. Do not modify this recording — it's used by behavioral probes.
+- **Config snapshot:** The config at training time is stored inside the model artifact (`model.joblib` contains the full config dict). For any saved model, the exact configuration can be recovered.
+- **If adding new dependencies** (requires human approval), note that the environment capture in `train_metadata.json` will automatically record the new package version.
+
 ## Safety
 
 - Do not modify files outside the ML project directory.
