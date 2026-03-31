@@ -194,10 +194,10 @@ A system where:
 | 1 | Hypothesis injection `/turing:try` | 1.1 | **Critical** | **DONE** | 14 |
 | 2 | Research briefing `/turing:brief` | 1.2 | **Critical** | **DONE** | 9 |
 | 3 | Experiment dependency graph | 1.3 | **High** | **DONE** | 7 |
-| 4 | Multi-run statistical significance | 2.1 | **High** | Planned | — |
-| 5 | Bayesian-guided suggestions | 2.2 | **Medium** | Planned | — |
-| 6 | Automatic metric decomposition | 3.1 | **Medium** | Planned | — |
-| 7 | Train/val gap monitoring | 3.2 | **Medium** | Planned | — |
-| 8 | Structured experiment state | 4.1 | **Medium** | Planned | — |
+| 4 | Multi-run statistical significance | 2.1 | **High** | **DONE** | 13 |
+| 5 | Bayesian-guided suggestions | 2.2 | **Medium** | **DONE** | 11 |
+| 6 | Automatic metric decomposition | 3.1 | **Medium** | **DONE** | 8 |
+| 7 | Train/val gap monitoring | 3.2 | **Medium** | **DONE** | — |
+| 8 | Structured experiment state | 4.1 | **Medium** | **DONE** | 13 |
 
-Phase 1 (v2.1.0) is complete. The taste-leverage loop is functional.
+All phases complete. The full roadmap is implemented and tested (143 tests).
