@@ -14,34 +14,9 @@ from pathlib import Path
 
 import yaml
 
+from scripts.turing_io import load_config, load_experiments
+
 DEFAULT_LOG_PATH = "experiments/log.jsonl"
-
-
-def load_experiments(log_path: str) -> list[dict]:
-    """Load all experiments from JSONL log."""
-    path = Path(log_path)
-    if not path.exists():
-        return []
-
-    experiments = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                experiments.append(json.loads(line))
-            except json.JSONDecodeError:
-                continue
-    return experiments
-
-
-def load_config() -> dict:
-    """Load config.yaml if present, else return defaults."""
-    if Path("config.yaml").exists():
-        with open("config.yaml") as f:
-            return yaml.safe_load(f) or {}
-    return {}
 
 
 def find_best(experiments: list[dict], primary_metric: str, lower_is_better: bool) -> str | None:

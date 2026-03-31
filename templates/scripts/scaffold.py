@@ -78,6 +78,7 @@ TEMPLATE_DIRS = {
         "generate_logbook.py",
         "validate_stability.py",
         "show_environment.py",
+        "turing_io.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }

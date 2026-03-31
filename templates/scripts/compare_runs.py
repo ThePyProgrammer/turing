@@ -16,6 +16,8 @@ from pathlib import Path
 
 import yaml
 
+from scripts.turing_io import load_config
+
 DEFAULT_LOG_PATH = "experiments/log.jsonl"
 
 
@@ -37,14 +39,6 @@ def load_experiment(log_path: str, experiment_id: str) -> dict | None:
             except json.JSONDecodeError:
                 continue
     return None
-
-
-def load_config() -> dict:
-    """Load config.yaml if present, else return defaults."""
-    if Path("config.yaml").exists():
-        with open("config.yaml") as f:
-            return yaml.safe_load(f) or {}
-    return {}
 
 
 def format_comparison(exp_a: dict, exp_b: dict, config: dict) -> str:

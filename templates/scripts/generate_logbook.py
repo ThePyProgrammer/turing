@@ -23,41 +23,7 @@ from pathlib import Path
 
 import yaml
 
-
-def load_experiments(log_path: str) -> list[dict]:
-    """Load experiments from JSONL log."""
-    path = Path(log_path)
-    if not path.exists():
-        return []
-    experiments = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                try:
-                    experiments.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
-    return experiments
-
-
-def load_hypotheses(queue_path: str) -> list[dict]:
-    """Load hypothesis queue."""
-    path = Path(queue_path)
-    if not path.exists() or path.stat().st_size == 0:
-        return []
-    with open(path) as f:
-        data = yaml.safe_load(f)
-    return data if isinstance(data, list) else []
-
-
-def load_config(config_path: str) -> dict:
-    """Load project config."""
-    path = Path(config_path)
-    if not path.exists():
-        return {}
-    with open(path) as f:
-        return yaml.safe_load(f) or {}
+from scripts.turing_io import load_config, load_experiments, load_hypotheses
 
 
 def load_decisions(decisions_dir: str) -> list[dict]:

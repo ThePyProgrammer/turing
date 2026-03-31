@@ -22,6 +22,7 @@ from pathlib import Path
 
 import yaml
 
+from scripts.turing_io import load_config
 
 DEFAULT_RUNS = 5
 CV_THRESHOLD = 5.0  # Percent
@@ -55,14 +56,6 @@ def run_experiment(seed: int) -> float | None:
                 except ValueError:
                     pass
     return None
-
-
-def load_config() -> dict:
-    """Load config.yaml."""
-    if Path("config.yaml").exists():
-        with open("config.yaml") as f:
-            return yaml.safe_load(f) or {}
-    return {}
 
 
 def check_stability(n_runs: int = DEFAULT_RUNS) -> dict:

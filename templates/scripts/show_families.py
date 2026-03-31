@@ -18,22 +18,7 @@ from pathlib import Path
 
 import yaml
 
-
-def load_experiments(log_path: str) -> list[dict]:
-    """Load all experiments from JSONL log."""
-    path = Path(log_path)
-    if not path.exists():
-        return []
-    experiments = []
-    with open(path) as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                try:
-                    experiments.append(json.loads(line))
-                except json.JSONDecodeError:
-                    continue
-    return experiments
+from scripts.turing_io import load_experiments
 
 
 def group_by_family(experiments: list[dict]) -> dict[str, list[dict]]:
