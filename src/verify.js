@@ -22,11 +22,21 @@ const EXPECTED_COMMANDS = [
   "validate/SKILL.md",
   "try/SKILL.md",
   "brief/SKILL.md",
+  "suggest/SKILL.md",
+  "design/SKILL.md",
+  "logbook/SKILL.md",
+  "poster/SKILL.md",
+  "report/SKILL.md",
+  "mode/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
 
-const EXPECTED_CONFIG = ["defaults.yaml", "lifecycle.toml", "taxonomy.toml"];
+const EXPECTED_CONFIG = [
+  "defaults.yaml", "lifecycle.toml", "taxonomy.toml",
+  "experiment_archetypes.yaml", "novelty_aliases.yaml",
+  "relationships.toml", "state.toml", "task_taxonomy.yaml",
+];
 
 async function fileExists(path) {
   try {
