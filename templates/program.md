@@ -71,6 +71,8 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    cat RESEARCH_PLAN.md 2>/dev/null || true
    ```
 
+   Read `model_registry.yaml` to know what model architectures are available, their default hyperparameters, and family groupings. Use this to inform model selection during suggest and model_comparison archetypes.
+
    If `RESEARCH_PLAN.md` exists, use it for strategic direction (which model families to explore, in what order, what budget). The plan is advisory — deviate if evidence warrants, but note why.
 
    For the most recent discarded experiments, read the actual git diff to understand what was tried and failed — do NOT rely on your own memory of what you changed:
