@@ -313,6 +313,8 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:try <hypothesis>` | Inject a hypothesis — free text or `archetype:model_comparison` |
 | `/turing:brief [--deep]` | Research briefing — campaign summary, failure patterns, literature-grounded suggestions |
 | `/turing:suggest` | Literature-grounded model architecture suggestions with citations |
+| `/turing:suggest --strategy treequest` | Tree-search hypothesis exploration (alias for `/turing:explore`) |
+| `/turing:explore` | AB-MCTS tree search over critique-scored hypothesis space |
 | `/turing:design <hyp-id>` | Generate structured experiment design from a hypothesis |
 | `/turing:mode <explore\|exploit\|replicate>` | Set research strategy — drives novelty guard policy |
 
@@ -390,6 +392,39 @@ After N experiments with no meaningful improvement, the agent stops and reports 
 
 For noisy metrics, `/turing:validate` runs the pipeline multiple times and measures variance. If the coefficient of variation exceeds 5%, it auto-configures multi-run evaluation so the agent can't be rewarded for lucky single runs.
 
+## Tree-Search Hypothesis Exploration
+
+> *"The learned coin-flipper weaves through the quadrillion-coin room with a preternatural air."*
+
+Sometimes the best experiment to try next isn't obvious from the literature or the agent's memory. `/turing:explore` uses [TreeQuest](https://github.com/SakanaAI/treequest)'s AB-MCTS (Adaptive Branching Monte Carlo Tree Search) to search the space of experiment *ideas* as a tree, scored by the critique engine (novelty x feasibility x impact).
+
+```
+/turing:explore                         # Run MCTS over hypothesis space
+/turing:explore --strategy greedy       # Greedy fallback (no TreeQuest needed)
+/turing:explore --iterations 50 --top 8 # Deeper search, more results
+/turing:suggest --strategy treequest    # Same thing via suggest
+```
+
+How it works:
+
+```
+         Seeds                    MCTS expands best-scoring branches
+           │
+    ┌──────┼──────┐               Each node is a hypothesis scored by:
+    ▼      ▼      ▼                 - Novelty (vs experiment history)
+  LightGBM Reg  Features            - Feasibility (hardware, deps)
+    │       │      │                - Expected impact (type success rate)
+    ▼       ▼      ▼
+  +dart   +L1   +poly             Top-K results queued as hypotheses
+    │              │              for the next /turing:train run
+    ▼              ▼
+  +subsamp      +target-enc
+```
+
+Unlike `/turing:suggest` (which searches the web for papers), `/turing:explore` searches the space of *refinement chains* — combinations and sequences of modifications that score well together. It discovers non-obvious experiment strategies that independent suggestions cannot find.
+
+Falls back to greedy best-first search when TreeQuest is not installed.
+
 ## Cost-Performance Frontier
 
 > *"This model is 2% better but takes 10x longer to train. Is that worth it?"*
@@ -451,11 +486,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-16 commands, 2 agents, 8 config files, 30 template scripts, model registry, artifact contract, cost-performance frontier, model cards, 345 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+17 commands, 2 agents, 8 config files, 31 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, 379 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              15 skill files (core + taste-leverage + reporting)
+├── commands/              16 skill files (core + taste-leverage + reporting + exploration)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
@@ -464,7 +499,7 @@ turing/
 │   ├── train.py           Training code (AGENT-EDITABLE)
 │   ├── model_contract.md  Artifact schema for production consumers
 │   ├── model_registry.yaml  Available model architectures + hyperparams
-│   └── scripts/           25 Python scripts (core loop + analysis + infra)
+│   └── scripts/           26 Python scripts (core loop + analysis + infra + tree search)
 ├── tests/                 338 tests (unit + integration + anti-pattern + manifest)
 ├── src/                   5 JS installer files (npm deployment)
 ├── bin/                   CLI entry points
@@ -482,6 +517,7 @@ turing/
 - **[Principle of Least Privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege)** (Saltzer & Schroeder, 1975) — each agent has exactly the capabilities needed for its role
 - **[Early Stopping](https://en.wikipedia.org/wiki/Early_stopping)** (Prechelt, 1998) — convergence detection as discrete early stopping
 - **[Multi-Armed Bandits](https://en.wikipedia.org/wiki/Multi-armed_bandit)** — the explore-exploit tradeoff
+- **[TreeQuest](https://github.com/SakanaAI/treequest)** (Sakana AI, 2025) — AB-MCTS for inference-time scaling; repurposed here for hypothesis-space exploration
 - **[Version Control as Lab Notebook](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004668)** (Ram, 2013) — git as a scientific record-keeping system
 - **[Reproducibility Crisis](https://en.wikipedia.org/wiki/Replication_crisis)** — if the measurement can change between experiments, results are not reproducible
 
