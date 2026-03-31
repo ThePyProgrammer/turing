@@ -14,9 +14,12 @@ from scripts.generate_brief import (
     compute_campaign_summary,
     compute_trajectory,
     find_best,
+    format_brief,
     generate_brief,
     identify_model_types,
     load_experiments,
+    load_reproductions,
+    load_seed_studies,
 )
 
 
@@ -162,3 +165,140 @@ def test_generate_brief_empty(tmp_path: Path):
     )
     assert "# Research Briefing" in brief
     assert "No kept experiments yet" in brief
+
+
+# --- Seed study integration ---
+
+
+def test_brief_includes_seed_studies():
+    """Brief should include seed study section when studies exist."""
+    seed_studies = [
+        {
+            "experiment_id": "exp-042",
+            "metric": "accuracy",
+            "mean": 0.8678,
+            "std": 0.0071,
+            "cv_percent": 0.82,
+            "seed_sensitive": False,
+            "ci_95": [0.859, 0.877],
+            "seeds_run": [42, 123, 456, 789, 1024],
+        },
+    ]
+    brief = format_brief(
+        {"total": 5, "kept": 3, "discarded": 2, "keep_rate": 0.6,
+         "first_experiment": "2026-01-01T00:00:00", "last_experiment": "2026-03-31T00:00:00"},
+        _make_exp("exp-042", "kept", 0.87),
+        [{"experiment_id": "exp-042", "value": 0.87, "best_so_far": 0.87}],
+        {"xgboost": {"total": 5, "kept": 3, "discarded": 2}},
+        [],
+        "accuracy", False,
+        seed_studies=seed_studies,
+    )
+    assert "Seed Studies" in brief
+    assert "exp-042" in brief
+    assert "STABLE" in brief
+
+
+def test_brief_includes_sensitive_seed_warning():
+    """Brief should warn about seed-sensitive results."""
+    seed_studies = [
+        {
+            "experiment_id": "exp-001",
+            "metric": "accuracy",
+            "mean": 0.80,
+            "std": 0.10,
+            "cv_percent": 12.5,
+            "seed_sensitive": True,
+            "ci_95": [0.55, 1.05],
+            "seeds_run": [42, 123, 456],
+        },
+    ]
+    brief = format_brief(
+        {"total": 1, "kept": 1, "discarded": 0, "keep_rate": 1.0,
+         "first_experiment": "2026-01-01T00:00:00", "last_experiment": "2026-01-01T00:00:00"},
+        _make_exp("exp-001", "kept"),
+        [],
+        {},
+        [],
+        "accuracy", False,
+        seed_studies=seed_studies,
+    )
+    assert "SEED-SENSITIVE" in brief
+    assert "Report distributions" in brief.lower() or "report distributions" in brief.lower()
+
+
+def test_brief_includes_reproductions():
+    """Brief should include reproducibility section when reports exist."""
+    reproductions = [
+        {
+            "experiment_id": "exp-042",
+            "verdict": "approximately_reproducible",
+            "reason": "Within 2.0% tolerance",
+        },
+    ]
+    brief = format_brief(
+        {"total": 1, "kept": 1, "discarded": 0, "keep_rate": 1.0,
+         "first_experiment": "2026-01-01T00:00:00", "last_experiment": "2026-01-01T00:00:00"},
+        _make_exp("exp-042", "kept"),
+        [],
+        {},
+        [],
+        "accuracy", False,
+        reproductions=reproductions,
+    )
+    assert "Reproducibility" in brief
+    assert "PASS" in brief
+
+
+def test_brief_no_seed_studies():
+    """Brief should omit seed study section when no studies exist."""
+    brief = format_brief(
+        {"total": 1, "kept": 1, "discarded": 0, "keep_rate": 1.0,
+         "first_experiment": "2026-01-01T00:00:00", "last_experiment": "2026-01-01T00:00:00"},
+        _make_exp("exp-001", "kept"),
+        [],
+        {},
+        [],
+        "accuracy", False,
+    )
+    assert "Seed Studies" not in brief
+    assert "Reproducibility" not in brief
+
+
+# --- load_seed_studies / load_reproductions ---
+
+
+def test_load_seed_studies_from_dir(tmp_path: Path):
+    """Should load YAML files from seed studies directory."""
+    seed_dir = tmp_path / "seed_studies"
+    seed_dir.mkdir()
+    study = {"experiment_id": "exp-001", "mean": 0.85, "std": 0.01}
+    with open(seed_dir / "exp-001-seeds.yaml", "w") as f:
+        yaml.dump(study, f)
+    studies = load_seed_studies(str(seed_dir))
+    assert len(studies) == 1
+    assert studies[0]["experiment_id"] == "exp-001"
+
+
+def test_load_seed_studies_empty_dir(tmp_path: Path):
+    """Should return empty list for nonexistent directory."""
+    studies = load_seed_studies(str(tmp_path / "nonexistent"))
+    assert studies == []
+
+
+def test_load_reproductions_from_dir(tmp_path: Path):
+    """Should load YAML files from reproductions directory."""
+    repro_dir = tmp_path / "reproductions"
+    repro_dir.mkdir()
+    report = {"experiment_id": "exp-001", "verdict": "reproducible"}
+    with open(repro_dir / "exp-001-repro.yaml", "w") as f:
+        yaml.dump(report, f)
+    reports = load_reproductions(str(repro_dir))
+    assert len(reports) == 1
+    assert reports[0]["verdict"] == "reproducible"
+
+
+def test_load_reproductions_empty_dir(tmp_path: Path):
+    """Should return empty list for nonexistent directory."""
+    reports = load_reproductions(str(tmp_path / "nonexistent"))
+    assert reports == []
