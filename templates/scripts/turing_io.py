@@ -74,3 +74,39 @@ def load_hypotheses(queue_path: str) -> list[dict]:
     with open(path) as f:
         data = yaml.safe_load(f)
     return data if isinstance(data, list) else []
+
+
+def load_seed_study(exp_id: str, seed_dir: str = "experiments/seed_studies") -> dict | None:
+    """Load a seed study result for a specific experiment.
+
+    Args:
+        exp_id: Experiment ID (e.g., "exp-042").
+        seed_dir: Directory containing seed study YAML files.
+
+    Returns:
+        Seed study dict, or None if not found.
+    """
+    path = Path(seed_dir) / f"{exp_id}-seeds.yaml"
+    if not path.exists():
+        return None
+    with open(path) as f:
+        data = yaml.safe_load(f)
+    return data if isinstance(data, dict) else None
+
+
+def load_reproduction(exp_id: str, repro_dir: str = "experiments/reproductions") -> dict | None:
+    """Load a reproduction report for a specific experiment.
+
+    Args:
+        exp_id: Experiment ID (e.g., "exp-042").
+        repro_dir: Directory containing reproduction YAML files.
+
+    Returns:
+        Reproduction report dict, or None if not found.
+    """
+    path = Path(repro_dir) / f"{exp_id}-repro.yaml"
+    if not path.exists():
+        return None
+    with open(path) as f:
+        data = yaml.safe_load(f)
+    return data if isinstance(data, dict) else None
