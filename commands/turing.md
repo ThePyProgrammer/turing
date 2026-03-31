@@ -9,7 +9,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 
 | User says... | Route to | Lifecycle phase |
 |---|---|---|
-| "train", "run experiments", "autoresearch", "improve the model", "start training" | `/turing:train` | Execute |
+| "train", "train ml/coding", "train ml/claims", "run experiments", "run experiments in ml/X", "autoresearch", "improve the model", "start training" | `/turing:train` | Execute |
 | "status", "how's training", "experiment results", "current metrics" | `/turing:status` | Observe |
 | "compare", "diff runs", "which is better" | `/turing:compare` | Analyze |
 | "sweep", "grid search", "hyperparameter search", "tune" | `/turing:sweep` | Explore |
@@ -29,7 +29,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 
 | Command | Purpose | Agent |
 |---|---|---|
-| `/turing:train [N]` | Run the autonomous experiment loop | @ml-researcher |
+| `/turing:train [ml/project] [N]` | Run the autonomous experiment loop (auto-detects project from path or cwd) | @ml-researcher |
 | `/turing:status` | Show experiment status, best model, convergence | @ml-evaluator |
 | `/turing:compare <a> <b>` | Side-by-side experiment comparison | @ml-evaluator |
 | `/turing:sweep` | Generate and run hyperparameter sweep | @ml-researcher |
