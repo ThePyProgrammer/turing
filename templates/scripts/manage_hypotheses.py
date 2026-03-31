@@ -343,6 +343,13 @@ def main() -> None:
     # count
     subparsers.add_parser("count", help="Count hypotheses by status")
 
+    # critique
+    critique_parser = subparsers.add_parser("critique", help="Score a hypothesis before execution")
+    critique_parser.add_argument("id", help="Hypothesis ID to critique")
+    critique_parser.add_argument("--log", default="experiments/log.jsonl")
+    critique_parser.add_argument("--config", default="config.yaml")
+    critique_parser.add_argument("--json", action="store_true", help="Output as JSON")
+
     args = parser.parse_args()
 
     if args.command == "add":
@@ -420,6 +427,33 @@ def main() -> None:
         print(f"Total: {total}")
         for status, count in sorted(counts.items()):
             print(f"  {status}: {count}")
+
+    elif args.command == "critique":
+        detail = load_detail(args.id)
+        if not detail:
+            print(f"Hypothesis {args.id} not found.", file=sys.stderr)
+            sys.exit(1)
+
+        from scripts.critique_hypothesis import critique_hypothesis, format_critique
+        import json as _json
+
+        result = critique_hypothesis(detail["description"], args.log, args.config)
+
+        # Store critique score in the detail file
+        update_detail(args.id, {"critique_score": result["overall_score"],
+                                "critique_verdict": result["verdict"]})
+
+        if args.json:
+            print(_json.dumps({
+                "id": args.id,
+                "overall_score": result["overall_score"],
+                "verdict": result["verdict"],
+                "novelty_score": result["novelty"]["score"],
+                "feasibility_score": result["feasibility"]["score"],
+                "impact_score": result["impact"]["score"],
+            }, indent=2))
+        else:
+            print(format_critique(result))
 
     else:
         parser.print_help()
