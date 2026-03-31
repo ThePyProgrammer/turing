@@ -44,9 +44,16 @@ def format_table(experiments: list[dict], best_id: str | None, metric_names: lis
     if not experiments:
         return "No experiments logged yet."
 
+    # Detect if any experiment has train_seconds
+    has_train_seconds = any(
+        exp.get("metrics", {}).get("train_seconds") is not None
+        for exp in experiments
+    )
+
     # Build dynamic header based on configured metrics
     metric_headers = "".join(f"{m:>12}" for m in metric_names)
-    header = f"{'ID':<10} {'Status':<10} {'Model':<15}{metric_headers} {'Timestamp':<22}"
+    time_header = f"{'Time':>10}" if has_train_seconds else ""
+    header = f"{'ID':<10} {'Status':<10} {'Model':<15}{metric_headers}{time_header} {'Timestamp':<22}"
     sep = "-" * len(header)
     lines = [header, sep]
 
@@ -62,9 +69,23 @@ def format_table(experiments: list[dict], best_id: str | None, metric_names: lis
             else:
                 metric_values += f"{'N/A':>12}"
 
+        time_col = ""
+        if has_train_seconds:
+            train_secs = metrics.get("train_seconds")
+            if train_secs is not None:
+                if train_secs < 60:
+                    time_col = f"{train_secs:.1f}s"
+                elif train_secs < 3600:
+                    time_col = f"{train_secs / 60:.1f}m"
+                else:
+                    time_col = f"{train_secs / 3600:.1f}h"
+                time_col = f"{time_col:>10}"
+            else:
+                time_col = f"{'N/A':>10}"
+
         ts = exp.get("timestamp", "")[:19]
         marker = " *BEST*" if exp.get("experiment_id") == best_id else ""
-        line = f"{exp.get('experiment_id', '?'):<10} {exp.get('status', '?'):<10} {model_type:<15}{metric_values} {ts}{marker}"
+        line = f"{exp.get('experiment_id', '?'):<10} {exp.get('status', '?'):<10} {model_type:<15}{metric_values}{time_col} {ts}{marker}"
         lines.append(line)
 
     return "\n".join(lines)
