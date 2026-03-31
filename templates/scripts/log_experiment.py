@@ -114,6 +114,17 @@ def log_experiment(
     path = Path(log_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
+    # Load environment snapshot from train_metadata.json if available
+    environment = None
+    metadata_path = Path("train_metadata.json")
+    if metadata_path.exists():
+        try:
+            with open(metadata_path) as mf:
+                meta = json.load(mf)
+                environment = meta.get("environment")
+        except (json.JSONDecodeError, OSError):
+            pass
+
     entry = {
         "experiment_id": experiment_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -127,6 +138,7 @@ def log_experiment(
         "metrics": metrics,
         "model_path": model_path,
         "description": description,
+        "environment": environment,
     }
 
     with open(path, "a") as f:
