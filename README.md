@@ -300,8 +300,8 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 
 | Command | What it does |
 |---------|-------------|
-| `/turing:init [--plan]` | Scaffold a new ML project. `--plan` generates a literature-grounded research plan. |
-| `/turing:train [N]` | Run the autonomous experiment loop (optional max iterations) |
+| `/turing:init [--plan]` | Scaffold a new ML project. `--plan` generates a literature-grounded research plan. Supports multiple projects in subdirectories. |
+| `/turing:train [ml/project] [N]` | Run the experiment loop. Auto-detects project from cwd or explicit path. |
 | `/turing:sweep` | Systematic hyperparameter sweep via cartesian product |
 | `/turing:status` | Quick experiment status — best model, convergence state |
 | `/turing:compare <a> <b>` | Side-by-side experiment comparison with causal analysis |
@@ -404,15 +404,27 @@ claude plugin add /path/to/turing
 ### Quick Start
 
 ```bash
-/turing:init            # Scaffold project (answer 3 prompts)
-/turing:train           # Run experiment loop
-/turing:brief           # Read what happened
-/turing:try "idea"      # Inject your taste
+/turing:init                    # Scaffold project (answer 3 prompts)
+/turing:train                   # Run experiment loop
+/turing:brief                   # Read what happened
+/turing:try "idea"              # Inject your taste
 ```
+
+### Multiple Projects
+
+```bash
+/turing:init                    # Scaffold ml/sentiment
+/turing:init                    # Scaffold ml/churn
+/turing:train ml/sentiment      # Train in specific project
+/turing:brief ml/churn          # Brief for specific project
+cd ml/sentiment && /turing:train  # Auto-detects from cwd
+```
+
+Each project gets independent config, data, experiments, models, and agent memory.
 
 ## Architecture of Turing Itself
 
-15 commands, 2 agents, 8 config files, 25 template scripts, 338 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+15 commands, 2 agents, 8 config files, 25 template scripts, model registry, artifact contract, 338 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
@@ -423,6 +435,8 @@ turing/
 │   ├── prepare.py         Data loading (HIDDEN from agent)
 │   ├── evaluate.py        Evaluation harness (HIDDEN from agent)
 │   ├── train.py           Training code (AGENT-EDITABLE)
+│   ├── model_contract.md  Artifact schema for production consumers
+│   ├── model_registry.yaml  Available model architectures + hyperparams
 │   └── scripts/           25 Python scripts (core loop + analysis + infra)
 ├── tests/                 338 tests (unit + integration + anti-pattern + manifest)
 ├── src/                   5 JS installer files (npm deployment)
