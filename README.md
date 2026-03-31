@@ -323,6 +323,8 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | Command | What it does |
 |---------|-------------|
 | `/turing:validate [--auto]` | Check metric stability — auto-configure multi-run if noisy |
+| `/turing:seed [N] [--quick]` | Multi-seed study — mean/std/CI, flag seed-sensitive results |
+| `/turing:reproduce <exp-id>` | Reproducibility verification — re-run and check tolerance |
 | `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
 | `/turing:report` | Generate research report |
@@ -391,6 +393,32 @@ convergence:
 After N experiments with no meaningful improvement, the agent stops and reports what it found. The human then decides: is this good enough, or should we point the agent at a different region?
 
 For noisy metrics, `/turing:validate` runs the pipeline multiple times and measures variance. If the coefficient of variation exceeds 5%, it auto-configures multi-run evaluation so the agent can't be rewarded for lucky single runs.
+
+## Statistical Rigor
+
+> *"Stop publishing lucky seeds. Start publishing distributions."*
+
+Before claiming a result, run a seed study:
+
+```
+/turing:seed              # 5 seeds on best experiment
+/turing:seed --quick      # 3 seeds for fast check
+/turing:seed 10           # 10 seeds for thorough study
+```
+
+This runs the same experiment across multiple random seeds and reports mean +/- std with 95% confidence intervals. If the coefficient of variation exceeds 5%, the result is flagged as **seed-sensitive** — meaning you should report the distribution, not a single number.
+
+To verify an experiment can be reproduced:
+
+```
+/turing:reproduce exp-042                  # Default: 3 runs, 2% tolerance
+/turing:reproduce exp-042 --strict         # Exact match required
+/turing:reproduce exp-042 --tolerance 0.05 # Custom tolerance
+```
+
+This re-runs the experiment from the logged config and checks that metrics fall within tolerance. It also detects environment drift — if library versions have changed since the original run, you'll know before a reviewer tells you.
+
+Seed study results automatically appear in `/turing:brief` and `/turing:card`.
 
 ## Tree-Search Hypothesis Exploration
 
