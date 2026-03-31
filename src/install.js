@@ -19,7 +19,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, "..");
 
 // Single source of truth for sub-commands (DRY — used for dirs and file copy)
-const SUB_COMMANDS = ["init", "train", "status", "compare", "sweep", "validate", "try", "brief"];
+const SUB_COMMANDS = [
+  "init", "train", "status", "compare", "sweep", "validate",
+  "try", "brief", "suggest", "design", "logbook", "poster",
+  "report", "mode",
+];
 
 export async function install(opts = {}) {
   const scope = opts.global ? "global" : opts.project ? "project" : "global";
@@ -68,7 +72,11 @@ export async function install(opts = {}) {
   console.log(`  ${agentFiles.length} agents installed`);
 
   // Copy config (static schema files only)
-  const CONFIG_FILES = ["defaults.yaml", "lifecycle.toml", "taxonomy.toml"];
+  const CONFIG_FILES = [
+    "defaults.yaml", "lifecycle.toml", "taxonomy.toml",
+    "experiment_archetypes.yaml", "novelty_aliases.yaml",
+    "relationships.toml", "state.toml", "task_taxonomy.yaml",
+  ];
   for (const file of CONFIG_FILES) {
     await copyFile(
       join(PLUGIN_ROOT, "config", file),
