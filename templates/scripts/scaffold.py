@@ -83,6 +83,7 @@ TEMPLATE_DIRS = {
         "turing_io.py",
         "preflight.py",
         "cleanup.py",
+        "generate_model_card.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
