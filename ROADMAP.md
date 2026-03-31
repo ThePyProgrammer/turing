@@ -440,5 +440,225 @@ Each layer addresses a different failure mode. Layers 1-3 prevent the agent from
 | 12 | Tool restriction | 5.4 | **High** | Partial | — |
 | 13 | Diff-based history | 5.5 | **Medium** | Planned | — |
 | 14 | Platform-managed execution | 5.6 | **Medium** | Future | — |
+| 15 | Novelty guard | 6.1 | **Critical** | Planned | — |
+| 16 | Decision packets | 6.2 | **High** | Planned | — |
+| 17 | Experiment families | 6.3 | **High** | Planned | — |
+| 18 | Failure clustering | 6.4 | **Medium** | Planned | — |
+| 19 | Research mode selection | 6.5 | **Medium** | Planned | — |
 
-Phases 1-4 complete (143 tests). Phase 5 (anti-cheating guardrails) is next.
+Phases 1-4 complete (165 tests). Phase 5 (anti-cheating) and Phase 6 (MemoryLab research-ops) are next.
+
+---
+
+## Phase 6: MemoryLab Research-Ops Layer
+
+*Source: [karpathy/autoresearch#172](https://github.com/karpathy/autoresearch/discussions/172) and [pauldebdeep9/autoresearch](https://github.com/pauldebdeep9/autoresearch)*
+
+### Background
+
+MemoryLab is a fork of Karpathy's autoresearch by pauldebdeep9 that adds an "operator-facing research memory layer" around the experiment loop. The upstream autoresearch has a tight loop but no memory of whether an idea is genuinely new, close to a prior success, or a likely repeat of a failed branch. MemoryLab wraps the loop with structured memory and decision infrastructure.
+
+The fork's thesis: the experiment loop itself is solved (Karpathy proved that). What's missing is the layer *around* the experiments — remembering what was tried, distinguishing repeated failures from intentional follow-ups, and helping a human wake up to something more interpretable than a pile of logs.
+
+### What MemoryLab Adds (Upstream Comparison)
+
+| Capability | karpathy/autoresearch | pauldebdeep9/MemoryLab | Turing (current) |
+|---|---|---|---|
+| Memory format | Console logs + TSV | Structured JSONL ledger + archived artifacts | JSONL log + structured `experiment_state.yaml` (Phase 4.1) |
+| Novelty control | None (agent decides) | History-aware guard (explore/exploit/replicate modes) | **NOT IMPLEMENTED** — agent uses MEMORY.md heuristically |
+| Run identity | Commit-oriented | Run-centric (repeated runs on same commit stay distinct) | Experiment-oriented (`exp-NNN` IDs, but no multi-run distinction) |
+| Best-run tracking | Manual inspection | Champion/challenger registry with lineage | `get_best_experiment()` function, but no challenger board |
+| Decision guidance | Human inference only | Policy-driven packets (promote, abandon, retry, etc.) | Hypothesis queue (Phase 1.1) — but no post-run decision synthesis |
+| Overnight reporting | Read logs by hand | Automated morning report + decision queue | `/turing:brief` (Phase 1.2) — similar but less structured |
+| Experiment families | None | Family tags group related experiments | `parent_experiment` linkage (Phase 1.3) — similar concept |
+
+### Overlap Analysis: What Turing Already Has
+
+**Significant overlap (already implemented):**
+- Structured experiment logging (JSONL) — Turing's `log_experiment.py` serves the same role as MemoryLab's ledger
+- Experiment lineage — Turing's `parent_experiment` field and `show_experiment_tree.py` cover MemoryLab's lineage tracking
+- Morning report — Turing's `/turing:brief` and `generate_brief.py` produce a similar report with campaign summary, trajectory, model types, hypothesis queue, and recommendations
+- Hypothesis queue — Turing's `manage_hypotheses.py` with status transitions covers the "what to try next" aspect
+- Structured state — Turing's `experiment_state.yaml` (Phase 4.1) serves the same purpose as MemoryLab's registry
+
+**Genuine gaps (MemoryLab has, Turing doesn't):**
+
+1. **Novelty guard** — the most valuable MemoryLab feature that Turing lacks entirely
+2. **Decision packets** — automated post-run "what happened / what next?" synthesis
+3. **Failure clustering** — identifying repeated failure patterns across experiments
+4. **Experiment families** — grouping experiments by strategic theme (not just parent-child)
+5. **Explore/exploit/replicate modes** — explicit research strategy selection
+
+### Merit Assessment
+
+**High merit — should implement:**
+
+1. **Novelty Guard (6.1)** — This is the single most impactful feature Turing is missing. Currently the agent has no mechanism to check whether a proposed experiment is genuinely new, a repeat of a known failure, or an incremental follow-up to a success. Without it, the agent wastes iterations re-trying things it has already tried (especially across `/loop` sessions where context is lost). MemoryLab's approach is deliberately heuristic — rule-based token matching with alias tables, not embedding search — which keeps it fast, inspectable, and dependency-free.
+
+2. **Decision Packets (6.2)** — After each experiment, MemoryLab synthesizes a compact verdict: `promote` (new champion), `branch_followup` (promising, explore further), `replicate` (needs confirmation), `abandon` (dead end), `fix_and_retry` (crashed, fixable). This is more structured than Turing's current approach where the agent makes a binary kept/discarded decision and updates free-text memory. Decision packets integrate naturally with the hypothesis queue — a `branch_followup` verdict can auto-queue a follow-up hypothesis.
+
+3. **Experiment Families (6.3)** — Grouping experiments by strategic theme ("optimizer-sweep", "architecture-search", "feature-engineering") provides a higher-level view than the parent-child tree. The agent can see that 8 experiments in the "optimizer-sweep" family produced diminishing returns, suggesting it's time to switch families rather than continuing to tweak learning rates.
+
+**Medium merit — useful but lower priority:**
+
+4. **Failure Clustering (6.4)** — Identifying patterns across failures (e.g., "all experiments with max_depth > 8 overfit") helps the agent avoid entire regions of the search space rather than individual points. Currently this analysis happens in the agent's reasoning, but a structured clustering tool would make it more reliable.
+
+5. **Research Mode Selection (6.5)** — The explore/exploit/replicate modes from MemoryLab provide an explicit strategy selector. Currently Turing's agent implicitly chooses between exploration and exploitation with no structured policy. Making this explicit would help the human steer: "we're in exploit mode now, focus on refining the current best."
+
+**Low merit — Turing's approach is better:**
+
+- **Champion/challenger registry** — Turing's `get_best_experiment()` + `generate_brief.py` already cover this. MemoryLab's registry is more elaborate but adds complexity for marginal benefit at Turing's scale.
+- **Run-centric identity** — MemoryLab distinguishes repeated runs on the same commit. Turing's Phase 2.1 (multi-run statistical significance) handles this more rigorously with actual statistical tests rather than just bookkeeping.
+
+### Design Constraints for Turing Integration
+
+MemoryLab was built for a specific context: karpathy/autoresearch's single-GPU nanochat training loop with 5-minute fixed-budget runs. Turing's context is different:
+
+1. **Project-scoped memory** — MemoryLab stores everything in `results/memorylab/`. Turing must scope memory per-project since one plugin manages multiple ML projects. The `experiment_state.yaml` and `hypotheses.yaml` already live in the ML project directory — new MemoryLab features must follow this pattern.
+
+2. **Plugin architecture** — MemoryLab is a standalone CLI (`memorylab.py`). Turing's features are Claude Code commands and scripts. New features should follow the existing pattern: a Python script in `templates/scripts/` consumed by a command in `commands/`.
+
+3. **Agent-native** — MemoryLab is operator-facing (the human runs `memorylab.py check`). In Turing, the agent runs the novelty check as part of its experiment loop. The novelty guard must be callable from `program.md` without human intervention.
+
+4. **Alias tables** — MemoryLab's novelty matching uses ML-training-specific alias tables ("learning rate" = "step size" = "lr"). Turing is model-agnostic (XGBoost, LightGBM, neural nets, etc.) so alias tables need to be configurable per project, not hardcoded.
+
+### Implementation Plan
+
+#### 6.1 Novelty Guard — Prevent Duplicate Work
+
+**What:** Before starting an experiment, check the proposed hypothesis against prior experiments. Classify as `novel`, `known_success`, `incremental_followup`, `repeat_failure`, or `duplicate_run`.
+
+**Why:** The highest-ROI MemoryLab feature. Prevents the agent from wasting iterations on ideas it has already tried, especially across `/loop` sessions where context is lost. MemoryLab's author frames it well: "not perfect semantic search — the goal is to prevent obvious duplicate work."
+
+**Implementation:**
+1. Create `templates/scripts/novelty_guard.py` with:
+   - `normalize_text(text)` — lowercase, strip stopwords, apply alias table, extract numbers
+   - `similarity_score(text_a, text_b)` — blend of token overlap (Jaccard), number overlap, and concept overlap (using configurable concept patterns)
+   - `classify_novelty(proposed, history, threshold=0.7)` — compare proposed text against all prior experiment descriptions, return classification + top matches + confidence
+   - `check_novelty(proposed, log_path, mode="exploit")` — main entry point, applies mode policy on top of classification
+2. Create `config/novelty_aliases.yaml` — configurable alias table (not hardcoded like MemoryLab):
+   ```yaml
+   phrase_aliases:
+     "learning rate": "lr"
+     "step size": "lr"
+     "batch size": "batch_size"
+     "gradient accumulation": "grad_accum"
+   token_aliases:
+     "increase": "up"
+     "decrease": "down"
+     "reduce": "down"
+   concept_patterns:
+     lr: ["lr", "learning_rate", "step_size"]
+     architecture: ["depth", "width", "heads", "layers"]
+     regularization: ["dropout", "weight_decay", "l1", "l2"]
+   ```
+3. Mode policies (from MemoryLab, adapted):
+   - `explore`: allow `novel`, block `duplicate_run` and `repeat_failure`
+   - `exploit`: allow `incremental_followup` and `known_success`, block `duplicate_run`
+   - `replicate`: allow `duplicate_run`, block `novel`
+4. Update `templates/program.md` HYPOTHESIZE step:
+   ```bash
+   python scripts/novelty_guard.py check \
+     --description "increase max_depth to 8" \
+     --log experiments/log.jsonl \
+     --mode exploit
+   ```
+   If blocked, the agent must choose a different hypothesis.
+5. Add to `templates/scripts/manage_hypotheses.py` — when adding an agent-generated hypothesis, run novelty check automatically. Human-injected hypotheses skip the guard (human taste overrides).
+6. Add tests for normalization, similarity scoring, classification, and mode policies.
+
+**Acceptance:** The agent cannot propose an experiment that is a near-duplicate of a prior failure without the guard flagging it. Human-injected hypotheses bypass the guard.
+
+#### 6.2 Decision Packets — Post-Run Verdict Synthesis
+
+**What:** After each experiment, synthesize a structured verdict that combines the run outcome, novelty classification, comparison to champion, and a recommended next action.
+
+**Why:** Currently the agent makes a binary kept/discarded decision. Decision packets add nuance: "this was kept but only marginally better — replicate before declaring it champion" or "this crashed, but it was an OOM — reduce batch size and retry."
+
+**Implementation:**
+1. Create `templates/scripts/synthesize_decision.py` with:
+   - `classify_outcome(metrics, best_metrics, config)` — determine if the run was a new champion, marginal improvement, lateral move, regression, or crash
+   - `recommend_action(outcome, novelty_class, hypothesis)` — map to action: `promote`, `branch_followup`, `replicate`, `abandon`, `fix_and_retry`, `investigate_crash`
+   - `format_decision_packet(run, outcome, action, evidence)` — produce a compact JSON summary
+2. Decision packets are written to `experiments/decisions/exp-NNN.json` alongside the JSONL log.
+3. Update `templates/program.md` RECORD step — after logging, synthesize a decision packet. The next iteration's OBSERVE step reads recent packets.
+4. Integrate with hypothesis queue:
+   - `branch_followup` → auto-queue a follow-up hypothesis as `agent` source, `medium` priority
+   - `fix_and_retry` → auto-queue a retry hypothesis with the crash context
+   - `abandon` → mark the associated hypothesis as `dead-end`
+5. Include decision packets in `/turing:brief` output.
+6. Add tests.
+
+**Acceptance:** Every experiment produces a decision packet. `branch_followup` and `fix_and_retry` verdicts auto-populate the hypothesis queue.
+
+#### 6.3 Experiment Families — Strategic Grouping
+
+**What:** Tag experiments with a `family` label (e.g., "optimizer-sweep", "architecture-search") to group related experiments beyond the parent-child tree.
+
+**Why:** The dependency tree shows individual lineage. Families show strategic themes. "All 8 experiments in the optimizer-sweep family produced diminishing returns" is a higher-level signal than "exp-007 is a child of exp-004."
+
+**Implementation:**
+1. Extend `log_experiment.py` — add optional `--family` and `--tags` CLI args. Store in JSONL entry.
+2. Extend `manage_hypotheses.py` — add `--family` and `--tags` to hypothesis entries.
+3. Create `templates/scripts/show_families.py` — group experiments by family, show per-family metrics:
+   ```
+   optimizer-sweep (8 experiments, 3 kept, best accuracy=0.87)
+   architecture-search (4 experiments, 1 kept, best accuracy=0.85)
+   feature-engineering (2 experiments, 2 kept, best accuracy=0.88)
+   ```
+4. Update `/turing:brief` to include family summary.
+5. Update novelty guard — same-family experiments get a lower novelty threshold (it's expected that experiments in a family are similar).
+6. Add tests.
+
+**Acceptance:** `python scripts/show_families.py` displays per-family performance summaries. The agent and human can see when a family is exhausted.
+
+#### 6.4 Failure Clustering — Pattern Detection Across Failures
+
+**What:** Automatically identify patterns across failed experiments — which hyperparameter ranges, model types, or feature combinations consistently fail.
+
+**Implementation:**
+1. Add to `generate_brief.py` — a "Failure Patterns" section that groups discarded experiments by common traits:
+   - "3/3 experiments with max_depth > 8 were discarded (overfitting)"
+   - "All neural network experiments were discarded (dataset too small?)"
+2. Use simple heuristics: group by model_type, by hyperparameter ranges, by family tags.
+3. Surface in `/turing:brief` output.
+4. Optionally feed back into novelty guard — experiments matching known failure patterns get flagged.
+
+**Acceptance:** `/turing:brief` includes a "Failure Patterns" section when discarded experiments share common traits.
+
+#### 6.5 Research Mode Selection — Explicit Strategy
+
+**What:** Add a `/turing:mode` command that sets the research strategy: explore (try new things), exploit (refine what works), replicate (verify results).
+
+**Implementation:**
+1. Create `commands/mode.md` — `/turing:mode explore|exploit|replicate`
+2. Store current mode in `experiment_state.yaml` under a `research_mode` key.
+3. The novelty guard reads the mode and applies the appropriate policy.
+4. The program.md HYPOTHESIZE step adapts behavior based on mode:
+   - `explore`: prefer novel hypotheses, skip incremental tweaks
+   - `exploit`: prefer follow-ups to best results, skip wild ideas
+   - `replicate`: re-run best experiments with different seeds
+5. Update router.
+6. Add tests.
+
+**Acceptance:** `/turing:mode exploit` causes the agent to focus on refining the current best rather than exploring new architectures.
+
+### Implementation Order
+
+| # | Feature | Phase | Priority | Depends On |
+|---|---------|-------|----------|------------|
+| 15 | Novelty guard | 6.1 | **Critical** | experiment log, alias config |
+| 16 | Decision packets | 6.2 | **High** | 6.1 (novelty classification feeds into packets) |
+| 17 | Experiment families | 6.3 | **High** | experiment log extension |
+| 18 | Failure clustering | 6.4 | **Medium** | 6.3 (families make clustering more meaningful) |
+| 19 | Research mode selection | 6.5 | **Medium** | 6.1 (mode drives novelty guard policy) |
+
+Phase 6.1 (novelty guard) is the highest-priority item. It's the single MemoryLab feature that Turing cannot replicate with existing infrastructure. The rest build on top of it.
+
+### What NOT to Adopt from MemoryLab
+
+1. **VRAM tracking** — MemoryLab tracks `peak_vram_mb` because upstream autoresearch runs on a single GPU. Turing is model-agnostic and may not involve GPUs at all (XGBoost runs on CPU). Skip.
+2. **Commit-centric identity** — MemoryLab indexes by git commit hash. Turing indexes by `exp-NNN` IDs which are cleaner for the hypothesis queue and dependency tree. Keep Turing's scheme.
+3. **Hardcoded alias tables** — MemoryLab's `novelty.py` has 30+ hardcoded aliases for LLM training ("muon", "adamw", "kv", "fa", etc.). Turing must use a configurable YAML alias table since it supports arbitrary ML tasks.
+4. **TSV compatibility layer** — MemoryLab maintains a compatibility TSV for upstream-style workflows. Turing already has its own TSV via `log_experiment.py`. No need for a second one.
+5. **Fixed 5-minute budget** — MemoryLab assumes 5-minute training runs. Turing has configurable convergence via patience/threshold. Keep Turing's approach.
