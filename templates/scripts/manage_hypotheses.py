@@ -346,8 +346,39 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "add":
-        hid = add_hypothesis(args.queue, args.description, args.source, args.priority, args.parent)
+        # Parse optional structured fields
+        architecture = {}
+        if args.model_type:
+            architecture["model_type"] = args.model_type
+        hyperparameters = None
+        if args.hyperparams:
+            import json as _json
+            hyperparameters = _json.loads(args.hyperparams)
+        expected_outcome = {}
+        if args.expected:
+            expected_outcome["rationale"] = args.expected
+        tags = [t.strip() for t in args.tags.split(",")] if args.tags else None
+
+        hid = add_hypothesis(
+            args.queue, args.description, args.source, args.priority,
+            parent_experiment=args.parent,
+            parent_hypothesis=getattr(args, "parent_hyp", None),
+            family=args.family,
+            tags=tags,
+            architecture=architecture or None,
+            hyperparameters=hyperparameters,
+            expected_outcome=expected_outcome or None,
+        )
         print(f"Added {hid}: {args.description}")
+        print(f"Detail: {DETAIL_DIR}/{hid}.yaml")
+
+    elif args.command == "show":
+        detail = load_detail(args.id)
+        if detail:
+            print(yaml.dump(detail, default_flow_style=False, sort_keys=False))
+        else:
+            print(f"No detail file for {args.id}.", file=sys.stderr)
+            sys.exit(1)
 
     elif args.command == "list":
         hypotheses = list_hypotheses(args.queue, args.status)
@@ -357,13 +388,26 @@ def main() -> None:
         h = get_next_hypothesis(args.queue)
         if h:
             import json
+            # Also print detail file path if it exists
+            detail = load_detail(h["id"])
             print(json.dumps(h, indent=2))
+            if detail:
+                print(f"\nDetail: {DETAIL_DIR}/{h['id']}.yaml")
         else:
             print("No queued hypotheses.", file=sys.stderr)
             sys.exit(1)
 
     elif args.command == "mark":
-        found = mark_hypothesis(args.queue, args.id, args.status, args.result)
+        result_metrics = None
+        if args.metrics:
+            import json as _json
+            result_metrics = _json.loads(args.metrics)
+        found = mark_hypothesis(
+            args.queue, args.id, args.status,
+            result_experiment=args.result,
+            result_metrics=result_metrics,
+            result_notes=args.notes,
+        )
         if found:
             print(f"Marked {args.id} as {args.status}")
         else:

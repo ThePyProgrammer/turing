@@ -86,15 +86,27 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    python scripts/manage_hypotheses.py mark hyp-NNN in-progress
    ```
 
-   **If generating your own hypothesis**, register it first:
+   **If generating your own hypothesis**, register it with structured detail:
    ```bash
-   python scripts/manage_hypotheses.py add "your hypothesis description" --priority medium --source agent
+   python scripts/manage_hypotheses.py add "your hypothesis description" \
+     --priority medium --source agent \
+     --model-type xgboost \
+     --hyperparams '{"max_depth": 8, "n_estimators": 200}' \
+     --family optimizer-sweep \
+     --tags "depth,estimators" \
+     --parent exp-NNN \
+     --expected "deeper trees should capture feature interactions"
    python scripts/manage_hypotheses.py mark hyp-NNN in-progress
    ```
 
+   This creates both an index entry in `hypotheses.yaml` and a detailed file at `hypotheses/hyp-NNN.yaml` with full architecture, hyperparameters, expected outcome, and lineage.
+
    Every experiment must have a corresponding hypothesis in the queue. This ensures the hypothesis database is a complete record of every idea — human and agent alike.
 
-   Document what you expect and why before proceeding.
+   To read a hypothesis's full detail:
+   ```bash
+   python scripts/manage_hypotheses.py show hyp-NNN
+   ```
 
 3. **PREPARE** — Modify `config.yaml` for hyperparameter changes. Only modify `train.py` for structural code changes.
 
@@ -133,12 +145,17 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
      models/model.joblib "Description of hypothesis and outcome"
    ```
 
-   Update the hypothesis status:
+   Update the hypothesis status with result metrics:
    ```bash
-   python scripts/manage_hypotheses.py mark hyp-NNN tested --result exp-NNN
-   # or: mark hyp-NNN promising --result exp-NNN (if it improved significantly)
-   # or: mark hyp-NNN dead-end --result exp-NNN (if it clearly failed)
+   python scripts/manage_hypotheses.py mark hyp-NNN tested \
+     --result exp-NNN \
+     --metrics '{"{{TARGET_METRIC}}": X.XX, ...}' \
+     --notes "Brief explanation of what happened and why"
+   # or: mark hyp-NNN promising (if it improved significantly)
+   # or: mark hyp-NNN dead-end (if it clearly failed)
    ```
+
+   This updates both `hypotheses.yaml` (index) and `hypotheses/hyp-NNN.yaml` (detail file with full result metrics and notes).
 
 9. **CONVERGE** — Check stopping conditions:
    - N consecutive non-improvements (`config.yaml` → `convergence.patience`) = STOP
