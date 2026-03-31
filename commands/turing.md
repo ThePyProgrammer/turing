@@ -16,6 +16,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "init", "set up ML", "initialize", "scaffold", "bootstrap" | `/turing:init` | Setup |
 | "try", "test this", "inject", "what if we", "I think we should" | `/turing:try` | Steer |
 | "brief", "briefing", "report", "what have we learned", "summary" | `/turing:brief` | Report |
+| "validate", "stability", "check variance", "noisy" | `/turing:validate` | Validate |
 
 ## Sub-commands
 
@@ -28,6 +29,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:try <hypothesis>` | Inject a hypothesis into the agent's queue | (inline) |
 | `/turing:brief` | Generate structured research intelligence report | @ml-evaluator |
 | `/turing:init` | Scaffold a new ML project | (inline) |
+| `/turing:validate` | Check metric stability, auto-fix if noisy | (inline) |
 
 ## Proactive Detection
 
