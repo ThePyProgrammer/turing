@@ -14,6 +14,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "compare", "diff runs", "which is better" | `/turing:compare` | Analyze |
 | "sweep", "grid search", "hyperparameter search", "tune" | `/turing:sweep` | Explore |
 | "init", "set up ML", "initialize", "scaffold", "bootstrap" | `/turing:init` | Setup |
+| "try", "test this", "inject", "what if we", "I think we should" | `/turing:try` | Steer |
+| "brief", "briefing", "report", "what have we learned", "summary" | `/turing:brief` | Report |
 
 ## Sub-commands
 
@@ -23,6 +25,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:status` | Show experiment status, best model, convergence | @ml-evaluator |
 | `/turing:compare <a> <b>` | Side-by-side experiment comparison | @ml-evaluator |
 | `/turing:sweep` | Generate and run hyperparameter sweep | @ml-researcher |
+| `/turing:try <hypothesis>` | Inject a hypothesis into the agent's queue | (inline) |
+| `/turing:brief` | Generate structured research intelligence report | @ml-evaluator |
 | `/turing:init` | Scaffold a new ML project | (inline) |
 
 ## Proactive Detection
