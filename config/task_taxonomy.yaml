@@ -1,0 +1,110 @@
+# ML Task Property Taxonomy
+#
+# Used by suggest_models.py to classify a task and generate
+# targeted arXiv search queries. Adapted from AERO's
+# ML_RESEARCH_CATEGORIES (src/aero/model_researcher/shared_defs.py).
+#
+# Each category has a key, a human-readable label, and a description.
+# The LLM detects which categories apply to the user's task.
+# Categories can be extended per-project by editing this file.
+
+categories:
+  variable_length_sequences:
+    label: "Variable-Length Sequences"
+    description: "Data consists of sequences of varying lengths (e.g., text, sensor streams, speech)"
+    search_terms: ["sequence modeling", "variable length", "recurrent"]
+
+  fixed_channel_count:
+    label: "Fixed Channel Count"
+    description: "Inputs have a fixed number of channels or features across all samples (e.g., EEG, RGB images)"
+    search_terms: ["multi-channel", "fixed input", "feature vector"]
+
+  temporal_structure:
+    label: "Temporal Structure"
+    description: "Data has inherent time dependencies or ordering (e.g., time series, forecasting)"
+    search_terms: ["time series", "temporal", "forecasting"]
+
+  classification_objective:
+    label: "Classification"
+    description: "Task involves predicting discrete labels from data"
+    search_terms: ["classification", "categorical prediction"]
+
+  regression_objective:
+    label: "Regression"
+    description: "Task involves predicting continuous values"
+    search_terms: ["regression", "continuous prediction"]
+
+  generation_objective:
+    label: "Generation"
+    description: "Models must produce new data samples from learned distributions"
+    search_terms: ["generative model", "data generation", "synthesis"]
+
+  noise_robustness:
+    label: "Noise Robustness"
+    description: "System must perform well under noisy, incomplete, or corrupted inputs"
+    search_terms: ["noise robust", "data corruption", "missing data"]
+
+  real_time_constraint:
+    label: "Real-Time Constraint"
+    description: "Solution must operate under strict latency or streaming requirements"
+    search_terms: ["real-time", "low latency", "streaming"]
+
+  sensor_data:
+    label: "Sensor Data"
+    description: "Inputs originate from physical sensors (e.g., IoT, biomedical, accelerometers)"
+    search_terms: ["sensor data", "IoT", "signal processing"]
+
+  multimodal_data:
+    label: "Multimodal"
+    description: "Task combines multiple data types or modalities (e.g., vision + language)"
+    search_terms: ["multimodal", "multi-modal", "cross-modal"]
+
+  interpretability_required:
+    label: "Interpretability"
+    description: "Model must provide human-understandable reasoning or explanations"
+    search_terms: ["interpretable", "explainable", "XAI"]
+
+  few_shot_learning:
+    label: "Few-Shot Learning"
+    description: "System must generalize from very few labeled examples"
+    search_terms: ["few-shot", "low resource", "meta-learning"]
+
+  tabular_data:
+    label: "Tabular Data"
+    description: "Inputs are structured rows/columns (e.g., CSV, database tables)"
+    search_terms: ["tabular", "structured data", "gradient boosting"]
+
+  image_data:
+    label: "Image Data"
+    description: "Inputs are images or visual data"
+    search_terms: ["image classification", "computer vision", "convolutional"]
+
+  text_data:
+    label: "Text Data"
+    description: "Inputs are natural language text"
+    search_terms: ["NLP", "text classification", "language model"]
+
+  anomaly_detection:
+    label: "Anomaly Detection"
+    description: "Task involves identifying outliers or unusual patterns"
+    search_terms: ["anomaly detection", "outlier detection", "novelty detection"]
+
+  imbalanced_classes:
+    label: "Imbalanced Classes"
+    description: "Class distribution is heavily skewed"
+    search_terms: ["class imbalance", "oversampling", "SMOTE"]
+
+  high_dimensionality:
+    label: "High Dimensionality"
+    description: "Feature space is very large relative to sample count"
+    search_terms: ["dimensionality reduction", "feature selection", "curse of dimensionality"]
+
+  small_dataset:
+    label: "Small Dataset"
+    description: "Training data is limited (hundreds to low thousands of samples)"
+    search_terms: ["small data", "data-efficient", "transfer learning"]
+
+  large_scale:
+    label: "Large Scale"
+    description: "Dataset or model requires distributed or efficient training"
+    search_terms: ["large-scale", "distributed training", "efficient training"]
