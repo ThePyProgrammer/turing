@@ -325,6 +325,9 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:validate [--auto]` | Check metric stability — auto-configure multi-run if noisy |
 | `/turing:seed [N] [--quick]` | Multi-seed study — mean/std/CI, flag seed-sensitive results |
 | `/turing:reproduce <exp-id>` | Reproducibility verification — re-run and check tolerance |
+| `/turing:diagnose [exp-id]` | Error analysis — failure modes, confused pairs, feature-range bias |
+| `/turing:ablate [--components]` | Ablation study — remove components, measure impact, flag dead weight |
+| `/turing:frontier [--metrics]` | Pareto frontier — multi-objective tradeoff visualization |
 | `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
 | `/turing:report` | Generate research report |
@@ -514,11 +517,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-19 commands, 2 agents, 8 config files, 34 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor (seed studies + reproducibility), 407 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+22 commands, 2 agents, 8 config files, 37 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence (error analysis + ablation + Pareto frontier), 487 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              18 skill files (core + taste-leverage + reporting + exploration + statistical rigor)
+├── commands/              21 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
