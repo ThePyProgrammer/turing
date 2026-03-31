@@ -20,6 +20,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "poster", "presentation", "one-pager", "visual summary" | `/turing:poster` | Document |
 | "report", "write-up", "findings", "document results" | `/turing:report` | Document |
 | "validate", "stability", "check variance", "noisy" | `/turing:validate` | Validate |
+| "seed", "seed study", "multi-seed", "lucky seed", "seed sensitivity" | `/turing:seed` | Validate |
+| "reproduce", "reproducibility", "verify results", "re-run experiment", "repro" | `/turing:reproduce` | Validate |
 | "suggest", "what model", "recommend", "which architecture", "literature" | `/turing:suggest` | Research |
 | "explore hypotheses", "tree search", "treequest", "search hypothesis space", "MCTS" | `/turing:explore` | Research |
 | "design", "plan experiment", "how should I test", "experiment design" | `/turing:design` | Design |
@@ -39,6 +41,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:brief` | Generate structured research intelligence report | @ml-evaluator |
 | `/turing:init` | Scaffold a new ML project | (inline) |
 | `/turing:validate` | Check metric stability, auto-fix if noisy | (inline) |
+| `/turing:seed [N] [--quick]` | Multi-seed study: mean/std/CI, flag seed-sensitive results | (inline) |
+| `/turing:reproduce <exp-id>` | Reproducibility verification with tolerance checking | (inline) |
 | `/turing:suggest` | Literature-grounded model architecture suggestions | (inline, uses WebSearch) |
 | `/turing:explore` | Tree-search hypothesis exploration via AB-MCTS | (inline) |
 | `/turing:design <hyp-id>` | Generate structured experiment design from hypothesis | (inline, uses WebSearch) |
