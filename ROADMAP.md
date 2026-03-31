@@ -1524,9 +1524,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 1–26 | Phases 1–9 | 1–9 | v1.0–v1.2 | — | **DONE** | — |
 | 27 | Multi-seed runner `/turing:seed` | 10.1 | v1.3.0 | **Critical** | **DONE** | Phase 2.1 (statistical compare) |
 | 28 | Reproducibility verification `/turing:reproduce` | 10.2 | v1.3.0 | **High** | **DONE** | Experiment logging (Phase 1) |
-| 29 | Error analysis `/turing:diagnose` | 11.1 | v1.4.0 | **Critical** | Planned | Phase 3.1 (metric decomposition) |
-| 30 | Ablation studies `/turing:ablate` | 11.2 | v1.4.0 | **High** | Planned | Phase 10.1 (seed runner) |
-| 31 | Pareto frontier `/turing:frontier` | 11.3 | v1.4.0 | **Medium** | Planned | Experiment logging |
+| 29 | Error analysis `/turing:diagnose` | 11.1 | v1.4.0 | **Critical** | **DONE** | Phase 3.1 (metric decomposition) |
+| 30 | Ablation studies `/turing:ablate` | 11.2 | v1.4.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
+| 31 | Pareto frontier `/turing:frontier` | 11.3 | v1.4.0 | **Medium** | **DONE** | Experiment logging |
 | 32 | Computational profiling `/turing:profile` | 12.1 | v1.5.0 | **High** | Planned | — (standalone) |
 | 33 | Smart checkpoint manager `/turing:checkpoint` | 12.2 | v1.5.0 | **Medium** | Planned | Phase 11.3 (Pareto logic) |
 | 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | Planned | Phase 10.1 (seed study for model card) |
