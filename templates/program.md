@@ -79,21 +79,22 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    done
    ```
 
-2. **HYPOTHESIZE** — If a queued hypothesis exists (especially human-injected, high priority), use it. Otherwise propose your own. Either way, document what you expect and why.
+2. **HYPOTHESIZE** — Check the queue first. If a queued hypothesis exists (especially human-injected, high priority), use it. Otherwise, generate your own and **register it in the queue before executing**:
 
-   **Before committing to a hypothesis, run the novelty guard:**
-   ```bash
-   python scripts/novelty_guard.py check \
-     --description "your proposed experiment description" \
-     --log experiments/log.jsonl \
-     --mode exploit
-   ```
-   If the guard returns `block`, choose a different hypothesis — this one is too similar to a prior failure or duplicate. If it returns `caution`, proceed but note the risk. Human-injected hypotheses (from `/turing:try`) skip the guard — human taste overrides.
-
-   If using a queued hypothesis, mark it in-progress:
+   **If using a queued hypothesis:**
    ```bash
    python scripts/manage_hypotheses.py mark hyp-NNN in-progress
    ```
+
+   **If generating your own hypothesis**, register it first:
+   ```bash
+   python scripts/manage_hypotheses.py add "your hypothesis description" --priority medium --source agent
+   python scripts/manage_hypotheses.py mark hyp-NNN in-progress
+   ```
+
+   Every experiment must have a corresponding hypothesis in the queue. This ensures the hypothesis database is a complete record of every idea — human and agent alike.
+
+   Document what you expect and why before proceeding.
 
 3. **PREPARE** — Modify `config.yaml` for hyperparameter changes. Only modify `train.py` for structural code changes.
 
@@ -132,7 +133,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
      models/model.joblib "Description of hypothesis and outcome"
    ```
 
-   If this experiment was from a queued hypothesis, update its status:
+   Update the hypothesis status:
    ```bash
    python scripts/manage_hypotheses.py mark hyp-NNN tested --result exp-NNN
    # or: mark hyp-NNN promising --result exp-NNN (if it improved significantly)
