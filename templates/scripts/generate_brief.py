@@ -25,6 +25,7 @@ import yaml
 
 from scripts.cost_frontier import compute_pareto_frontier, load_cost_data, _format_seconds
 from scripts.turing_io import load_config, load_experiments, load_hypotheses
+from scripts.seed_runner import CV_THRESHOLD
 
 
 def compute_campaign_summary(experiments: list[dict]) -> dict:
@@ -211,6 +212,40 @@ def detect_environment_drift(experiments: list[dict]) -> list[str]:
     return warnings
 
 
+def load_seed_studies(seed_dir: str = "experiments/seed_studies") -> list[dict]:
+    """Load all seed study results from YAML files."""
+    path = Path(seed_dir)
+    if not path.exists():
+        return []
+    studies = []
+    for f in sorted(path.glob("*-seeds.yaml")):
+        try:
+            with open(f) as fh:
+                study = yaml.safe_load(fh)
+                if study and isinstance(study, dict):
+                    studies.append(study)
+        except (yaml.YAMLError, OSError):
+            continue
+    return studies
+
+
+def load_reproductions(repro_dir: str = "experiments/reproductions") -> list[dict]:
+    """Load all reproduction reports from YAML files."""
+    path = Path(repro_dir)
+    if not path.exists():
+        return []
+    reports = []
+    for f in sorted(path.glob("*-repro.yaml")):
+        try:
+            with open(f) as fh:
+                report = yaml.safe_load(fh)
+                if report and isinstance(report, dict):
+                    reports.append(report)
+        except (yaml.YAMLError, OSError):
+            continue
+    return reports
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -223,6 +258,8 @@ def format_brief(
     env_warnings: list[str] | None = None,
     cost_data: list | None = None,
     cost_frontier: list | None = None,
+    seed_studies: list[dict] | None = None,
+    reproductions: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -361,6 +398,44 @@ def format_brief(
                     f"The {pct:.1f}% improvement costs {ratio:.0f}x more compute.",
                 ])
 
+    # Seed studies
+    if seed_studies:
+        lines.extend(["", "## Seed Studies", ""])
+        for study in seed_studies:
+            exp_id = study.get("experiment_id", "?")
+            sensitive = study.get("seed_sensitive", False)
+            status = "SEED-SENSITIVE" if sensitive else "STABLE"
+            lines.append(
+                f"- **{exp_id}:** {study.get('metric', metric)} = "
+                f"{study.get('mean', 0):.4f} +/- {study.get('std', 0):.4f} "
+                f"(CV={study.get('cv_percent', 0):.1f}%) — **{status}**"
+            )
+            if sensitive:
+                lines.append(
+                    f"  - 95% CI: [{study['ci_95'][0]:.4f}, {study['ci_95'][1]:.4f}] "
+                    f"over {len(study.get('seeds_run', []))} seeds"
+                )
+        if any(s.get("seed_sensitive") for s in seed_studies):
+            lines.extend(["", "*Some results are seed-sensitive. Report distributions, not point estimates.*"])
+
+    # Reproduction reports
+    if reproductions:
+        lines.extend(["", "## Reproducibility", ""])
+        verdict_markers = {
+            "reproducible": "PASS",
+            "approximately_reproducible": "PASS (approx)",
+            "not_reproducible": "FAIL",
+            "environment_changed": "WARN (env)",
+        }
+        for report in reproductions:
+            exp_id = report.get("experiment_id", "?")
+            verdict = report.get("verdict", "unknown")
+            marker = verdict_markers.get(verdict, verdict)
+            lines.append(f"- **{exp_id}:** {marker} — {report.get('reason', 'N/A')}")
+        failed = [r for r in reproductions if r.get("verdict") in ("not_reproducible", "environment_changed")]
+        if failed:
+            lines.extend(["", f"*{len(failed)} experiment(s) failed reproducibility checks.*"])
+
     lines.extend([
         "",
         "## Recommendations",
@@ -420,11 +495,17 @@ def generate_brief(
     cost_records = load_cost_data(log_path, metric)
     pareto = compute_pareto_frontier(cost_records, lower_is_better) if cost_records else []
 
+    # Load seed studies and reproduction reports
+    seed_studies = load_seed_studies()
+    reproductions = load_reproductions()
+
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
         metric, lower_is_better, failures, env_warnings,
         cost_data=cost_records if cost_records else None,
         cost_frontier=pareto if cost_records else None,
+        seed_studies=seed_studies if seed_studies else None,
+        reproductions=reproductions if reproductions else None,
     )
 
 
