@@ -24,6 +24,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "design", "plan experiment", "how should I test", "experiment design" | `/turing:design` | Design |
 | "mode", "explore", "exploit", "replicate", "strategy" | `/turing:mode` | Strategy |
 | "preflight", "resources", "VRAM", "memory", "can I run", "OOM", "GPU" | `/turing:preflight` | Check |
+| "card", "model card", "document model", "model documentation" | `/turing:card` | Document |
 
 ## Sub-commands
 
@@ -44,6 +45,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:report` | Structured markdown research report | (inline) |
 | `/turing:mode <mode>` | Set research strategy (explore/exploit/replicate) | (inline) |
 | `/turing:preflight` | Pre-flight resource check (VRAM/RAM/disk) | (inline) |
+| `/turing:card` | Generate standardized model card (type, performance, data, limitations, contract) | (inline) |
 
 ## Proactive Detection
 
