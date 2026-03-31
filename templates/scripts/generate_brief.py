@@ -192,6 +192,58 @@ def cluster_failures(experiments: list[dict]) -> list[dict]:
     return result[:5]  # Top 5 clusters
 
 
+def detect_environment_drift(experiments: list[dict]) -> list[str]:
+    """Detect environment changes across experiments.
+
+    Compares the most recent experiment's environment against the best
+    experiment's environment. Flags differences in python version,
+    key package versions, or hardware that could affect reproducibility.
+    """
+    if len(experiments) < 2:
+        return []
+
+    # Find most recent and best experiments with environment data
+    recent = None
+    best_env_exp = None
+    for e in reversed(experiments):
+        if e.get("environment") and not recent:
+            recent = e
+        if e.get("status") == "kept" and e.get("environment") and not best_env_exp:
+            best_env_exp = e
+        if recent and best_env_exp:
+            break
+
+    if not recent or not best_env_exp or recent == best_env_exp:
+        return []
+
+    warnings = []
+    env_new = recent["environment"]
+    env_old = best_env_exp["environment"]
+
+    # Python version
+    if env_new.get("python_version") != env_old.get("python_version"):
+        warnings.append(
+            f"Python version changed: {env_old.get('python_version')} -> {env_new.get('python_version')}"
+        )
+
+    # Key packages
+    pkgs_new = env_new.get("packages", {})
+    pkgs_old = env_old.get("packages", {})
+    for pkg in set(pkgs_new) | set(pkgs_old):
+        v_new = pkgs_new.get(pkg)
+        v_old = pkgs_old.get(pkg)
+        if v_new and v_old and v_new != v_old:
+            warnings.append(f"{pkg}: {v_old} -> {v_new}")
+
+    # Config hash drift
+    hash_new = env_new.get("config_hash")
+    hash_old = env_old.get("config_hash")
+    if hash_new and hash_old and hash_new != hash_old:
+        warnings.append("config.yaml has changed since best experiment")
+
+    return warnings
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -201,6 +253,7 @@ def format_brief(
     metric: str,
     lower_is_better: bool,
     failure_clusters: list[dict] | None = None,
+    env_warnings: list[str] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -284,6 +337,15 @@ def format_brief(
         lines.append("")
         lines.append("*Consider avoiding these traits in future experiments.*")
 
+    # Environment drift warnings
+    if env_warnings:
+        lines.extend(["", "## Environment Drift", ""])
+        lines.append("The runtime environment has changed since the best experiment:")
+        for w in env_warnings:
+            lines.append(f"- {w}")
+        lines.append("")
+        lines.append("*Results may not be directly comparable. Consider re-running the best experiment in the current environment.*")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -337,8 +399,12 @@ def generate_brief(
     trajectory = compute_trajectory(experiments, metric, lower_is_better)
     model_types = identify_model_types(experiments)
     failures = cluster_failures(experiments)
+    env_warnings = detect_environment_drift(experiments)
 
-    return format_brief(campaign, best, trajectory, model_types, hypotheses, metric, lower_is_better, failures)
+    return format_brief(
+        campaign, best, trajectory, model_types, hypotheses,
+        metric, lower_is_better, failures, env_warnings,
+    )
 
 
 def main() -> None:
