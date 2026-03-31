@@ -286,7 +286,8 @@ def format_brief(
         lines.append(f"**{len(queued)} queued:**")
         for h in queued:
             priority_marker = " (HIGH)" if h.get("priority") == "high" else ""
-            source_marker = " [human]" if h.get("source") == "human" else ""
+            source = h.get("source", "")
+            source_marker = f" [{source}]" if source in ("human", "treequest", "literature") else ""
             lines.append(f"- {h['id']}: {h.get('description', '?')}{priority_marker}{source_marker}")
     else:
         lines.append("No queued hypotheses. Use `/turing:try` to inject ideas.")
@@ -387,9 +388,9 @@ def format_brief(
 
         # Check if hypotheses are exhausted
         if not queued:
-            lines.append("- No hypotheses queued — inject ideas with `/turing:try`")
+            lines.append("- No hypotheses queued — inject ideas with `/turing:try` or explore with `/turing:explore`")
 
-    lines.extend(["", "---", "", "*Use `/turing:try` to inject hypotheses. Use `/turing:train` to execute.*"])
+    lines.extend(["", "---", "", "*Use `/turing:try` to inject hypotheses, `/turing:explore` for tree search, `/turing:train` to execute.*"])
 
     return "\n".join(lines)
 
