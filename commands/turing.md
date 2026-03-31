@@ -15,7 +15,10 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "sweep", "grid search", "hyperparameter search", "tune" | `/turing:sweep` | Explore |
 | "init", "set up ML", "initialize", "scaffold", "bootstrap" | `/turing:init` | Setup |
 | "try", "test this", "inject", "what if we", "I think we should" | `/turing:try` | Steer |
-| "brief", "briefing", "report", "what have we learned", "summary" | `/turing:brief` | Report |
+| "brief", "briefing", "what have we learned", "summary" | `/turing:brief` | Report |
+| "logbook", "log", "history", "timeline", "narrative" | `/turing:logbook` | Document |
+| "poster", "presentation", "one-pager", "visual summary" | `/turing:poster` | Document |
+| "report", "write-up", "findings", "document results" | `/turing:report` | Document |
 | "validate", "stability", "check variance", "noisy" | `/turing:validate` | Validate |
 | "suggest", "what model", "recommend", "which architecture", "literature" | `/turing:suggest` | Research |
 | "design", "plan experiment", "how should I test", "experiment design" | `/turing:design` | Design |
@@ -35,6 +38,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:validate` | Check metric stability, auto-fix if noisy | (inline) |
 | `/turing:suggest` | Literature-grounded model architecture suggestions | (inline, uses WebSearch) |
 | `/turing:design <hyp-id>` | Generate structured experiment design from hypothesis | (inline, uses WebSearch) |
+| `/turing:logbook` | HTML/markdown logbook with trajectory chart | (inline) |
+| `/turing:poster` | Single-page HTML research poster | (inline) |
+| `/turing:report` | Structured markdown research report | (inline) |
 | `/turing:mode <mode>` | Set research strategy (explore/exploit/replicate) | (inline) |
 
 ## Proactive Detection

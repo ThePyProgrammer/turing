@@ -140,6 +140,69 @@ def update_detail(hid: str, updates: dict) -> bool:
     return True
 
 
+def load_archetypes(config_path: str | None = None) -> dict:
+    """Load experiment archetypes from YAML config.
+
+    Searches for config/experiment_archetypes.yaml in standard locations.
+    """
+    candidates = []
+    if config_path:
+        candidates.append(Path(config_path))
+    candidates.extend([
+        Path("config") / "experiment_archetypes.yaml",
+        Path(__file__).parent.parent.parent / "config" / "experiment_archetypes.yaml",
+        Path(__file__).parent.parent / "config" / "experiment_archetypes.yaml",
+    ])
+    for p in candidates:
+        if p.exists():
+            with open(p) as f:
+                data = yaml.safe_load(f)
+            return data.get("archetypes", {}) if data else {}
+    return {}
+
+
+def expand_archetype(archetype_name: str, config_path: str | None = None) -> tuple[str, str | None, list[str] | None]:
+    """Expand an archetype name into a structured hypothesis description.
+
+    Args:
+        archetype_name: Key from experiment_archetypes.yaml (e.g., "model_comparison").
+        config_path: Optional path to archetypes YAML.
+
+    Returns:
+        Tuple of (description, family_tag, tags).
+        Returns a fallback description if archetype is not found.
+    """
+    archetypes = load_archetypes(config_path)
+
+    if archetype_name not in archetypes:
+        available = ", ".join(sorted(archetypes.keys())) if archetypes else "none loaded"
+        return (
+            f"[Unknown archetype: {archetype_name}. Available: {available}]",
+            None,
+            None,
+        )
+
+    arch = archetypes[archetype_name]
+    name = arch.get("name", archetype_name)
+    steps = arch.get("steps", [])
+    when = arch.get("when_to_use", "")
+    expected = arch.get("expected_experiments", "?")
+
+    # Build structured description
+    lines = [f"{name}:"]
+    for i, step in enumerate(steps, 1):
+        lines.append(f"  {i}. {step}")
+    if when:
+        lines.append(f"  Context: {when}")
+    lines.append(f"  Expected: ~{expected} experiments")
+
+    description = "\n".join(lines)
+    family_tag = arch.get("family_tag")
+    tags = [archetype_name, "archetype"]
+
+    return description, family_tag, tags
+
+
 def add_hypothesis(
     queue_path: str,
     description: str,
@@ -310,7 +373,8 @@ def main() -> None:
 
     # add
     add_parser = subparsers.add_parser("add", help="Add a hypothesis")
-    add_parser.add_argument("description", help="What to try and why")
+    add_parser.add_argument("description", nargs="?", default=None, help="What to try and why")
+    add_parser.add_argument("--archetype", default=None, help="Expand from archetype (e.g., model_comparison)")
     add_parser.add_argument("--priority", default="high", choices=sorted(VALID_PRIORITIES))
     add_parser.add_argument("--source", default="human", choices=["human", "agent", "literature", "taxonomy"])
     add_parser.add_argument("--parent", default=None, help="Parent experiment ID")
@@ -353,6 +417,22 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "add":
+        description = args.description
+        family = args.family
+        tags = [t.strip() for t in args.tags.split(",")] if args.tags else None
+
+        # Expand archetype if specified
+        if args.archetype:
+            arch_desc, arch_family, arch_tags = expand_archetype(args.archetype)
+            description = description or arch_desc
+            family = family or arch_family
+            if arch_tags:
+                tags = (tags or []) + arch_tags
+
+        if not description:
+            print("Error: provide a description or --archetype", file=sys.stderr)
+            sys.exit(1)
+
         # Parse optional structured fields
         architecture = {}
         if args.model_type:
@@ -364,19 +444,19 @@ def main() -> None:
         expected_outcome = {}
         if args.expected:
             expected_outcome["rationale"] = args.expected
-        tags = [t.strip() for t in args.tags.split(",")] if args.tags else None
 
         hid = add_hypothesis(
-            args.queue, args.description, args.source, args.priority,
+            args.queue, description, args.source, args.priority,
             parent_experiment=args.parent,
             parent_hypothesis=getattr(args, "parent_hyp", None),
-            family=args.family,
+            family=family,
             tags=tags,
             architecture=architecture or None,
             hyperparameters=hyperparameters,
             expected_outcome=expected_outcome or None,
         )
-        print(f"Added {hid}: {args.description}")
+        short_desc = description.split("\n")[0][:60]
+        print(f"Added {hid}: {short_desc}")
         print(f"Detail: {DETAIL_DIR}/{hid}.yaml")
 
     elif args.command == "show":
