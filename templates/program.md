@@ -81,6 +81,15 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
 2. **HYPOTHESIZE** — If a queued hypothesis exists (especially human-injected, high priority), use it. Otherwise propose your own. Either way, document what you expect and why.
 
+   **Before committing to a hypothesis, run the novelty guard:**
+   ```bash
+   python scripts/novelty_guard.py check \
+     --description "your proposed experiment description" \
+     --log experiments/log.jsonl \
+     --mode exploit
+   ```
+   If the guard returns `block`, choose a different hypothesis — this one is too similar to a prior failure or duplicate. If it returns `caution`, proceed but note the risk. Human-injected hypotheses (from `/turing:try`) skip the guard — human taste overrides.
+
    If using a queued hypothesis, mark it in-progress:
    ```bash
    python scripts/manage_hypotheses.py mark hyp-NNN in-progress
