@@ -996,3 +996,76 @@ AERO's `experiment_designer/search.py` demonstrates the full pipeline including 
 | 26 | Semantic experiment index (TF-IDF) | 9.1 | **Medium** | **DONE** | 21 |
 
 All phases 1-9 complete except 5.6 (platform-managed execution, deferred until Agent SDK integration). 257 tests passing.
+
+---
+
+## Appendix: K-Dense BYOK Evaluation
+
+*Source: [K-Dense-AI/k-dense-byok](https://github.com/K-Dense-AI/k-dense-byok)*
+*Evaluated: 2026-03-31*
+
+### What K-Dense BYOK Is
+
+A desktop AI research assistant with a React frontend, Python backend, and LiteLLM proxy routing to 40+ models. The system has a main agent ("Kady") that delegates tasks to specialized "experts" via the Gemini CLI. It ships with 326 workflow templates across 22 scientific disciplines, access to 229 scientific databases, and 170+ skills from the K-Dense skill library.
+
+### Architecture
+
+```
+React Frontend (port 3000) → Python Backend (port 8000) → LiteLLM Proxy (port 4000)
+                                    ↓
+                              Kady Agent (google.adk.agents.LlmAgent)
+                                    ↓
+                              delegate_task() → Gemini CLI subprocess
+                                    ↓
+                              K-Dense Skills (170+ scientific skills)
+```
+
+The agent is built on Google's Agent Development Kit (`google.adk`). Expert delegation happens via `delegate_task()` which spawns Gemini CLI as a subprocess, captures JSONL stream output, and extracts activated skills and tool usage.
+
+### Overlap Assessment with Turing
+
+| K-Dense Feature | Turing Equivalent | Worth Adopting? |
+|---|---|---|
+| 326 workflow templates | `/turing:init --plan` research plan | **No** — different scope |
+| 229 database catalog | Not applicable | **No** — Turing is model-agnostic |
+| Multi-model routing (40+ models) | Single Claude Code agent | **No** — architectural mismatch |
+| Expert delegation via Gemini CLI | Two-agent architecture (ADR-0003) | **No** — Turing's approach is simpler and sufficient |
+| Sandbox file management | Template scaffolding (ADR-0008) | **No** — different paradigm |
+| MCP server extensibility | Claude Code plugin system | **No** — already extensible |
+| React web UI | CLI-first (Claude Code) | **No** — different interface paradigm |
+
+### Verdict: Nothing to Adopt
+
+K-Dense BYOK and Turing solve fundamentally different problems:
+
+**K-Dense BYOK** is a *general scientific assistant* — a desktop app where a human chats with an AI that can delegate to specialized experts across 22 scientific disciplines. It is broad (326 workflows) but shallow (each workflow is a one-shot prompt template, not an iterative loop). It has no experiment tracking, no convergence detection, no hypothesis queue, no immutable evaluation, no memory across sessions. It is a research *dispatcher*, not a research *engine*.
+
+**Turing** is a *focused ML experiment engine* — a CLI plugin that autonomously iterates through a hypothesis-test-decide loop with structured memory, statistical rigor, anti-cheating guardrails, and a formal taste-leverage interface. It is narrow (ML experiments only) but deep (19 implemented features across 9 phases, 257 tests, 16 ADRs).
+
+The two systems are complementary, not competitive. A researcher could use K-Dense BYOK's "Build a Classifier" workflow to get initial ideas, then use Turing to systematically iterate on those ideas with discipline.
+
+**Specific features evaluated:**
+
+1. **Workflow templates** — K-Dense's 15 ML workflows ("Build a Classifier", "Hyperparameter Tuning", "Model Comparison") are prompt templates with placeholder variables. They are equivalent to Turing's `program.md` but less structured — no iteration, no memory, no convergence. Turing's `/turing:init --plan` already generates a more detailed research plan grounded in literature search. **Not useful.**
+
+2. **Multi-model routing** — K-Dense routes to 40+ models via LiteLLM/OpenRouter. Turing runs inside Claude Code which handles model routing. Adding multi-model support would contradict Turing's single-agent architecture (ADR-0003) and add complexity without clear benefit for the ML experiment loop. **Not useful.**
+
+3. **Expert delegation** — K-Dense's `delegate_task()` spawns Gemini CLI as a subprocess for specialized work. This is architecturally interesting but solves a different problem (breadth across disciplines) than Turing needs (depth in one experiment loop). Turing already has two agents with distinct capabilities. **Not useful.**
+
+4. **Scientific database catalog** — 229 databases across genomics, finance, astronomy, etc. This is a data discovery feature, not an experiment infrastructure feature. Turing assumes the user already has their data. **Not useful.**
+
+5. **MCP extensibility** — Custom Model Context Protocol servers configured via JSON. Claude Code already has its own MCP integration. **Not useful.**
+
+6. **Skill library** — 170+ K-Dense scientific skills activated via Gemini CLI. These are domain-specific tools (scikit-learn, SHAP, PyTorch Lightning). Turing's templates already include scikit-learn, XGBoost, and LightGBM. The skill activation model ("not always reliable" per K-Dense's own docs) is less robust than Turing's direct Python imports. **Not useful.**
+
+### What Would Be Useful (If K-Dense Had It)
+
+The features that *would* be worth adopting from a system like K-Dense — if it had them — are exactly the features it's missing:
+
+- Experiment memory across sessions (Turing has it: Phases 1, 4, 6)
+- Iterative experiment loops with convergence (Turing has it: ADR-0006)
+- Hypothesis tracking and novelty detection (Turing has it: Phases 1.1, 6.1)
+- Immutable evaluation with anti-cheating (Turing has it: ADRs 0002, Phase 5)
+- Statistical significance testing (Turing has it: Phase 2.1)
+
+K-Dense BYOK is impressive infrastructure for multi-disciplinary scientific assistance. It is not relevant to Turing's problem domain.
