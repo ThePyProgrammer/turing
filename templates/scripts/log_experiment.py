@@ -11,6 +11,7 @@ Every experiment is logged. No information is lost.
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from datetime import datetime, timezone
@@ -195,68 +196,47 @@ def get_best_experiment(log_path: str, primary_metric: str = "accuracy", lower_i
 
 
 def main() -> None:
-    """CLI entry point.
+    """CLI entry point for logging experiments."""
+    parser = argparse.ArgumentParser(
+        description="Log an experiment to the append-only JSONL experiment log.",
+    )
+    parser.add_argument("log_path", help="Path to experiments/log.jsonl")
+    parser.add_argument("experiment_id", help='Experiment ID, e.g. "exp-001"')
+    parser.add_argument("status", help='"kept" or "discarded"')
+    parser.add_argument("metrics_json", help="Metrics as a JSON string")
+    parser.add_argument("config_json", help="Config as a JSON string")
+    parser.add_argument("model_path", help="Path to saved model artifact")
+    parser.add_argument(
+        "description",
+        nargs="*",
+        help="Human-readable experiment description",
+    )
+    parser.add_argument("--parent", default=None, help="Parent experiment ID")
+    parser.add_argument("--hypothesis", default=None, help="Hypothesis ID")
+    parser.add_argument("--family", default=None, help="Experiment family name")
+    parser.add_argument("--tags", default=None, help="Comma-separated tags")
 
-    Usage: python scripts/log_experiment.py <log_path> <experiment_id> <status> \\
-           <metrics_json> <config_json> <model_path> <description> \\
-           [--parent <exp-id>] [--hypothesis <hyp-id>]
-    """
-    # Separate positional args from --flags
-    positional = []
-    parent = None
-    hypothesis = None
-    family = None
-    tags_str = None
-    i = 1
-    while i < len(sys.argv):
-        if sys.argv[i] == "--parent" and i + 1 < len(sys.argv):
-            parent = sys.argv[i + 1]
-            i += 2
-        elif sys.argv[i] == "--hypothesis" and i + 1 < len(sys.argv):
-            hypothesis = sys.argv[i + 1]
-            i += 2
-        elif sys.argv[i] == "--family" and i + 1 < len(sys.argv):
-            family = sys.argv[i + 1]
-            i += 2
-        elif sys.argv[i] == "--tags" and i + 1 < len(sys.argv):
-            tags_str = sys.argv[i + 1]
-            i += 2
-        else:
-            positional.append(sys.argv[i])
-            i += 1
+    args = parser.parse_args()
 
-    if len(positional) < 7:
-        print(
-            "Usage: python scripts/log_experiment.py <log_path> <experiment_id> "
-            "<status> <metrics_json> <config_json> <model_path> <description> "
-            "[--parent <exp-id>] [--hypothesis <hyp-id>] [--family <name>] [--tags <a,b,c>]"
-        )
-        sys.exit(1)
-
-    log_path = positional[0]
-    experiment_id = positional[1]
-    status = positional[2]
-    metrics = json.loads(positional[3])
-    config = json.loads(positional[4])
-    model_path = positional[5]
-    description = " ".join(positional[6:])
-
-    tags = [t.strip() for t in tags_str.split(",")] if tags_str else None
+    metrics = json.loads(args.metrics_json)
+    config = json.loads(args.config_json)
+    description = " ".join(args.description) if args.description else ""
+    tags = [t.strip() for t in args.tags.split(",")] if args.tags else None
 
     log_experiment(
-        log_path=log_path,
-        experiment_id=experiment_id,
+        log_path=args.log_path,
+        experiment_id=args.experiment_id,
         config=config,
         metrics=metrics,
-        model_path=model_path,
+        model_path=args.model_path,
         description=description,
-        status=status,
-        parent_experiment=parent,
-        hypothesis_id=hypothesis,
-        family=family,
+        status=args.status,
+        parent_experiment=args.parent,
+        hypothesis_id=args.hypothesis,
+        family=args.family,
         tags=tags,
     )
-    print(f"Logged {experiment_id} ({status})")
+    print(f"Logged {args.experiment_id} ({args.status})")
 
 
 if __name__ == "__main__":
