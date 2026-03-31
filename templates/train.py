@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -124,6 +125,18 @@ def train_model(
         model_file,
     )
     print(f"\nModel saved to {model_file}")
+
+    # 9. Write training metadata for behavioral validation
+    metadata = {
+        "train_time_sec": round(train_seconds, 1),
+        "model_size_bytes": model_file.stat().st_size if model_file.exists() else 0,
+        "n_train_samples": len(X_train),
+        "n_features": X_train.shape[1] if hasattr(X_train, 'shape') else len(X_train.columns),
+        "predictions_unique": int(len(set(y_pred_val.tolist()))),
+    }
+    metadata_path = Path("train_metadata.json")
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=2)
 
 
 def main() -> None:
