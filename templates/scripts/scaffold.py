@@ -95,6 +95,8 @@ TEMPLATE_DIRS = {
         "diagnose_errors.py",
         "ablation_study.py",
         "pareto_frontier.py",
+        "profile_training.py",
+        "checkpoint_manager.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -108,6 +110,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/ablations",
     "experiments/frontiers",
     "experiments/predictions",
+    "experiments/profiles",
+    "experiments/checkpoints",
     "models/best",
     "models/archive",
 ]

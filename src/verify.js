@@ -36,6 +36,8 @@ const EXPECTED_COMMANDS = [
   "diagnose/SKILL.md",
   "ablate/SKILL.md",
   "frontier/SKILL.md",
+  "profile/SKILL.md",
+  "checkpoint/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
