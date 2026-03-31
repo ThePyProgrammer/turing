@@ -202,3 +202,52 @@ def test_generate_card_includes_contract(tmp_path: Path):
     assert "**Contract version:** 2" in card
     assert "joblib" in card.lower()
     assert "model_contract.md" in card
+
+
+def test_generate_card_includes_seed_study(tmp_path: Path, monkeypatch):
+    """Model card should include seed study if available for best experiment."""
+    monkeypatch.chdir(tmp_path)
+
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    log_path = tmp_path / "log.jsonl"
+    _write_log(log_path, [_make_exp("exp-001", "kept", accuracy=0.87)])
+
+    # Create seed study for this experiment
+    seed_dir = tmp_path / "experiments" / "seed_studies"
+    seed_dir.mkdir(parents=True)
+    seed_study = {
+        "experiment_id": "exp-001",
+        "metric": "accuracy",
+        "mean": 0.8678,
+        "std": 0.0071,
+        "ci_95": [0.859, 0.877],
+        "cv_percent": 0.82,
+        "seed_sensitive": False,
+        "seeds_run": [42, 123, 456, 789, 1024],
+    }
+    with open(seed_dir / "exp-001-seeds.yaml", "w") as f:
+        yaml.dump(seed_study, f)
+
+    card = generate_card(str(config_path), str(log_path), str(tmp_path / "c.md"))
+
+    assert "Seed Study" in card
+    assert "STABLE" in card
+    assert "0.8678" in card
+    assert "0.0071" in card
+
+
+def test_generate_card_no_seed_study(tmp_path: Path, monkeypatch):
+    """Model card should not have seed study section if none exists."""
+    monkeypatch.chdir(tmp_path)
+
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    log_path = tmp_path / "log.jsonl"
+    _write_log(log_path, [_make_exp("exp-001", "kept")])
+
+    card = generate_card(str(config_path), str(log_path), str(tmp_path / "c.md"))
+
+    assert "Seed Study" not in card
