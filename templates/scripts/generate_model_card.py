@@ -243,6 +243,31 @@ def generate_card(
     else:
         lines.append("No experiments completed yet.")
 
+    # --- Seed Study ---
+    if best:
+        seed_study_path = Path("experiments/seed_studies") / f"{best.get('experiment_id', 'unknown')}-seeds.yaml"
+        if seed_study_path.exists():
+            import yaml
+            with open(seed_study_path) as f:
+                seed_study = yaml.safe_load(f) or {}
+            if seed_study and "mean" in seed_study:
+                sensitive = seed_study.get("seed_sensitive", False)
+                status = "SEED-SENSITIVE" if sensitive else "STABLE"
+                lines.extend([
+                    "",
+                    "### Seed Study",
+                    "",
+                    f"- **Status:** {status}",
+                    f"- **{metric}:** {seed_study['mean']:.4f} +/- {seed_study.get('std', 0):.4f}",
+                ])
+                if "ci_95" in seed_study:
+                    ci = seed_study["ci_95"]
+                    lines.append(f"- **95% CI:** [{ci[0]:.4f}, {ci[1]:.4f}]")
+                lines.append(f"- **CV:** {seed_study.get('cv_percent', 0):.2f}%")
+                lines.append(f"- **Seeds tested:** {len(seed_study.get('seeds_run', []))}")
+                if sensitive:
+                    lines.append("- *Result varies significantly across seeds. Report distribution, not point estimate.*")
+
     # --- Training History ---
     lines.extend([
         "",
