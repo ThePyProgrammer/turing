@@ -514,11 +514,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-17 commands, 2 agents, 8 config files, 31 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, 379 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+19 commands, 2 agents, 8 config files, 34 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor (seed studies + reproducibility), 407 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              16 skill files (core + taste-leverage + reporting + exploration)
+├── commands/              18 skill files (core + taste-leverage + reporting + exploration + statistical rigor)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
