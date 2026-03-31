@@ -1,0 +1,107 @@
+# Novelty Guard Alias Configuration
+#
+# Configurable per-project. The novelty guard normalizes experiment
+# descriptions using these tables before comparing similarity.
+# Extend with domain-specific aliases for your ML task.
+
+phrase_aliases:
+  "learning rate": "lr"
+  "step size": "lr"
+  "batch size": "batch_size"
+  "gradient accumulation": "grad_accum"
+  "weight decay": "weight_decay"
+  "early stopping": "early_stop"
+  "random forest": "rf"
+  "gradient boosting": "gbdt"
+  "neural network": "nn"
+  "neural net": "nn"
+  "decision tree": "dtree"
+  "feature engineering": "feat_eng"
+  "feature selection": "feat_sel"
+  "hyperparameter tuning": "hparam_tune"
+  "cross validation": "cv"
+  "train test split": "split"
+  "one hot encoding": "onehot"
+  "label encoding": "label_enc"
+
+token_aliases:
+  "increase": "up"
+  "increasing": "up"
+  "raise": "up"
+  "higher": "up"
+  "boost": "up"
+  "larger": "up"
+  "bigger": "up"
+  "more": "up"
+  "decrease": "down"
+  "decreasing": "down"
+  "lower": "down"
+  "reduce": "down"
+  "smaller": "down"
+  "fewer": "down"
+  "less": "down"
+  "remove": "drop"
+  "delete": "drop"
+  "disable": "drop"
+  "add": "include"
+  "enable": "include"
+  "introduce": "include"
+  "switch": "change"
+  "replace": "change"
+  "swap": "change"
+
+stopwords:
+  - "a"
+  - "an"
+  - "and"
+  - "are"
+  - "as"
+  - "at"
+  - "be"
+  - "by"
+  - "for"
+  - "from"
+  - "if"
+  - "in"
+  - "into"
+  - "is"
+  - "it"
+  - "of"
+  - "on"
+  - "or"
+  - "the"
+  - "to"
+  - "try"
+  - "use"
+  - "using"
+  - "with"
+
+concept_patterns:
+  lr: ["lr", "learning_rate", "step_size"]
+  architecture: ["depth", "width", "layers", "heads", "nn", "rf", "gbdt", "dtree", "xgboost", "lightgbm"]
+  regularization: ["dropout", "weight_decay", "l1", "l2", "early_stop", "regulariz"]
+  features: ["feat_eng", "feat_sel", "onehot", "label_enc", "feature", "column"]
+  data: ["split", "augment", "sample", "oversample", "undersample", "cv"]
+  optimizer: ["adam", "sgd", "optim", "momentum", "scheduler"]
+  ensemble: ["voting", "stacking", "blending", "bagging", "boosting"]
+
+# Mode policies: what each research mode allows/blocks
+mode_policies:
+  explore:
+    novel: "allow"
+    known_success: "block"
+    incremental_followup: "block"
+    repeat_failure: "block"
+    duplicate_run: "block"
+  exploit:
+    novel: "caution"
+    known_success: "allow"
+    incremental_followup: "allow"
+    repeat_failure: "block"
+    duplicate_run: "block"
+  replicate:
+    novel: "block"
+    known_success: "allow"
+    incremental_followup: "allow"
+    repeat_failure: "caution"
+    duplicate_run: "allow"
