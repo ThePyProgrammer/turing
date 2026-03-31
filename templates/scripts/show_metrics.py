@@ -151,6 +151,11 @@ def main() -> None:
         action="store_true",
         help="Include git diffs for discarded experiments",
     )
+    parser.add_argument(
+        "--with-seeds",
+        action="store_true",
+        help="Show seed study results alongside best experiment",
+    )
     args = parser.parse_args()
 
     config = load_config()
@@ -166,6 +171,18 @@ def main() -> None:
 
     best_id = find_best(experiments, primary_metric, lower_is_better)
     print(format_table(experiments, best_id, metric_names))
+
+    if args.with_seeds and best_id:
+        from scripts.turing_io import load_seed_study
+        study = load_seed_study(best_id)
+        if study and "mean" in study:
+            sensitive = "SEED-SENSITIVE" if study.get("seed_sensitive") else "STABLE"
+            print(f"\nSeed Study ({best_id}): {sensitive}")
+            print(f"  {primary_metric} = {study['mean']:.4f} +/- {study.get('std', 0):.4f}")
+            if "ci_95" in study:
+                ci = study["ci_95"]
+                print(f"  95% CI: [{ci[0]:.4f}, {ci[1]:.4f}]")
+            print(f"  CV: {study.get('cv_percent', 0):.2f}%")
 
     if args.with_diffs:
         all_experiments = load_experiments(args.log)
