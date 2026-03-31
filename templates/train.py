@@ -32,6 +32,7 @@ from prepare import load_config, load_splits
 def train_model(
     config_path: str = "config.yaml",
     output_dir: str | None = None,
+    seed_override: int | None = None,
 ) -> None:
     """Train a model and print metrics.
 
@@ -75,9 +76,10 @@ def train_model(
     # 4. Train model (hyperparams from config.yaml)
     model_config = config.get("model", {})
     hyperparams = model_config.get("hyperparams", {})
+    random_state = seed_override if seed_override is not None else config["data"].get("random_state", 42)
     model = XGBClassifier(
         **hyperparams,
-        random_state=config["data"].get("random_state", 42),
+        random_state=random_state,
     )
     model.fit(X_train, y_train)
 
@@ -126,8 +128,14 @@ def main() -> None:
         default=None,
         help="Model output directory (default: from config)",
     )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="Override random_state for multi-run statistical comparison",
+    )
     args = parser.parse_args()
-    train_model(config_path=args.config, output_dir=args.output_dir)
+    train_model(config_path=args.config, output_dir=args.output_dir, seed_override=args.seed)
 
 
 if __name__ == "__main__":
