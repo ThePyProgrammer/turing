@@ -19,6 +19,16 @@ evaluation:
   # Set to false for metrics where higher is better (accuracy, f1, auc)
   lower_is_better: false  # {{METRIC_DIRECTION}} -- change to true if lower is better
 
+  # Multi-seed configuration (Phase 10.1: /turing:seed)
+  # Seeds used for seed studies — diverse values for good coverage
+  seed_seeds: [42, 123, 456, 789, 1024, 1337, 2048, 3141, 4096, 7919]
+  seed_study_n_runs: 5        # Default number of seeds for /turing:seed
+  seed_sensitivity_threshold: 5.0  # CV% above this = seed-sensitive
+
+  # Reproducibility configuration (Phase 10.2: /turing:reproduce)
+  reproduce_tolerance: 0.02   # 2% relative tolerance for approximate match
+  reproduce_n_runs: 3         # Default reproduction runs for stochastic algorithms
+
 convergence:
   patience: 3                    # Consecutive non-improvements before stopping
   improvement_threshold: 0.005   # 0.5% relative improvement required
