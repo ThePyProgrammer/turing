@@ -87,6 +87,70 @@ def evaluate_model(
     return results
 
 
+def evaluate_detailed(
+    predictions: np.ndarray,
+    ground_truth: np.ndarray,
+    config: dict | None = None,
+) -> dict:
+    """Compute detailed evaluation metrics including per-class breakdown.
+
+    Extends evaluate_model with per-class precision/recall/F1 and a
+    confusion matrix. The agent uses this to understand WHERE the model
+    fails, not just that it fails.
+
+    Args:
+        predictions: Model predictions (numpy array).
+        ground_truth: Ground truth values (numpy array).
+        config: Optional config dict for metric selection.
+
+    Returns:
+        Dict with 'aggregate' (same as evaluate_model), 'per_class'
+        (dict of class -> {precision, recall, f1, support}), and
+        'confusion_matrix' (dict representation).
+    """
+    aggregate = evaluate_model(predictions, ground_truth, config)
+
+    # Per-class breakdown
+    classes = sorted(set(ground_truth.tolist()))
+    per_class = {}
+
+    for cls in classes:
+        cls_mask = ground_truth == cls
+        n_support = int(cls_mask.sum())
+        cls_preds = predictions[cls_mask]
+
+        tp = int((cls_preds == cls).sum())
+        precision_denom = int((predictions == cls).sum())
+        cls_precision = round(tp / precision_denom, 4) if precision_denom > 0 else 0.0
+        cls_recall = round(tp / n_support, 4) if n_support > 0 else 0.0
+
+        if cls_precision + cls_recall > 0:
+            cls_f1 = round(2 * cls_precision * cls_recall / (cls_precision + cls_recall), 4)
+        else:
+            cls_f1 = 0.0
+
+        per_class[str(cls)] = {
+            "precision": cls_precision,
+            "recall": cls_recall,
+            "f1": cls_f1,
+            "support": n_support,
+        }
+
+    # Confusion matrix as dict
+    confusion = {}
+    for true_cls in classes:
+        row = {}
+        for pred_cls in classes:
+            row[str(pred_cls)] = int(((ground_truth == true_cls) & (predictions == pred_cls)).sum())
+        confusion[str(true_cls)] = row
+
+    return {
+        "aggregate": aggregate,
+        "per_class": per_class,
+        "confusion_matrix": confusion,
+    }
+
+
 def format_metrics(metrics: dict) -> str:
     """Format metrics in a parseable delimited format.
 
