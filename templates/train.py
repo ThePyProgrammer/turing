@@ -83,11 +83,22 @@ def train_model(
     )
     model.fit(X_train, y_train)
 
-    # 5. Predict on val set
-    y_pred = model.predict(X_val)
+    # 5. Predict on train and val sets
+    y_pred_val = model.predict(X_val)
+    y_pred_train = model.predict(X_train)
 
-    # 6. Evaluate
-    metrics = evaluate_model(y_pred, y_val, config)
+    # 6. Evaluate on val (primary) and train (gap monitoring)
+    metrics = evaluate_model(y_pred_val, y_val, config)
+    train_metrics = evaluate_model(y_pred_train, y_train, config)
+
+    # Compute train/val gap for overfitting detection
+    eval_cfg = config.get("evaluation", {})
+    primary_metric = eval_cfg.get("primary_metric", "{{TARGET_METRIC}}")
+    val_score = metrics.get(primary_metric)
+    train_score = train_metrics.get(primary_metric)
+    if val_score is not None and train_score is not None:
+        metrics["train_" + primary_metric] = train_score
+        metrics["overfit_gap"] = round(train_score - val_score, 4)
 
     train_seconds = time.time() - start_time
 
