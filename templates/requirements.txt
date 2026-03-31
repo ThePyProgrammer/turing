@@ -6,3 +6,7 @@ numpy>=2.0
 joblib>=1.4
 pyyaml>=6.0
 pytest>=8.0
+
+# Optional: tree-search-guided hypothesis exploration
+# Install with: pip install "treequest[all]"
+# treequest>=0.1
