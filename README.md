@@ -330,6 +330,7 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:frontier [--metrics]` | Pareto frontier — multi-objective tradeoff visualization |
 | `/turing:profile [exp-id]` | Computational profiling — timing, memory, throughput, bottleneck detection |
 | `/turing:checkpoint <action>` | Smart checkpoint management — list, prune (Pareto), average, resume, stats |
+| `/turing:export [--format]` | Export model to production format with equivalence check + latency benchmark |
 | `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
 | `/turing:report` | Generate research report |
@@ -519,11 +520,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-24 commands, 2 agents, 8 config files, 39 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling + smart checkpoints, 542 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+25 commands, 2 agents, 8 config files, 44 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, 611 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              23 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance)
+├── commands/              24 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
