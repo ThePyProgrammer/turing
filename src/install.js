@@ -22,7 +22,7 @@ const PLUGIN_ROOT = join(__dirname, "..");
 const SUB_COMMANDS = [
   "init", "train", "status", "compare", "sweep", "validate",
   "try", "brief", "suggest", "explore", "design", "logbook", "poster",
-  "report", "mode", "preflight", "card",
+  "report", "mode", "preflight", "card", "seed", "reproduce",
 ];
 
 export async function install(opts = {}) {

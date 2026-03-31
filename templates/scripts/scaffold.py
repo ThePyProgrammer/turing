@@ -90,6 +90,8 @@ TEMPLATE_DIRS = {
         "export_results.py",
         "plot_trajectory.py",
         "treequest_suggest.py",
+        "seed_runner.py",
+        "reproduce_experiment.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
