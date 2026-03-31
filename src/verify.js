@@ -29,6 +29,7 @@ const EXPECTED_COMMANDS = [
   "report/SKILL.md",
   "mode/SKILL.md",
   "preflight/SKILL.md",
+  "card/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
