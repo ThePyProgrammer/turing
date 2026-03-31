@@ -121,3 +121,16 @@ If `$ARGUMENTS` contains `--plan`, generate a research plan AFTER scaffolding. T
 ### Integration
 
 The agent's `program.md` OBSERVE step reads `RESEARCH_PLAN.md` (if it exists) for strategic direction. The plan is advisory — the agent can deviate but should note why in `experiment_state.yaml`.
+
+## Multiple Projects
+
+You can scaffold multiple ML projects in the same repository:
+
+```bash
+/turing:init    # First project: prompts for ml_dir (e.g., ml/sentiment)
+/turing:init    # Second project: prompts for ml_dir (e.g., ml/churn)
+```
+
+Each project gets its own directory with independent config, data, experiments, and models. `/turing:train ml/sentiment` or `/turing:train ml/churn` targets a specific project. If you `cd ml/sentiment` first, `/turing:train` auto-detects from cwd.
+
+Agent memory is scoped per project: `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md`
