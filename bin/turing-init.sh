@@ -79,6 +79,7 @@ cp "${TEMPLATES_DIR}/scripts/post-train-hook.sh" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/stop-hook.sh" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/check_convergence.py" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/verify_placeholders.py" "${ML_DIR}/scripts/"
+cp "${TEMPLATES_DIR}/scripts/manage_hypotheses.py" "${ML_DIR}/scripts/"
 echo "    scripts/"
 
 mkdir -p "${ML_DIR}/tests"
