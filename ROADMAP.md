@@ -1068,4 +1068,55 @@ The features that *would* be worth adopting from a system like K-Dense — if it
 - Immutable evaluation with anti-cheating (Turing has it: ADRs 0002, Phase 5)
 - Statistical significance testing (Turing has it: Phase 2.1)
 
-K-Dense BYOK is impressive infrastructure for multi-disciplinary scientific assistance. It is not relevant to Turing's problem domain.
+K-Dense BYOK is impressive infrastructure for multi-disciplinary scientific assistance. It is not relevant to Turing's core experiment loop.
+
+### What IS Worth Stealing (Revised Assessment)
+
+Two narrow features from K-Dense improve Turing's existing literature capabilities:
+
+#### A. Scholarly API Catalog for `/turing:suggest` and `/turing:design`
+
+K-Dense catalogs 15 scholarly publication APIs. Turing's literature features currently use `WebSearch` blindly. A curated catalog of *which API to query for what* makes searches more targeted:
+
+| API | What it provides | Use case in Turing |
+|-----|-----------------|-------------------|
+| [Semantic Scholar](https://api.semanticscholar.org/api-docs/) | AI-enhanced paper search, citations, recommendations | `/turing:suggest` — find papers for a model architecture |
+| [OpenAlex](https://docs.openalex.org) | Open scholarly metadata, 200M+ works | `/turing:design` — find benchmark results for a task |
+| [arXiv API](https://info.arxiv.org/help/api/) | Preprints in CS/ML/AI | `/turing:suggest` — find cutting-edge approaches |
+| [CrossRef](https://api.crossref.org) | DOI metadata for 150M+ works | `/turing:brief --deep` — resolve citation metadata |
+| [Papers With Code](https://paperswithcode.com/api/v1/docs/) | SOTA leaderboards, datasets, methods | `/turing:init --plan` — find baseline metrics for a task |
+
+**Implementation:** Add `config/scholarly_apis.yaml` listing these APIs with their base URLs, query patterns, and which Turing command uses them. Update `/turing:suggest`, `/turing:design`, and `/turing:init --plan` to prefer these APIs over blind web search when available. This is a config-only change plus minor updates to the WebSearch queries in the command files.
+
+**Priority:** Low — improves quality of literature grounding but doesn't change functionality. The current WebSearch approach works; this makes it more precise.
+
+#### B. Structured Experiment Archetypes for `/turing:try`
+
+K-Dense's 15 ML workflows are structured prompts with placeholders: "Build a Classifier: (1) EDA, (2) Feature engineering, (3) Train {models}, (4) Evaluate {metrics}, (5) SHAP interpretability, (6) Tune best model." Turing's `/turing:try` accepts free text.
+
+A library of *experiment archetypes* would give both humans and the agent structured starting points:
+
+```yaml
+# config/experiment_archetypes.yaml
+archetypes:
+  model_comparison:
+    description: "Systematic comparison of multiple model families"
+    steps: ["Train all models with identical preprocessing", "Cross-validate", "Statistical comparison (paired t-test)", "Report"]
+    suggested_families: ["xgboost", "lightgbm", "random_forest", "mlp"]
+
+  feature_sweep:
+    description: "Systematic feature engineering exploration"
+    steps: ["Analyze feature importance", "Add interaction features", "Add polynomial features", "Evaluate each addition independently"]
+
+  regularization_search:
+    description: "Find optimal regularization for current best model"
+    steps: ["Vary weight_decay/dropout/max_depth", "Plot train-val gap vs regularization", "Find elbow point"]
+
+  ensemble_construction:
+    description: "Combine top-performing models"
+    steps: ["Select top 3 diverse models", "Try voting ensemble", "Try stacking", "Compare with individual bests"]
+```
+
+**Implementation:** Add `config/experiment_archetypes.yaml`. Update `/turing:try` to accept archetype names: `/turing:try archetype:model_comparison`. The hypothesis description is auto-generated from the archetype template with the project's specific metric and model type filled in.
+
+**Priority:** Medium — improves hypothesis quality by giving structured approaches rather than ad-hoc text. Particularly valuable for the agent's self-generated hypotheses (not just human injections).
