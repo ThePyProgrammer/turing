@@ -95,6 +95,47 @@ def format_table(experiments: list[dict], best_id: str | None, metric_names: lis
     return "\n".join(lines)
 
 
+def get_experiment_diffs(experiments: list[dict], max_diffs: int = 3) -> str:
+    """Get git diffs for recent discarded experiments."""
+    import subprocess
+
+    discarded = [e for e in experiments if e.get("status") == "discarded"]
+    if not discarded:
+        return ""
+
+    recent = discarded[-max_diffs:]
+    lines = ["\n--- Recent Failed Experiment Diffs ---\n"]
+
+    for exp in recent:
+        exp_id = exp.get("experiment_id", "unknown")
+        description = exp.get("description", "no description")
+        lines.append(f"=== {exp_id}: {description} ===")
+
+        # Try to find the experiment branch
+        branch = f"exp/{exp_id.replace('exp-', '')}"
+        try:
+            result = subprocess.run(
+                ["git", "diff", f"main...{branch}", "--", "train.py", "config.yaml"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                # Truncate long diffs
+                diff_lines = result.stdout.strip().splitlines()
+                if len(diff_lines) > 30:
+                    diff_lines = diff_lines[:30] + [f"... ({len(diff_lines) - 30} more lines)"]
+                lines.append("\n".join(diff_lines))
+            else:
+                lines.append("  (branch not found or no diff)")
+        except (subprocess.TimeoutExpired, FileNotFoundError):
+            lines.append("  (git not available)")
+
+        lines.append("")
+
+    return "\n".join(lines)
+
+
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description="Show experiment metrics")
@@ -108,6 +149,11 @@ def main() -> None:
         type=int,
         default=None,
         help="Show only last N experiments",
+    )
+    parser.add_argument(
+        "--with-diffs",
+        action="store_true",
+        help="Include git diffs for discarded experiments",
     )
     args = parser.parse_args()
 
@@ -124,6 +170,12 @@ def main() -> None:
 
     best_id = find_best(experiments, primary_metric, lower_is_better)
     print(format_table(experiments, best_id, metric_names))
+
+    if args.with_diffs:
+        all_experiments = load_experiments(args.log)
+        diffs = get_experiment_diffs(all_experiments)
+        if diffs:
+            print(diffs)
 
 
 if __name__ == "__main__":

@@ -17,7 +17,8 @@ This separation is not a convention — it is the architectural invariant that m
 
 | Layer | Files | Your Access |
 |-------|-------|-------------|
-| Measurement | `prepare.py`, `evaluate.py` | READ-ONLY |
+| Hidden | `evaluate.py` | NONE — do not read, reference, or access |
+| Measurement | `prepare.py` | READ-ONLY |
 | Hypothesis | `train.py`, `config.yaml` | READ-WRITE |
 | Features | `features/featurizers.py` | READ-ONLY (modify how `train.py` uses it) |
 
@@ -63,10 +64,19 @@ For systematic hyperparameter search:
 
 The autoresearch experiment loop. Each iteration is one experiment — one hypothesis tested.
 
-1. **OBSERVE** — Read recent results and check the hypothesis queue:
+1. **OBSERVE** — Read recent results, check hypothesis queue, and review failed diffs:
    ```bash
    python scripts/show_metrics.py --last 5
    python scripts/manage_hypotheses.py next 2>/dev/null || echo "No queued hypotheses"
+   ```
+
+   For the most recent discarded experiments, read the actual git diff to understand what was tried and failed — do NOT rely on your own memory of what you changed:
+   ```bash
+   # Show diffs from recent discarded experiment branches
+   for branch in $(git branch --list 'exp/*' | tail -3); do
+     echo "=== $branch ==="
+     git diff main...$branch -- train.py config.yaml 2>/dev/null | head -40
+   done
    ```
 
 2. **HYPOTHESIZE** — If a queued hypothesis exists (especially human-injected, high priority), use it. Otherwise propose your own. Either way, document what you expect and why.
@@ -133,6 +143,19 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 - **ALWAYS parse with grep:** `grep -A 10 "^---" run.log | head -10`
 - **ALWAYS activate venv:** `source .venv/bin/activate`
 - **NEVER install packages** without human approval
+
+## Strategy Escalation Protocol
+
+When consecutive experiments fail to improve, escalate your approach rather than repeating similar attempts:
+
+| Consecutive Failures | Strategy | Description |
+|---------------------|----------|-------------|
+| 0-1 | **EXPLOIT** | Push further in the current direction — small tweaks, parameter refinement |
+| 2-3 | **RE-READ** | Stop. Re-read ALL code from scratch. Your mental model is likely stale. |
+| 4-5 | **COMBINE** | Combine two previously successful ideas that haven't been tried together |
+| 6+ | **RADICAL** | Abandon the current approach entirely. Try a fundamentally different model, architecture, or feature strategy. |
+
+Track your consecutive failure count. When you hit a new tier, announce it: "Escalating to COMBINE strategy after 4 consecutive failures."
 
 ## Experiment Ideas
 
