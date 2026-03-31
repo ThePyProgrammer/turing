@@ -12,16 +12,25 @@ Read `program.md` in the ML project directory for the complete protocol. Follow 
 
 ## Arguments
 
-`$ARGUMENTS` — if a number, use as max_iterations (stop after N experiments). If empty, run until convergence (as defined in `config.yaml` convergence settings).
+`$ARGUMENTS` — accepts a project path (e.g., `ml/coding`), a number for max_iterations, or both (e.g., `ml/coding 10`). If no number, run until convergence (as defined in `config.yaml` convergence settings).
 
 ## Bootstrap Sequence
 
-0. **Restore memory:** Read `.claude/agent-memory/ml-researcher/MEMORY.md` for prior observations and best results.
-1. **Read protocol:** Read `program.md` completely — it defines the experiment loop, constraints, and output format.
-2. **Bootstrap data:** Check for training data at `config.yaml` → `data.source`. If no splits exist, run `python prepare.py`.
-3. **Bootstrap venv:** `test -d .venv || (python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt)`
-4. **Assess state:** `source .venv/bin/activate && python scripts/show_metrics.py --last 5`
-5. **Begin the loop** from program.md.
+0. **Detect project directory:**
+   - If `$ARGUMENTS` contains a path (e.g., `ml/coding`), use that as the project directory
+   - Else if cwd contains `config.yaml` and `train.py`, use cwd
+   - Else search for `ml/*/` subdirectories containing `config.yaml`
+     - If exactly one found, use it
+     - If multiple found, list them and ask the user which to target
+   - All subsequent commands run from the detected project directory
+   - Memory path: `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md`
+
+1. **Restore memory:** Read `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md` for prior observations and best results.
+2. **Read protocol:** Read `program.md` completely — it defines the experiment loop, constraints, and output format.
+3. **Bootstrap data:** Check for training data at `config.yaml` → `data.source`. If no splits exist, run `python prepare.py`.
+4. **Bootstrap venv:** `test -d .venv || (python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt)`
+5. **Assess state:** `source .venv/bin/activate && python scripts/show_metrics.py --last 5`
+6. **Begin the loop** from program.md.
 
 ## The Loop
 
