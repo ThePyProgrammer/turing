@@ -21,7 +21,7 @@ const PLUGIN_ROOT = join(__dirname, "..");
 // Single source of truth for sub-commands (DRY — used for dirs and file copy)
 const SUB_COMMANDS = [
   "init", "train", "status", "compare", "sweep", "validate",
-  "try", "brief", "suggest", "design", "logbook", "poster",
+  "try", "brief", "suggest", "explore", "design", "logbook", "poster",
   "report", "mode", "preflight", "card",
 ];
 

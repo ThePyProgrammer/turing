@@ -21,6 +21,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "report", "write-up", "findings", "document results" | `/turing:report` | Document |
 | "validate", "stability", "check variance", "noisy" | `/turing:validate` | Validate |
 | "suggest", "what model", "recommend", "which architecture", "literature" | `/turing:suggest` | Research |
+| "explore hypotheses", "tree search", "treequest", "search hypothesis space", "MCTS" | `/turing:explore` | Research |
 | "design", "plan experiment", "how should I test", "experiment design" | `/turing:design` | Design |
 | "mode", "explore", "exploit", "replicate", "strategy" | `/turing:mode` | Strategy |
 | "preflight", "resources", "VRAM", "memory", "can I run", "OOM", "GPU" | `/turing:preflight` | Check |
@@ -39,6 +40,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:init` | Scaffold a new ML project | (inline) |
 | `/turing:validate` | Check metric stability, auto-fix if noisy | (inline) |
 | `/turing:suggest` | Literature-grounded model architecture suggestions | (inline, uses WebSearch) |
+| `/turing:explore` | Tree-search hypothesis exploration via AB-MCTS | (inline) |
 | `/turing:design <hyp-id>` | Generate structured experiment design from hypothesis | (inline, uses WebSearch) |
 | `/turing:logbook` | HTML/markdown logbook with trajectory chart | (inline) |
 | `/turing:poster` | Single-page HTML research poster | (inline) |

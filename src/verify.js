@@ -23,6 +23,7 @@ const EXPECTED_COMMANDS = [
   "try/SKILL.md",
   "brief/SKILL.md",
   "suggest/SKILL.md",
+  "explore/SKILL.md",
   "design/SKILL.md",
   "logbook/SKILL.md",
   "poster/SKILL.md",
