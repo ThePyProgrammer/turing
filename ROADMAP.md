@@ -4,7 +4,7 @@
 
 This roadmap describes the features needed to make the coin-flipping vision real — to close the gap between what the README promises and what the system delivers.
 
-## Current State (v2.0.0)
+## Current State (v1.1.0)
 
 The scaffolding works. The experiment loop runs. Evaluation is immutable. Convergence is detected. 68 tests pass. 16 ADRs document the architecture. But the actual research intelligence is thin: grid search, free-text memory, single-run comparisons, and no structured mechanism for the human to steer the agent or the agent to report back to the human.
 
@@ -1120,3 +1120,443 @@ archetypes:
 **Implementation:** Add `config/experiment_archetypes.yaml`. Update `/turing:try` to accept archetype names: `/turing:try archetype:model_comparison`. The hypothesis description is auto-generated from the archetype template with the project's specific metric and model type filled in.
 
 **Priority:** Medium — improves hypothesis quality by giving structured approaches rather than ad-hoc text. Particularly valuable for the agent's self-generated hypotheses (not just human injections).
+
+---
+
+## Phase 10: Statistical Rigor (v1.3.0)
+
+*Stop publishing lucky seeds. Start publishing distributions.*
+
+Phase 2.1 added optional multi-run significance testing. This phase makes statistical rigor a first-class workflow with dedicated commands.
+
+### 10.1 Multi-Seed Runner — `/turing:seed`
+
+**What:** Run the same experiment across N random seeds, compute mean/std/confidence intervals, and flag results that are seed-sensitive. Prevents publishing lucky seeds.
+
+**Why:** Phase 2.1's `statistical_compare.py` requires manual `n_runs` config. `/turing:seed` makes multi-seed evaluation a one-command operation that any researcher reaches for before claiming a result. The difference: Phase 2.1 is infrastructure the agent uses during training; `/turing:seed` is a human-facing verification command.
+
+**Implementation:**
+1. Create `commands/seed.md` — `/turing:seed [N]` (default N=5)
+2. Add `templates/scripts/seed_runner.py`:
+   - Reads current best experiment config from `experiment_state.yaml`
+   - Runs `train.py` N times with seeds `[42, 123, 456, 789, 1024, ...]` (configurable in `config.yaml`)
+   - Collects per-seed metrics into a structured result:
+     ```yaml
+     seeds_run: [42, 123, 456, 789, 1024]
+     metric: accuracy
+     results: [0.872, 0.868, 0.871, 0.855, 0.873]
+     mean: 0.8678
+     std: 0.0071
+     ci_95: [0.859, 0.877]
+     cv_percent: 0.82
+     seed_sensitive: false  # true if CV > 5%
+     worst_seed: 789
+     best_seed: 1024
+     ```
+   - Writes results to `experiments/seed_studies/exp-NNN-seeds.yaml`
+   - Prints a summary table with pass/fail verdict
+3. Integration with `/turing:brief` — seed study results appear in the "Current Best" section
+4. Add `--quick` flag: runs 3 seeds instead of 5 for fast checks
+5. Add tests for seed runner, CI computation, sensitivity detection
+
+**Acceptance:** `/turing:seed` runs 5 seeds, reports mean±std with 95% CI, and flags seed-sensitive results (CV > 5%) before the researcher publishes.
+
+### 10.2 Reproducibility Verification — `/turing:reproduce`
+
+**What:** Given an experiment ID, re-run it from the logged config and verify metrics fall within a confidence interval of the original. Catches non-determinism, environment drift, and silent data changes.
+
+**Why:** Reviewers ask "did you check reproducibility?" and the honest answer is usually "no." This command makes it trivial. It also catches environment drift — if you upgrade a library and your results shift, `/turing:reproduce` will tell you before a reviewer does.
+
+**Implementation:**
+1. Create `commands/reproduce.md` — `/turing:reproduce <exp-id> [--tolerance 0.02]`
+2. Add `templates/scripts/reproduce_experiment.py`:
+   - Reads the experiment entry from `log.jsonl` by ID
+   - Extracts the full config (hyperparameters, seed, model type)
+   - Reconstructs `train.py` from the experiment's git commit: `git show exp/NNN:train.py`
+   - Runs the experiment with identical config
+   - Compares new metrics against original:
+     - **Exact match** (deterministic algorithms): metrics must match within float tolerance (1e-6)
+     - **Statistical match** (stochastic algorithms): runs N times (default 3), checks if original metric falls within the 95% CI of the new distribution
+   - Reports verdict: `reproducible`, `approximately_reproducible` (within tolerance), `not_reproducible` (outside CI), `environment_changed` (different library versions detected)
+   - Writes report to `experiments/reproductions/exp-NNN-repro.yaml`
+3. Environment snapshot: capture `pip freeze` at experiment time (extend `log_experiment.py`) and diff against current environment during reproduction
+4. Add `--strict` flag: exact match only, no statistical tolerance
+5. Add tests
+
+**Depends on:** Experiment logging (Phase 1), git-based experiment tracking
+
+**Acceptance:** `/turing:reproduce exp-042` re-runs the experiment and reports whether results are within statistical tolerance. Environment differences are flagged.
+
+---
+
+## Phase 11: Experiment Intelligence (v1.4.0)
+
+*Understand your experiments deeper than aggregate metrics.*
+
+### 11.1 Error Analysis — `/turing:diagnose`
+
+**What:** Cluster failure cases from the current best model, identify systematic failure modes, and suggest targeted fixes. Goes beyond aggregate metrics to answer "where and why does this model fail?"
+
+**Why:** A model with 87% accuracy is hiding 13% of failures. Are those failures random, or does the model consistently fail on a specific subpopulation (long sequences, rare classes, noisy features)? `/turing:diagnose` answers this and feeds actionable hypotheses into the experiment queue.
+
+**Implementation:**
+1. Create `commands/diagnose.md` — `/turing:diagnose [exp-id]` (defaults to current best)
+2. Add `templates/scripts/diagnose_errors.py`:
+   - Loads the model and runs inference on the validation set
+   - Collects all misclassified/high-error samples
+   - For classification: builds confusion matrix, identifies most-confused class pairs, analyzes per-class precision/recall (extends Phase 3.1's metric decomposition)
+   - For regression: identifies high-residual samples, bins by feature ranges to find systematic bias
+   - Clusters error cases by feature similarity (k-means on feature vectors of misclassified samples)
+   - For each cluster, describes the failure mode:
+     ```yaml
+     failure_modes:
+       - id: fm-001
+         description: "Model confuses class 'cat' and 'dog' — 42% of all errors"
+         affected_samples: 127
+         suggested_fix: "Add pet-specific features or increase training data for these classes"
+         auto_hypothesis: "Add breed-specific features to distinguish cat vs dog"
+       - id: fm-002
+         description: "High error on samples where feature_3 > 100 — model extrapolates poorly"
+         affected_samples: 34
+         suggested_fix: "Add feature_3 binning or cap outliers"
+         auto_hypothesis: "Bin feature_3 into quantiles instead of raw values"
+     ```
+   - Optionally auto-queues hypotheses from failure modes into `hypotheses.yaml` with `source: "diagnose"`
+3. Writes report to `experiments/diagnoses/exp-NNN-diagnosis.md`
+4. Integration with `/turing:brief` — failure modes appear in recommendations
+5. Add tests
+
+**Acceptance:** `/turing:diagnose` identifies the top 3-5 systematic failure modes with actionable fix suggestions. Auto-queued hypotheses target specific weaknesses.
+
+### 11.2 Systematic Ablation Studies — `/turing:ablate`
+
+**What:** Given a model configuration, systematically remove or disable components one at a time, measure the impact on the primary metric, and produce an ablation table ready for a paper.
+
+**Why:** Ablation tables are required by every ML venue and are the most tedious part of writing a paper. Each row requires a separate training run with one component removed. `/turing:ablate` automates the mechanical work — the researcher chooses which components to ablate, the system runs the experiments and formats the table.
+
+**Implementation:**
+1. Create `commands/ablate.md` — `/turing:ablate [exp-id] [--components "feature_X,regularization,augmentation"]`
+2. Add `templates/scripts/ablation_study.py`:
+   - Reads the experiment's config from `log.jsonl`
+   - If `--components` not specified, auto-detects ablatable components:
+     - Feature groups (if feature engineering is used)
+     - Regularization terms (dropout, weight_decay, max_depth limits)
+     - Preprocessing steps (normalization, encoding)
+     - Model-specific components (number of estimators, layer count)
+   - For each component, creates a modified config with that component removed/disabled
+   - Runs all ablation experiments (optionally in parallel via `/turing:seed` with N=3 for statistical robustness)
+   - Produces ablation table:
+     ```
+     | Configuration          | Accuracy | Δ from Full |
+     |------------------------|----------|-------------|
+     | Full model             | 0.872    | —           |
+     | − feature_X            | 0.851    | −0.021      |
+     | − regularization       | 0.863    | −0.009      |
+     | − augmentation         | 0.870    | −0.002      |
+     | − feature_Y            | 0.874    | +0.002      |
+     ```
+   - Ranks by impact (largest Δ first)
+   - Flags components with positive Δ when removed (dead weight — removing them improves the model)
+   - Writes to `experiments/ablations/exp-NNN-ablation.md`
+3. Integration with `/turing:paper` (Phase 14.2) — ablation tables are auto-included
+4. Add `--latex` flag for LaTeX-formatted table output
+5. Add tests
+
+**Depends on:** Seed runner (Phase 10.1) for statistical robustness of ablation results
+
+**Acceptance:** `/turing:ablate` produces a publication-ready ablation table showing the impact of each component. Dead-weight components are flagged.
+
+### 11.3 Pareto Frontier Visualization — `/turing:frontier`
+
+**What:** Visualize the Pareto frontier across multiple objectives (accuracy vs. latency vs. parameter count vs. memory) from experiment history. Answers "which model is actually best?" when there are tradeoffs.
+
+**Why:** Researchers often have multiple objectives that trade off against each other. The "best" model depends on deployment constraints. A Pareto frontier makes the tradeoff space visible so the researcher can make an informed choice rather than optimizing a single metric blindly.
+
+**Implementation:**
+1. Create `commands/frontier.md` — `/turing:frontier [--metrics "accuracy,latency_ms,n_params"]`
+2. Add `templates/scripts/pareto_frontier.py`:
+   - Reads all experiments from `log.jsonl`
+   - Extracts specified metrics (defaults to primary metric + any secondary metrics in config)
+   - Computes Pareto-optimal set: experiments where no other experiment is strictly better on all metrics
+   - Produces output:
+     - Text table of Pareto-optimal experiments with all metrics
+     - ASCII scatter plot (2D projection for the two most important metrics)
+     - Dominated experiments marked with their closest Pareto-optimal neighbor
+     ```
+     Pareto-optimal experiments (3 of 47):
+     | Exp ID  | Accuracy | Latency (ms) | Params  | Notes             |
+     |---------|----------|--------------|---------|-------------------|
+     | exp-042 | 0.872    | 12.3         | 1.2M    | Best accuracy     |
+     | exp-031 | 0.865    | 3.1          | 45K     | Best latency      |
+     | exp-038 | 0.870    | 5.7          | 200K    | Best tradeoff     |
+     ```
+   - Writes to `experiments/frontiers/frontier-YYYY-MM-DD.md`
+3. Extended metrics collection: update `log_experiment.py` to optionally capture inference latency and model size alongside the primary metric
+4. Integration with `/turing:brief` — Pareto summary appears when multiple metrics are tracked
+5. Add tests for Pareto computation, dominance checking
+
+**Acceptance:** `/turing:frontier` shows which experiments are Pareto-optimal across tracked metrics. Researchers can identify the best tradeoff point for their deployment constraints.
+
+---
+
+## Phase 12: Performance & Resources (v1.5.0)
+
+*Know where your time and memory go.*
+
+### 12.1 Computational Profiling — `/turing:profile`
+
+**What:** Measure FLOPS, memory high-water mark, throughput (samples/sec), and per-phase timing breakdown for a training run. Identifies bottlenecks (data loading? forward pass? gradient computation? I/O?) to answer "why is training slow?"
+
+**Why:** Researchers waste hours waiting for training without knowing that 60% of the time is spent in data loading (fixable with caching) or that memory peaks during a single poorly-batched operation (fixable with gradient accumulation). Profiling makes the invisible visible.
+
+**Implementation:**
+1. Create `commands/profile.md` — `/turing:profile [exp-id]` (profiles the current best config)
+2. Add `templates/scripts/profile_training.py`:
+   - Wraps a single training run with instrumentation:
+     - **Timing:** `time.perf_counter()` around data loading, preprocessing, model forward, loss computation, backward pass, optimizer step
+     - **Memory:** `tracemalloc` for Python memory; `torch.cuda.max_memory_allocated()` for GPU if available; `/proc/self/status` VmPeak for system memory
+     - **Throughput:** samples/sec and batches/sec
+     - **I/O:** time spent reading from disk vs. compute
+   - Produces a structured profile:
+     ```yaml
+     profile:
+       total_time_sec: 142.3
+       breakdown:
+         data_loading: 85.2  # 59.9% — BOTTLENECK
+         preprocessing: 12.1
+         forward_pass: 22.4
+         backward_pass: 18.7
+         optimizer_step: 3.9
+       memory:
+         peak_rss_mb: 2048
+         peak_gpu_mb: null  # No GPU detected
+         model_size_mb: 12.3
+       throughput:
+         samples_per_sec: 1420
+         batches_per_sec: 44.4
+       bottleneck: "data_loading (59.9% of total time)"
+       recommendations:
+         - "Cache preprocessed data to disk — data loading is 60% of training time"
+         - "Consider increasing batch size — GPU memory is underutilized"
+     ```
+   - Writes to `experiments/profiles/exp-NNN-profile.yaml`
+3. Auto-recommendations engine: map bottleneck patterns to known fixes
+4. Integration with `/turing:brief` — profile summary if available
+5. Add tests for timing instrumentation, memory tracking
+
+**Acceptance:** `/turing:profile` identifies the training bottleneck and suggests concrete fixes. A researcher can immediately see whether to optimize data loading, model architecture, or hardware.
+
+### 12.2 Smart Checkpoint Manager — `/turing:checkpoint`
+
+**What:** Manage model checkpoints based on Pareto dominance (not just "keep last K"). Supports checkpoint averaging, pruning, and resumption from any point in experiment history.
+
+**Why:** Default checkpoint strategies waste disk space (keep everything) or lose good models (keep last K). Pareto-based pruning keeps only checkpoints that are best on at least one metric. Checkpoint averaging across the top-K epochs often outperforms any single checkpoint — free accuracy at no training cost.
+
+**Implementation:**
+1. Create `commands/checkpoint.md` — `/turing:checkpoint [list|prune|average|resume]`
+2. Add `templates/scripts/checkpoint_manager.py`:
+   - **list:** Scan `experiments/checkpoints/` and display with metrics, size, and Pareto status
+   - **prune:** Remove checkpoints dominated on all tracked metrics. Keep Pareto-optimal + the latest checkpoint (for resume safety)
+     ```
+     Before: 47 checkpoints, 12.3 GB
+     Pareto-optimal: 5 checkpoints
+     Pruning 42 dominated checkpoints...
+     After: 5 checkpoints, 1.4 GB (saved 10.9 GB)
+     ```
+   - **average:** Load top-K checkpoints (by primary metric), average their weights, evaluate the averaged model. Often yields 0.5-1% improvement for free
+     ```
+     Averaging top 3 checkpoints: exp-042 (0.872), exp-038 (0.870), exp-035 (0.869)
+     Averaged model accuracy: 0.875 (+0.003 over best single)
+     ```
+   - **resume:** Given an experiment ID, restore the checkpoint and training state for continued training
+3. Checkpoint metadata: extend `log_experiment.py` to record checkpoint path and size
+4. Automatic pruning: optionally run after each experiment to prevent unbounded disk growth
+5. Add tests for Pareto pruning, checkpoint averaging, resume logic
+
+**Depends on:** Pareto computation from Phase 11.3 (shared logic)
+
+**Acceptance:** `/turing:checkpoint prune` reclaims disk space by removing dominated checkpoints. `/turing:checkpoint average` produces a model that outperforms any single checkpoint.
+
+---
+
+## Phase 13: Deployment Bridge (v2.0.0)
+
+*The v2.0 milestone. Turing crosses from experiment engine to production-ready pipeline — the first time it produces deployable artifacts, not just experiment logs. Get the model out of the loop and into production.*
+
+### 13.1 Model Export — `/turing:export`
+
+**What:** Export the best model to production-ready formats (ONNX, TorchScript, TFLite, scikit-learn joblib, XGBoost JSON). Run inference equivalence checks and benchmark latency on simulated hardware profiles.
+
+**Why:** The gap between "experiment works" and "model is deployable" is where most ML projects stall. Format conversion, equivalence testing, and latency benchmarking are mechanical but error-prone. `/turing:export` automates the mechanical parts so the researcher can focus on whether the model is *worth* deploying.
+
+**Implementation:**
+1. Create `commands/export.md` — `/turing:export [exp-id] [--format onnx|torchscript|joblib|xgboost_json] [--target cpu|gpu|edge]`
+2. Add `templates/scripts/export_model.py`:
+   - Auto-detects model type from experiment config
+   - Format-specific export:
+     - **scikit-learn/XGBoost/LightGBM:** `joblib.dump()` + model-native format (XGBoost JSON, LightGBM text)
+     - **PyTorch:** `torch.jit.trace()` for TorchScript, `torch.onnx.export()` for ONNX
+     - **TensorFlow/Keras:** `tf.lite.TFLiteConverter` for TFLite, SavedModel for serving
+   - Inference equivalence check:
+     - Run 100 random samples through both original and exported model
+     - Compare outputs within tolerance (1e-5 for float32, 1e-3 for quantized)
+     - Report: `equivalent` / `approximately_equivalent` / `divergent` with max delta
+   - Latency benchmark:
+     - Warm-up: 10 inference calls (discard)
+     - Benchmark: 100 calls, report p50/p95/p99 latency
+     - Compare against original model latency
+   - Model card generation:
+     ```yaml
+     model_card:
+       name: "exp-042-xgboost-classifier"
+       task: "binary_classification"
+       metrics: {accuracy: 0.872, f1: 0.869}
+       seed_study: {mean: 0.868, std: 0.007}
+       export_format: "xgboost_json"
+       equivalence: "exact (max_delta=0.0)"
+       inference_latency:
+         original_p50_ms: 1.2
+         exported_p50_ms: 0.8
+       size_mb: 2.3
+       dependencies: ["xgboost>=1.7"]
+       training_date: "2026-03-31"
+       experiment_id: "exp-042"
+     ```
+   - Writes exported model + card to `exports/exp-NNN/`
+3. Integration with seed study (Phase 10.1) — model card includes seed study results if available
+4. Add `--quantize` flag for INT8 quantization (where supported) with accuracy-loss check
+5. Add tests for export, equivalence checking, latency benchmarking
+
+**Acceptance:** `/turing:export` produces a deployable model artifact with equivalence verification, latency benchmarks, and a model card. Zero manual conversion steps.
+
+---
+
+## Phase 14: Research Workflow (v2.1.0)
+
+*Close the loop from experiment to publication.*
+
+### 14.1 Literature Integration — `/turing:lit`
+
+**What:** Targeted literature search scoped to the current experiment's domain. Find relevant papers, baselines to compare against, and methodological precedent — without leaving the experiment loop.
+
+**Why:** Phase 7 added literature-grounded model selection and experiment design. `/turing:lit` is the human-facing complement: a researcher mid-experiment who wants to know "has anyone tried this approach on a similar dataset?" or "what's the SOTA baseline I should be comparing against?" Currently this requires context-switching to Google Scholar. `/turing:lit` brings the search into the experiment workflow.
+
+**Implementation:**
+1. Create `commands/lit.md` — `/turing:lit <query>` or `/turing:lit --baseline` or `/turing:lit --related <exp-id>`
+2. Add `templates/scripts/literature_search.py`:
+   - **Free query mode:** `/turing:lit "gradient boosting for tabular data with missing values"`
+     - Searches scholarly APIs (arXiv, Semantic Scholar, Papers With Code — from Appendix A's catalog)
+     - Returns top 5 papers with: title, authors, year, venue, abstract snippet, citation count, relevance score
+   - **Baseline mode:** `/turing:lit --baseline`
+     - Reads task description from `config.yaml`
+     - Searches Papers With Code for SOTA results on similar tasks/datasets
+     - Returns leaderboard entries with: method, metric, paper, code availability
+     - Compares against current best: "Your accuracy (0.872) vs. SOTA (0.891) — gap: 0.019"
+   - **Related mode:** `/turing:lit --related exp-042`
+     - Reads experiment description and config
+     - Finds papers using similar methods/architectures
+     - Highlights methodological differences worth trying
+   - Writes results to `experiments/literature/query-YYYY-MM-DD-HHMMSS.md`
+   - Optionally auto-queues hypotheses from literature findings with `source: "literature"`
+3. Reuses the arXiv/Semantic Scholar pipeline from Phase 7.1 (shared library)
+4. Integration with `/turing:brief --deep` (Phase 7.3) — literature results feed into deep briefings
+5. Add tests
+
+**Depends on:** Scholarly API infrastructure from Phase 7.1
+
+**Acceptance:** `/turing:lit --baseline` shows SOTA comparison for the current task. `/turing:lit "query"` returns relevant papers without leaving the terminal.
+
+### 14.2 Paper Section Drafting — `/turing:paper`
+
+**What:** Draft the mechanical sections of an ML paper (methodology, results tables, ablation tables, experimental setup) directly from experiment logs. Not a full paper — just the parts that are tedious to write and easy to get wrong.
+
+**Why:** Writing "we trained XGBoost with max_depth=6, learning_rate=0.1, n_estimators=500 on an 80/20 train/test split with 5-fold cross-validation" is mechanical transcription from experiment logs to LaTeX. Getting a number wrong in a results table is embarrassingly common. `/turing:paper` eliminates transcription errors and saves hours of formatting.
+
+**Implementation:**
+1. Create `commands/paper.md` — `/turing:paper [--sections setup,results,ablation] [--format latex|markdown]`
+2. Add `templates/scripts/draft_paper_sections.py`:
+   - **Experimental Setup section:**
+     - Reads `config.yaml` for task description, dataset info, evaluation protocol
+     - Reads best experiment config for hyperparameters
+     - Reads seed study (Phase 10.1) for statistical methodology
+     - Generates prose: "We evaluate on [dataset] using [metric] with [N]-fold cross-validation. Results are reported as mean ± standard deviation over [N] random seeds."
+   - **Results Table:**
+     - Reads experiment families (Phase 6.3) or top-K experiments
+     - Generates formatted table with model name, all tracked metrics, seed study stats
+     - Highlights best result per metric (bold)
+     - Includes statistical significance indicators (from Phase 2.1)
+     ```latex
+     \begin{table}[h]
+     \centering
+     \caption{Comparison of model architectures on [dataset].}
+     \begin{tabular}{lcc}
+     \toprule
+     Model & Accuracy & F1 \\
+     \midrule
+     XGBoost & \textbf{0.872 ± 0.007} & 0.869 ± 0.008 \\
+     LightGBM & 0.865 ± 0.005 & \textbf{0.871 ± 0.006} \\
+     Random Forest & 0.843 ± 0.012 & 0.839 ± 0.014 \\
+     \bottomrule
+     \end{tabular}
+     \end{table}
+     ```
+   - **Ablation Table:**
+     - Reads ablation study (Phase 11.2) if available
+     - Formats as publication-ready table
+   - **Hyperparameter Table:**
+     - Extracts final hyperparameters for all reported models
+     - Formats as appendix-style table
+   - Writes to `paper/sections/` directory with one file per section
+3. Add `--bib` flag: generates BibTeX entries for papers cited via `/turing:lit`
+4. Add `--overleaf` flag: formats for direct paste into Overleaf
+5. Add tests for table generation, number accuracy (critical — verify against log.jsonl)
+
+**Depends on:** Seed runner (10.1), ablation studies (11.2), literature integration (14.1), experiment families (6.3)
+
+**Acceptance:** `/turing:paper` produces LaTeX sections with correct numbers pulled directly from experiment logs. No manual transcription needed.
+
+---
+
+## Updated Full Implementation Order
+
+| # | Feature | Phase | Version | Priority | Status | Depends On |
+|---|---------|-------|---------|----------|--------|------------|
+| 1–26 | Phases 1–9 | 1–9 | v1.0–v1.2 | — | **DONE** | — |
+| 27 | Multi-seed runner `/turing:seed` | 10.1 | v1.3.0 | **Critical** | **DONE** | Phase 2.1 (statistical compare) |
+| 28 | Reproducibility verification `/turing:reproduce` | 10.2 | v1.3.0 | **High** | **DONE** | Experiment logging (Phase 1) |
+| 29 | Error analysis `/turing:diagnose` | 11.1 | v1.4.0 | **Critical** | Planned | Phase 3.1 (metric decomposition) |
+| 30 | Ablation studies `/turing:ablate` | 11.2 | v1.4.0 | **High** | Planned | Phase 10.1 (seed runner) |
+| 31 | Pareto frontier `/turing:frontier` | 11.3 | v1.4.0 | **Medium** | Planned | Experiment logging |
+| 32 | Computational profiling `/turing:profile` | 12.1 | v1.5.0 | **High** | Planned | — (standalone) |
+| 33 | Smart checkpoint manager `/turing:checkpoint` | 12.2 | v1.5.0 | **Medium** | Planned | Phase 11.3 (Pareto logic) |
+| 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | Planned | Phase 10.1 (seed study for model card) |
+| 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | Planned | Phase 7.1 (scholarly API infra) |
+| 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | Planned | Phases 10.1, 11.2, 14.1, 6.3 |
+
+### Dependency Graph
+
+```
+Phase 10 (Statistical Rigor)          Phase 12 (Performance)
+  10.1 seed ─────────┐                  12.1 profile (standalone)
+  10.2 reproduce     │                  12.2 checkpoint ← 11.3 Pareto
+                     ▼
+Phase 11 (Experiment Intelligence)
+  11.1 diagnose ← 3.1 decomposition
+  11.2 ablate ← 10.1 seed
+  11.3 frontier (standalone)
+                     │
+                     ▼
+Phase 13 (Deployment)                Phase 14 (Research Workflow)
+  13.1 export ← 10.1 seed             14.1 lit ← 7.1 scholarly APIs
+                                       14.2 paper ← 10.1, 11.2, 14.1, 6.3
+```
+
+### Version Release Criteria
+
+| Version | Phase | Release Gate |
+|---------|-------|-------------|
+| v1.3.0 | 10 (Statistical Rigor) | `/turing:seed` and `/turing:reproduce` pass on 3 different ML tasks |
+| v1.4.0 | 11 (Experiment Intelligence) | `/turing:diagnose`, `/turing:ablate`, `/turing:frontier` produce correct output on existing experiment logs |
+| v1.5.0 | 12 (Performance) | `/turing:profile` identifies known bottlenecks; `/turing:checkpoint prune` reclaims >50% disk on a 50-experiment project |
+| **v2.0.0** | **13 (Deployment Bridge)** | **`/turing:export` produces bit-equivalent ONNX/joblib output verified by equivalence tests — Turing crosses from experiment engine to production pipeline** |
+| v2.1.0 | 14 (Research Workflow) | `/turing:paper` generates a results table where every number matches `log.jsonl` (zero transcription errors) |
