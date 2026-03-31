@@ -23,6 +23,7 @@ from pathlib import Path
 
 import yaml
 
+from scripts.cost_frontier import compute_pareto_frontier, load_cost_data, _format_seconds
 from scripts.turing_io import load_config, load_experiments, load_hypotheses
 
 
@@ -220,6 +221,8 @@ def format_brief(
     lower_is_better: bool,
     failure_clusters: list[dict] | None = None,
     env_warnings: list[str] | None = None,
+    cost_data: list | None = None,
+    cost_frontier: list | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -312,6 +315,51 @@ def format_brief(
         lines.append("")
         lines.append("*Results may not be directly comparable. Consider re-running the best experiment in the current environment.*")
 
+    # Cost-performance analysis (only if train_seconds data exists)
+    if cost_data and cost_frontier is not None:
+        lines.extend(["", "## Cost-Performance Analysis", ""])
+
+        frontier_ids = {r.experiment_id for r in cost_frontier}
+
+        lines.append("**Pareto frontier (efficient set):**")
+        if cost_frontier:
+            for r in cost_frontier:
+                lines.append(
+                    f"- {r.experiment_id} ({r.model_type}): "
+                    f"{metric}={r.metric_value:.4f}, time={_format_seconds(r.train_seconds)}"
+                )
+        else:
+            lines.append("- No Pareto-optimal experiments found.")
+
+        # Compare best metric vs cheapest frontier alternative
+        if len(cost_frontier) >= 2:
+            if lower_is_better:
+                best_cost_exp = min(cost_data, key=lambda r: r.metric_value)
+            else:
+                best_cost_exp = max(cost_data, key=lambda r: r.metric_value)
+
+            cheapest = cost_frontier[0]  # sorted by train_seconds
+
+            if best_cost_exp.experiment_id != cheapest.experiment_id:
+                metric_diff = abs(best_cost_exp.metric_value - cheapest.metric_value)
+                if cheapest.metric_value != 0:
+                    pct = metric_diff / abs(cheapest.metric_value) * 100
+                else:
+                    pct = 0.0
+                if cheapest.train_seconds > 0:
+                    ratio = best_cost_exp.train_seconds / cheapest.train_seconds
+                else:
+                    ratio = float("inf")
+
+                lines.extend([
+                    "",
+                    f"Current best: **{best_cost_exp.experiment_id}** "
+                    f"({best_cost_exp.metric_value:.4f}, {_format_seconds(best_cost_exp.train_seconds)})",
+                    f"Cheapest acceptable: **{cheapest.experiment_id}** "
+                    f"({cheapest.metric_value:.4f}, {_format_seconds(cheapest.train_seconds)})",
+                    f"The {pct:.1f}% improvement costs {ratio:.0f}x more compute.",
+                ])
+
     lines.extend([
         "",
         "## Recommendations",
@@ -367,9 +415,15 @@ def generate_brief(
     failures = cluster_failures(experiments)
     env_warnings = detect_environment_drift(experiments)
 
+    # Load cost-performance data if available
+    cost_records = load_cost_data(log_path, metric)
+    pareto = compute_pareto_frontier(cost_records, lower_is_better) if cost_records else []
+
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
         metric, lower_is_better, failures, env_warnings,
+        cost_data=cost_records if cost_records else None,
+        cost_frontier=pareto if cost_records else None,
     )
 
 
