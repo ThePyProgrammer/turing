@@ -58,6 +58,22 @@ The autoresearch harness enforces a strict separation between the **hypothesis s
 - **max_iterations** (if provided) overrides convergence.
 - **Always report** final best model, metrics, and recommended next steps when stopping.
 
+## Tool Restrictions
+
+The researcher agent's Bash access is restricted to a whitelist of necessary commands:
+
+| Allowed Pattern | Purpose |
+|-----------------|---------|
+| `python train.py:*` | Execute training |
+| `python scripts/*:*` | Run utility scripts (logging, metrics, sweep) |
+| `git:*` | Branch, commit, merge, reset operations |
+| `source .venv/bin/activate:*` | Virtual environment activation |
+| `pip:*` | Package installation (requires human approval) |
+
+**Blocked by omission:** `cat`, `head`, `tail`, `less` (prevents reading hidden files via shell), `curl`, `wget` (prevents data exfiltration), arbitrary command execution.
+
+The agent's Read tool is separately governed by the file access tiers above — hidden files are denied at the tool level.
+
 ## Safety
 
 - Do not modify files outside the ML project directory.
