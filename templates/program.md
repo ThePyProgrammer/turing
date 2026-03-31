@@ -170,6 +170,11 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    - N consecutive non-improvements (`config.yaml` → `convergence.patience`) = STOP
    - `max_iterations` reached = STOP
    - Report final best model and recommend next steps
+   - **Before declaring final results**, run a seed study to verify robustness:
+     ```bash
+     python scripts/seed_runner.py --quick
+     ```
+     If CV > 5%, the result is seed-sensitive — report mean ± std, not a single-seed number.
 
 10. **REPEAT** — return to step 1.
 
