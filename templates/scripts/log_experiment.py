@@ -90,6 +90,8 @@ def log_experiment(
     description: str,
     status: str = "kept",
     git_commit: str | None = None,
+    parent_experiment: str | None = None,
+    hypothesis_id: str | None = None,
 ) -> None:
     """Append one experiment entry to the JSONL log.
 
@@ -102,6 +104,8 @@ def log_experiment(
         description: Human-readable experiment description.
         status: "kept" or "discarded".
         git_commit: Optional git commit hash.
+        parent_experiment: Optional parent experiment ID (for dependency tree).
+        hypothesis_id: Optional hypothesis ID (links to hypotheses.yaml).
     """
     path = Path(log_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -111,6 +115,8 @@ def log_experiment(
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_commit,
         "status": status,
+        "parent_experiment": parent_experiment,
+        "hypothesis_id": hypothesis_id,
         "config": config,
         "metrics": metrics,
         "model_path": model_path,
@@ -174,22 +180,40 @@ def main() -> None:
     """CLI entry point.
 
     Usage: python scripts/log_experiment.py <log_path> <experiment_id> <status> \\
-           <metrics_json> <config_json> <model_path> <description>
+           <metrics_json> <config_json> <model_path> <description> \\
+           [--parent <exp-id>] [--hypothesis <hyp-id>]
     """
-    if len(sys.argv) < 8:
+    # Separate positional args from --flags
+    positional = []
+    parent = None
+    hypothesis = None
+    i = 1
+    while i < len(sys.argv):
+        if sys.argv[i] == "--parent" and i + 1 < len(sys.argv):
+            parent = sys.argv[i + 1]
+            i += 2
+        elif sys.argv[i] == "--hypothesis" and i + 1 < len(sys.argv):
+            hypothesis = sys.argv[i + 1]
+            i += 2
+        else:
+            positional.append(sys.argv[i])
+            i += 1
+
+    if len(positional) < 7:
         print(
             "Usage: python scripts/log_experiment.py <log_path> <experiment_id> "
-            "<status> <metrics_json> <config_json> <model_path> <description>"
+            "<status> <metrics_json> <config_json> <model_path> <description> "
+            "[--parent <exp-id>] [--hypothesis <hyp-id>]"
         )
         sys.exit(1)
 
-    log_path = sys.argv[1]
-    experiment_id = sys.argv[2]
-    status = sys.argv[3]
-    metrics = json.loads(sys.argv[4])
-    config = json.loads(sys.argv[5])
-    model_path = sys.argv[6]
-    description = " ".join(sys.argv[7:])
+    log_path = positional[0]
+    experiment_id = positional[1]
+    status = positional[2]
+    metrics = json.loads(positional[3])
+    config = json.loads(positional[4])
+    model_path = positional[5]
+    description = " ".join(positional[6:])
 
     log_experiment(
         log_path=log_path,
@@ -199,6 +223,8 @@ def main() -> None:
         model_path=model_path,
         description=description,
         status=status,
+        parent_experiment=parent,
+        hypothesis_id=hypothesis,
     )
     print(f"Logged {experiment_id} ({status})")
 
