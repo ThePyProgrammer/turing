@@ -118,3 +118,63 @@ def test_packet_no_champion():
     packet = synthesize_packet(exp, None, "accuracy", False)
     assert packet["champion_id"] is None
     assert packet["outcome"] == "new_champion"
+
+
+# --- auto_queue_followup ---
+
+from scripts.synthesize_decision import auto_queue_followup
+from scripts.manage_hypotheses import load_queue
+
+
+def test_auto_queue_branch_followup(tmp_path):
+    """branch_followup should auto-queue a medium-priority agent hypothesis."""
+    qpath = str(tmp_path / "hypotheses.yaml")
+    packet = {
+        "experiment_id": "exp-005",
+        "action": "branch_followup",
+        "description": "increase depth to 6",
+        "family": "architecture",
+    }
+    hyp_id = auto_queue_followup(packet, qpath)
+    assert hyp_id is not None
+    assert hyp_id.startswith("hyp-")
+
+    queue = load_queue(qpath)
+    assert len(queue) == 1
+    assert queue[0]["source"] == "agent"
+    assert queue[0]["priority"] == "medium"
+    assert "exp-005" in queue[0]["description"]
+
+
+def test_auto_queue_fix_and_retry(tmp_path):
+    """fix_and_retry should auto-queue a high-priority agent hypothesis."""
+    qpath = str(tmp_path / "hypotheses.yaml")
+    packet = {
+        "experiment_id": "exp-007",
+        "action": "fix_and_retry",
+        "description": "OOM on large batch size",
+        "family": None,
+    }
+    hyp_id = auto_queue_followup(packet, qpath)
+    assert hyp_id is not None
+
+    queue = load_queue(qpath)
+    assert queue[0]["priority"] == "high"
+    assert "exp-007" in queue[0]["description"]
+
+
+def test_auto_queue_promote_does_nothing(tmp_path):
+    """promote action should NOT auto-queue anything."""
+    qpath = str(tmp_path / "hypotheses.yaml")
+    packet = {"experiment_id": "exp-010", "action": "promote", "description": "new best", "family": None}
+    hyp_id = auto_queue_followup(packet, qpath)
+    assert hyp_id is None
+    assert load_queue(qpath) == []
+
+
+def test_auto_queue_abandon_does_nothing(tmp_path):
+    """abandon action should NOT auto-queue anything."""
+    qpath = str(tmp_path / "hypotheses.yaml")
+    packet = {"experiment_id": "exp-011", "action": "abandon", "description": "regression", "family": None}
+    hyp_id = auto_queue_followup(packet, qpath)
+    assert hyp_id is None

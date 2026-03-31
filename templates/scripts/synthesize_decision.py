@@ -194,6 +194,48 @@ def synthesize_packet(
     return packet
 
 
+def auto_queue_followup(
+    packet: dict,
+    hypotheses_path: str = "hypotheses.yaml",
+) -> str | None:
+    """Auto-queue a follow-up hypothesis based on the decision packet.
+
+    Actions that trigger auto-queuing:
+    - branch_followup: queue a follow-up hypothesis as agent/medium priority
+    - fix_and_retry: queue a retry hypothesis as agent/high priority
+
+    Returns the new hypothesis ID if queued, or None if no action taken.
+    """
+    action = packet.get("action", "")
+    exp_id = packet.get("experiment_id", "?")
+    description = packet.get("description", "")
+    family = packet.get("family")
+
+    # Import here to avoid circular dependency at module level
+    from scripts.manage_hypotheses import add_hypothesis
+
+    if action == "branch_followup":
+        desc = f"Follow up on {exp_id}: explore variations of '{description[:60]}'"
+        return add_hypothesis(
+            queue_path=hypotheses_path,
+            description=desc,
+            source="agent",
+            priority="medium",
+            parent_experiment=exp_id,
+        )
+    elif action == "fix_and_retry":
+        desc = f"Retry {exp_id} with fixes: '{description[:60]}' crashed — investigate and fix"
+        return add_hypothesis(
+            queue_path=hypotheses_path,
+            description=desc,
+            source="agent",
+            priority="high",
+            parent_experiment=exp_id,
+        )
+
+    return None
+
+
 def format_packet(packet: dict, metric_name: str) -> str:
     """Format a decision packet for display."""
     lines = [
@@ -216,6 +258,8 @@ def main() -> None:
     parser.add_argument("--experiment", required=True, help="Experiment ID")
     parser.add_argument("--log", default="experiments/log.jsonl")
     parser.add_argument("--config", default="config.yaml")
+    parser.add_argument("--hypotheses", default="hypotheses.yaml", help="Hypothesis queue path")
+    parser.add_argument("--auto-queue", action="store_true", help="Auto-queue follow-up hypotheses")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
@@ -244,6 +288,12 @@ def main() -> None:
         print(json.dumps(packet, indent=2))
     else:
         print(format_packet(packet, metric))
+
+    # Auto-queue follow-up hypotheses if requested
+    if args.auto_queue:
+        hyp_id = auto_queue_followup(packet, args.hypotheses)
+        if hyp_id:
+            print(f"\n  Auto-queued: {hyp_id} ({packet['action']})")
 
 
 if __name__ == "__main__":

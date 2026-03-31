@@ -155,7 +155,11 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    # or: mark hyp-NNN dead-end (if it clearly failed)
    ```
 
-   This updates both `hypotheses.yaml` (index) and `hypotheses/hyp-NNN.yaml` (detail file with full result metrics and notes).
+   Then synthesize a decision packet and auto-queue follow-ups:
+   ```bash
+   python scripts/synthesize_decision.py --experiment exp-NNN --auto-queue
+   ```
+   This produces a verdict (promote/branch_followup/abandon/fix_and_retry) and automatically queues follow-up hypotheses for `branch_followup` and `fix_and_retry` outcomes.
 
 9. **CONVERGE** — Check stopping conditions:
    - N consecutive non-improvements (`config.yaml` → `convergence.patience`) = STOP
