@@ -2,11 +2,23 @@
 name: brief
 description: Generate a structured research intelligence report from experiment history — what's been learned, what's promising, what's exhausted, and what the human should consider next. Use --deep for literature-grounded suggestions.
 disable-model-invocation: true
-argument-hint: "[--deep]"
+argument-hint: "[ml/project] [--deep]"
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob, WebSearch, WebFetch
 ---
 
 Generate a research briefing that a human can read in 2 minutes and immediately decide what to inject next.
+
+## Project Detection
+
+Before generating the briefing, detect which project to report on:
+
+0. **Detect project directory:**
+   - If `$ARGUMENTS` contains a path (e.g., `ml/coding`), use that as the project directory
+   - Else if cwd contains `config.yaml` and `train.py`, use cwd
+   - Else search for `ml/*/` subdirectories containing `config.yaml`
+     - If exactly one found, use it
+     - If multiple found, list them and ask the user which to report on
+   - All subsequent commands run from the detected project directory
 
 ## Steps
 
