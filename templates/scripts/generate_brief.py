@@ -139,6 +139,59 @@ def identify_model_types(experiments: list[dict]) -> dict[str, dict]:
     return result
 
 
+def cluster_failures(experiments: list[dict]) -> list[dict]:
+    """Identify patterns across failed (discarded) experiments.
+
+    Groups discarded experiments by common traits and reports clusters
+    where multiple experiments share the same failure characteristic.
+
+    Returns list of cluster dicts with: trait, count, experiments, description.
+    """
+    discarded = [e for e in experiments if e.get("status") == "discarded"]
+    if len(discarded) < 2:
+        return []
+
+    clusters: dict[str, list[str]] = {}
+
+    for exp in discarded:
+        exp_id = exp.get("experiment_id", "?")
+        config = exp.get("config", {})
+        hyperparams = config.get("hyperparams", {})
+
+        # Cluster by model type
+        mt = config.get("model_type", "unknown")
+        key = f"model_type={mt}"
+        clusters.setdefault(key, []).append(exp_id)
+
+        # Cluster by hyperparameter ranges
+        for param, value in hyperparams.items():
+            if isinstance(value, (int, float)):
+                # Bin into high/low relative to a simple threshold
+                key = f"{param}>={value}" if isinstance(value, int) else f"{param}~{value}"
+                clusters.setdefault(key, []).append(exp_id)
+
+        # Cluster by family
+        family = exp.get("family")
+        if family:
+            key = f"family={family}"
+            clusters.setdefault(key, []).append(exp_id)
+
+    # Filter to clusters with 2+ experiments
+    result = []
+    for trait, exp_ids in clusters.items():
+        if len(exp_ids) >= 2:
+            result.append({
+                "trait": trait,
+                "count": len(exp_ids),
+                "experiments": exp_ids,
+                "description": f"{len(exp_ids)} discarded experiments share: {trait}",
+            })
+
+    # Sort by count descending
+    result.sort(key=lambda c: -c["count"])
+    return result[:5]  # Top 5 clusters
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -147,6 +200,7 @@ def format_brief(
     hypotheses: list[dict],
     metric: str,
     lower_is_better: bool,
+    failure_clusters: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -221,6 +275,15 @@ def format_brief(
             result = f" -> {h['result_experiment']}" if h.get("result_experiment") else ""
             lines.append(f"- {h['id']}: {h.get('description', '?')} [{h.get('status')}]{result}")
 
+    # Failure patterns
+    if failure_clusters:
+        lines.extend(["", "## Failure Patterns", ""])
+        for cluster in failure_clusters:
+            exps = ", ".join(cluster["experiments"][:5])
+            lines.append(f"- **{cluster['trait']}** — {cluster['count']} discarded experiments ({exps})")
+        lines.append("")
+        lines.append("*Consider avoiding these traits in future experiments.*")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -273,8 +336,9 @@ def generate_brief(
     best = find_best(experiments, metric, lower_is_better)
     trajectory = compute_trajectory(experiments, metric, lower_is_better)
     model_types = identify_model_types(experiments)
+    failures = cluster_failures(experiments)
 
-    return format_brief(campaign, best, trajectory, model_types, hypotheses, metric, lower_is_better)
+    return format_brief(campaign, best, trajectory, model_types, hypotheses, metric, lower_is_better, failures)
 
 
 def main() -> None:
