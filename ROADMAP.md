@@ -413,18 +413,18 @@ Turing is a Claude Code plugin — the human is always in the loop. Fully autono
 | 6 | Automatic metric decomposition | 3.1 | **Medium** | **DONE** | 8 |
 | 7 | Train/val gap monitoring | 3.2 | **Medium** | **DONE** | — |
 | 8 | Structured experiment state | 4.1 | **Medium** | **DONE** | 13 |
-| 9 | Hidden file tier | 5.1 | **Critical** | Planned | — |
-| 10 | Behavioral probes | 5.2 | **Critical** | Planned | — |
-| 11 | Stability validation | 5.3 | **High** | Planned | — |
-| 12 | Tool restriction | 5.4 | **High** | Partial | — |
-| 13 | Diff-based history | 5.5 | **Medium** | Planned | — |
+| 9 | Hidden file tier | 5.1 | **Critical** | **DONE** | — |
+| 10 | Behavioral probes | 5.2 | **Critical** | **DONE** | — |
+| 11 | Stability validation | 5.3 | **High** | **DONE** | — |
+| 12 | Tool restriction | 5.4 | **High** | **DONE** | — |
+| 13 | Diff-based history | 5.5 | **Medium** | **DONE** | — |
 | 14 | Novelty guard | 6.1 | **Critical** | Planned | — |
 | 15 | Decision packets | 6.2 | **High** | Planned | — |
 | 16 | Experiment families | 6.3 | **High** | Planned | — |
 | 17 | Failure clustering | 6.4 | **Medium** | Planned | — |
 | 18 | Research mode selection | 6.5 | **Medium** | Planned | — |
 
-Phases 1-4 complete (165 tests). Phase 5 (anti-cheating) and Phase 6 (MemoryLab research-ops) are next.
+Phases 1-5 complete. Phase 6 (MemoryLab research-ops) is next.
 
 ---
 

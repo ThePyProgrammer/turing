@@ -19,7 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, "..");
 
 // Single source of truth for sub-commands (DRY — used for dirs and file copy)
-const SUB_COMMANDS = ["init", "train", "status", "compare", "sweep", "validate"];
+const SUB_COMMANDS = ["init", "train", "status", "compare", "sweep", "validate", "try", "brief"];
 
 export async function install(opts = {}) {
   const scope = opts.global ? "global" : opts.project ? "project" : "global";

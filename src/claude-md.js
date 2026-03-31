@@ -19,6 +19,8 @@ Autonomous ML research harness. The autoresearch loop as a formal protocol.
 | \`/turing:compare <a> <b>\` | Side-by-side experiment comparison |
 | \`/turing:sweep\` | Generate and run hyperparameter sweep |
 | \`/turing:validate\` | Check metric stability, auto-fix if noisy |
+| \`/turing:try <hypothesis>\` | Inject a hypothesis into the experiment queue |
+| \`/turing:brief\` | Generate research intelligence report |
 
 ### Agents
 

@@ -2,6 +2,7 @@
 name: brief
 description: Generate a structured research intelligence report from experiment history — what's been learned, what's promising, what's exhausted, and what the human should consider next. Closes the taste-leverage loop.
 disable-model-invocation: true
+allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
 ---
 
 Generate a research briefing that a human can read in 2 minutes and immediately decide what to inject next.
