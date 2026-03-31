@@ -296,16 +296,35 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 
 ## Commands
 
+### Core Loop
+
 | Command | What it does |
 |---------|-------------|
-| `/turing:init` | Scaffold a new ML project — creates the separation between hypothesis space and measurement apparatus |
+| `/turing:init [--plan]` | Scaffold a new ML project. `--plan` generates a literature-grounded research plan. |
 | `/turing:train [N]` | Run the autonomous experiment loop (optional max iterations) |
-| `/turing:try <hypothesis>` | Inject a hypothesis into the queue — this is how taste reaches the agent |
-| `/turing:brief [--deep]` | Generate research briefing — campaign summary, recommendations, optionally literature-grounded suggestions |
+| `/turing:sweep` | Systematic hyperparameter sweep via cartesian product |
 | `/turing:status` | Quick experiment status — best model, convergence state |
 | `/turing:compare <a> <b>` | Side-by-side experiment comparison with causal analysis |
-| `/turing:sweep` | Systematic hyperparameter sweep via cartesian product |
-| `/turing:validate [--auto]` | Check metric stability — if noisy, auto-configure multi-run evaluation |
+
+### Taste-Leverage Interface
+
+| Command | What it does |
+|---------|-------------|
+| `/turing:try <hypothesis>` | Inject a hypothesis — free text or `archetype:model_comparison` |
+| `/turing:brief [--deep]` | Research briefing — campaign summary, failure patterns, literature-grounded suggestions |
+| `/turing:suggest` | Literature-grounded model architecture suggestions with citations |
+| `/turing:design <hyp-id>` | Generate structured experiment design from a hypothesis |
+| `/turing:mode <explore\|exploit\|replicate>` | Set research strategy — drives novelty guard policy |
+
+### Reporting & Validation
+
+| Command | What it does |
+|---------|-------------|
+| `/turing:validate [--auto]` | Check metric stability — auto-configure multi-run if noisy |
+| `/turing:logbook` | Generate HTML experiment logbook |
+| `/turing:report` | Generate research report |
+| `/turing:poster` | Generate research poster |
+| `/turing:preflight` | Pre-release validation checks |
 
 And for fully hands-off operation:
 
@@ -393,56 +412,22 @@ claude plugin add /path/to/turing
 
 ## Architecture of Turing Itself
 
+15 commands, 2 agents, 8 config files, 25 template scripts, 338 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+
 ```
 turing/
-├── commands/              8 skill files (SKILL.md pattern)
-│   ├── turing.md          Router — intent detection + dispatch
-│   ├── init.md            Project scaffolding
-│   ├── train.md           Autonomous experiment loop
-│   ├── try.md             Hypothesis injection
-│   ├── brief.md           Research briefing generation
-│   ├── status.md          Experiment status display
-│   ├── compare.md         Side-by-side run comparison
-│   ├── sweep.md           Hyperparameter sweep
-│   ├── validate.md        Metric stability validation
-│   └── rules/
-│       └── loop-protocol.md   Safety constraints + access tiers
-├── agents/                2 agent definitions
-│   ├── ml-researcher.md   Autonomous researcher (Read/Write/Edit/Bash)
-│   └── ml-evaluator.md    Read-only analyst (Read/Bash only)
-├── config/                Domain-specific language
-│   ├── defaults.yaml      Fallback hyperparameters and settings
-│   ├── lifecycle.toml     Experiment state machine
-│   ├── taxonomy.toml      Classification system
-│   └── novelty_aliases.yaml  Alias tables for novelty guard
-├── templates/             Project scaffolding (copied to user projects)
-│   ├── prepare.py         Data loading/splitting (READ-ONLY)
-│   ├── evaluate.py        Evaluation harness (HIDDEN)
+├── commands/              15 skill files (core + taste-leverage + reporting)
+├── agents/                2 agents (researcher: read/write, evaluator: read-only)
+├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
+├── templates/             Scaffolded into user projects by /turing:init
+│   ├── prepare.py         Data loading (HIDDEN from agent)
+│   ├── evaluate.py        Evaluation harness (HIDDEN from agent)
 │   ├── train.py           Training code (AGENT-EDITABLE)
-│   ├── config.yaml        Experiment configuration
-│   ├── program.md         Agent protocol — the experiment loop
-│   ├── scripts/           The toolbox:
-│   │   ├── manage_hypotheses.py    Hypothesis queue + detail files
-│   │   ├── novelty_guard.py        Duplicate detection
-│   │   ├── generate_brief.py       Research briefing
-│   │   ├── validate_stability.py   Metric stability check
-│   │   ├── show_metrics.py         Experiment table + diffs
-│   │   ├── log_experiment.py       Append-only JSONL logging
-│   │   ├── compare_runs.py         Side-by-side comparison
-│   │   ├── sweep.py                Hyperparameter sweep queue
-│   │   └── ...
-│   └── ...
-├── src/                   Installation machinery (5 files)
-│   ├── paths.js           Path resolution (global/project scopes)
-│   ├── claude-md.js       CLAUDE.md managed section
-│   ├── install.js         Deploy to ~/.claude/ (SKILL.md pattern)
-│   ├── verify.js          Check installation completeness
-│   └── postinstall.js     npm postinstall hook
-├── bin/
-│   ├── cli.js             Node.js CLI (uses commander)
-│   └── turing-init.sh     Standalone scaffolding
-└── .claude-plugin/
-    └── plugin.json        Plugin metadata
+│   └── scripts/           25 Python scripts (core loop + analysis + infra)
+├── tests/                 338 tests (unit + integration + anti-pattern + manifest)
+├── src/                   5 JS installer files (npm deployment)
+├── bin/                   CLI entry points
+└── docs/                  ARCHITECTURE.md + 16 ADRs
 ```
 
 ## Intellectual Heritage
@@ -467,4 +452,6 @@ MIT
 
 *"In God we trust. All others must bring data."* — W. Edwards Deming
 
-*Turing computes the answer.*
+*"When code is free, research is all that matters."* — Amy Tam
+
+*Turing flips the coins. You choose which ones.*
