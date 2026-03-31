@@ -8,7 +8,8 @@ The autoresearch harness enforces a strict separation between the **hypothesis s
 
 | Layer | Files | Agent Access | Rationale |
 |-------|-------|-------------|-----------|
-| Measurement | `prepare.py`, `evaluate.py` | READ-ONLY | Modifying evaluation invalidates all comparisons |
+| Hidden | `evaluate.py` | NONE — do not read, write, or reference | Reading evaluation code enables seed exploitation and metric gaming |
+| Measurement | `prepare.py` | READ-ONLY | Data loading is visible but immutable |
 | Hypothesis | `train.py` | READ-WRITE | All experimental changes go here |
 | Configuration | `config.yaml` | READ-WRITE | Hyperparameter changes without code changes |
 | Features | `features/featurizers.py` | READ-ONLY | Modify how `train.py` *uses* featurizers instead |

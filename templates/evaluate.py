@@ -1,18 +1,15 @@
 """Evaluation harness for the {{PROJECT_NAME}} ML pipeline.
 
-READ-ONLY — MEASUREMENT APPARATUS.
+HIDDEN — MEASUREMENT APPARATUS.
 
-This file is part of the immutable evaluation infrastructure. The autoresearch
-agent MUST NOT modify this file under any circumstances. This separation between
-hypothesis space (train.py) and measurement apparatus (this file) is the
-architectural invariant that makes experiment comparisons valid.
+This file is hidden from the autoresearch agent. The agent cannot
+read, modify, or reference this file. This prevents metric gaming,
+seed exploitation, and evaluation function reverse-engineering.
 
-If this file could change between experiments, no comparison would be
-meaningful — the definition of "accuracy" would shift under your feet.
-
-Provides:
-  - evaluate_model: Compute metrics from predictions vs ground truth.
-  - format_metrics: Format metrics in a parseable delimited format.
+The platform runs this file automatically. The agent knows only:
+- The primary metric name (from config.yaml)
+- Whether higher or lower is better (from config.yaml)
+- The metric value (from parsed run.log output)
 """
 
 from __future__ import annotations
