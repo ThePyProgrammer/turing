@@ -92,6 +92,9 @@ TEMPLATE_DIRS = {
         "treequest_suggest.py",
         "seed_runner.py",
         "reproduce_experiment.py",
+        "diagnose_errors.py",
+        "ablation_study.py",
+        "pareto_frontier.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -101,6 +104,10 @@ DIRECTORIES_TO_CREATE = [
     "experiments",
     "experiments/seed_studies",
     "experiments/reproductions",
+    "experiments/diagnoses",
+    "experiments/ablations",
+    "experiments/frontiers",
+    "experiments/predictions",
     "models/best",
     "models/archive",
 ]

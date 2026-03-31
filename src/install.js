@@ -23,6 +23,7 @@ const SUB_COMMANDS = [
   "init", "train", "status", "compare", "sweep", "validate",
   "try", "brief", "suggest", "explore", "design", "logbook", "poster",
   "report", "mode", "preflight", "card", "seed", "reproduce",
+  "diagnose", "ablate", "frontier",
 ];
 
 export async function install(opts = {}) {
