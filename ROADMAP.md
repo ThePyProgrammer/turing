@@ -976,23 +976,23 @@ AERO's `experiment_designer/search.py` demonstrates the full pipeline including 
 | 6 | Automatic metric decomposition | 3.1 | **Medium** | **DONE** | 8 |
 | 7 | Train/val gap monitoring | 3.2 | **Medium** | **DONE** | — |
 | 8 | Structured experiment state | 4.1 | **Medium** | **DONE** | 13 |
-| 9 | Hidden file tier | 5.1 | **Critical** | Planned | — |
-| 10 | Behavioral probes | 5.2 | **Critical** | Planned | — |
-| 11 | Stability validation | 5.3 | **High** | Planned | — |
-| 12 | Tool restriction | 5.4 | **High** | Partial | — |
-| 13 | Diff-based history | 5.5 | **Medium** | Planned | — |
+| 9 | Hidden file tier | 5.1 | **Critical** | **DONE** | — |
+| 10 | Behavioral probes | 5.2 | **Critical** | **DONE** | — |
+| 11 | Stability validation | 5.3 | **High** | **DONE** | — |
+| 12 | Tool restriction | 5.4 | **High** | **DONE** | — |
+| 13 | Diff-based history | 5.5 | **Medium** | **DONE** | — |
 | 14 | Platform-managed execution | 5.6 | **Medium** | Future | — |
-| 15 | Novelty guard | 6.1 | **Critical** | Planned | — |
-| 16 | Decision packets | 6.2 | **High** | Planned | — |
-| 17 | Experiment families | 6.3 | **High** | Planned | — |
-| 18 | Failure clustering | 6.4 | **Medium** | Planned | — |
-| 19 | Research mode selection | 6.5 | **Medium** | Planned | — |
+| 15 | Novelty guard | 6.1 | **Critical** | **DONE** | 25 |
+| 16 | Decision packets | 6.2 | **High** | **DONE** | 20 |
+| 17 | Experiment families | 6.3 | **High** | **DONE** | 6 |
+| 18 | Failure clustering | 6.4 | **Medium** | **DONE** | — |
+| 19 | Research mode selection | 6.5 | **Medium** | **DONE** | — |
 | 20 | Literature-informed model selection `/turing:suggest` | 7.1 | **High** | **DONE** | — |
 | 21 | Experiment design scaffolding `/turing:design` | 7.2 | **Medium** | **DONE** | — |
 | 22 | Literature-grounded briefing `/turing:brief --deep` | 7.3 | **Medium** | **DONE** | — |
-| 23 | Research plan generation `/turing:init --plan` | 7.4 | **Low** | Planned | — |
+| 23 | Research plan generation `/turing:init --plan` | 7.4 | **Low** | **DONE** | — |
 | 24 | Critique loops for hypothesis generation | 8.1 | **High** | **DONE** | 20 |
-| 25 | Critique loops for briefing reports | 8.2 | **Low** | Planned | — |
+| 25 | Critique loops for briefing reports | 8.2 | **Low** | **DONE** | — |
 | 26 | Semantic experiment index (TF-IDF) | 9.1 | **Medium** | **DONE** | 21 |
 
-Phases 1-4 complete. Phase 5 (anti-cheating) is next. Phase 6 (MemoryLab-inspired) follows. Phases 7-9 (AERO-inspired): 7.1-7.3 done (Claude-native commands using WebSearch), 8.1 done (critique engine, 20 tests), 9.1 done (TF-IDF index, 21 tests). Total: 257 tests passing.
+All phases 1-9 complete except 5.6 (platform-managed execution, deferred until Agent SDK integration). 257 tests passing.
