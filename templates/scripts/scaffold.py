@@ -99,6 +99,8 @@ TEMPLATE_DIRS = {
 DIRECTORIES_TO_CREATE = [
     "data/splits",
     "experiments",
+    "experiments/seed_studies",
+    "experiments/reproductions",
     "models/best",
     "models/archive",
 ]
