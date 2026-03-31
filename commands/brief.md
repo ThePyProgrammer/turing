@@ -15,7 +15,15 @@ Generate a research briefing that a human can read in 2 minutes and immediately 
    source .venv/bin/activate && python scripts/generate_brief.py
    ```
 
-2. **Present the output** to the user. The briefing has 6 sections:
+2. **Self-critique the briefing** before presenting. Review the generated output and check:
+   - **Recommendations specificity:** Are they concrete enough to act on? "Try a different model" is bad. "Try LightGBM with leaf-wise growth because exp-004 showed depth sensitivity" is good. If vague, rewrite them with specific model/hyperparameter suggestions grounded in the experiment data.
+   - **Exhausted directions coverage:** Cross-reference the "Model Types Explored" section against `experiments/log.jsonl`. Are there discarded experiments missing from the summary? If so, add them.
+   - **Convergence estimate grounding:** If the briefing says "close to convergence" or "further improvement possible", verify against the actual metric trajectory. Is the claim supported by the numbers?
+   - **Metric accuracy:** Spot-check that the "Current Best" metrics match the actual log. Run `python scripts/show_metrics.py --last 1` if uncertain.
+
+   If any section fails the check, regenerate just that section. Max 1 revision round — don't over-polish.
+
+3. **Present the output** to the user. The briefing has 6 sections:
    - **Campaign Summary** — total experiments, keep rate, timespan
    - **Current Best** — model type, metrics, experiment ID, configuration
    - **Improvement Trajectory** — metric over time, rate of improvement
@@ -23,9 +31,9 @@ Generate a research briefing that a human can read in 2 minutes and immediately 
    - **Hypothesis Queue** — pending and completed hypotheses
    - **Recommendations** — data-driven next steps
 
-3. **If `$ARGUMENTS` contains `--deep`:** run the Literature-Grounded Suggestions step below.
+4. **If `$ARGUMENTS` contains `--deep`:** run the Literature-Grounded Suggestions step below.
 
-4. **Prompt for action:**
+5. **Prompt for action:**
    - "Want to inject a hypothesis? Use `/turing:try <idea>`"
    - "Want to continue training? Use `/turing:train`"
    - "Want literature-backed suggestions? Use `/turing:brief --deep`"
