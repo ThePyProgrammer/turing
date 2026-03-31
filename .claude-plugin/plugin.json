@@ -1,7 +1,7 @@
 {
   "name": "turing",
-  "version": "1.3.0",
-  "description": "Autonomous ML research harness — the autoresearch loop as a formal protocol. 19 commands, 2 specialized agents, statistical rigor (multi-seed studies, reproducibility verification), tree-search hypothesis exploration (TreeQuest AB-MCTS), cost-performance frontier analysis, model cards, model registry, hypothesis database with novelty guard, anti-cheating guardrails, and the taste-leverage loop. Inspired by Karpathy's autoresearch and the scientific method itself.",
+  "version": "1.4.0",
+  "description": "Autonomous ML research harness — the autoresearch loop as a formal protocol. 22 commands, 2 specialized agents, experiment intelligence (error analysis, ablation studies, Pareto frontiers), statistical rigor (multi-seed studies, reproducibility verification), tree-search hypothesis exploration (TreeQuest AB-MCTS), cost-performance frontier analysis, model cards, model registry, hypothesis database with novelty guard, anti-cheating guardrails, and the taste-leverage loop. Inspired by Karpathy's autoresearch and the scientific method itself.",
   "author": {
     "name": "Prannaya Gupta"
   },
