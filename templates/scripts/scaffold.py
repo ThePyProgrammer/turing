@@ -82,6 +82,7 @@ TEMPLATE_DIRS = {
         "show_environment.py",
         "turing_io.py",
         "preflight.py",
+        "cleanup.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
