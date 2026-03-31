@@ -14,7 +14,12 @@ This is the taste-leverage mechanism: you provide judgment about what's worth tr
 
 1. **Parse the hypothesis** from `$ARGUMENTS`. If empty, ask the user what they want the agent to try.
 
-2. **Add to the queue:**
+2. **Check for archetype syntax.** If the argument starts with `archetype:`, expand it:
+   ```bash
+   source .venv/bin/activate && python scripts/manage_hypotheses.py add --archetype <name> --priority high --source human
+   ```
+
+   Otherwise, use the raw description:
    ```bash
    source .venv/bin/activate && python scripts/manage_hypotheses.py add "$ARGUMENTS" --priority high --source human
    ```
@@ -27,11 +32,31 @@ This is the taste-leverage mechanism: you provide judgment about what's worth tr
 ## Examples
 
 ```
+# Free-text hypotheses
 /turing:try switch to LightGBM with dart boosting and lower learning rate
 /turing:try add polynomial features for the numeric columns
-/turing:try try a random forest ensemble — I think the data has too many interactions for linear boosting
 /turing:try increase regularization, the train/val gap suggests overfitting
+
+# Archetype-based structured strategies
+/turing:try archetype:model_comparison
+/turing:try archetype:feature_sweep
+/turing:try archetype:ensemble_construction
+/turing:try archetype:regularization_search
+/turing:try archetype:ablation_study
 ```
+
+## Available Archetypes
+
+| Archetype | What it does | Expected experiments |
+|-----------|-------------|---------------------|
+| `model_comparison` | Compare XGBoost, LightGBM, RF, LR, MLP with statistical tests | ~5 |
+| `hyperparameter_sweep` | Grid search with multi-seed validation | 15-36 |
+| `feature_sweep` | Add/remove feature transforms one at a time | 6-10 |
+| `regularization_search` | Binary search for optimal regularization | 4-6 |
+| `ensemble_construction` | Voting, stacking, blending of top models | 4-6 |
+| `learning_rate_schedule` | lr vs n_estimators tradeoff | 4-5 |
+| `data_quality_audit` | Class balance, label noise, leakage checks | 3-5 |
+| `ablation_study` | Remove features one at a time to measure importance | N+1 |
 
 ## How It Connects
 
