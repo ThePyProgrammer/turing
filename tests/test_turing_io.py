@@ -12,7 +12,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from scripts.turing_io import load_config, load_experiments, load_hypotheses
+from scripts.turing_io import (
+    load_config,
+    load_experiments,
+    load_hypotheses,
+    load_reproduction,
+    load_seed_study,
+)
 
 
 # --- load_experiments ---
@@ -191,3 +197,55 @@ def test_load_hypotheses_preserves_all_fields(tmp_path: Path):
     assert result[0]["source"] == "human"
     assert result[0]["priority"] == "high"
     assert result[0]["created_at"] == "2026-03-15T09:00:00"
+
+
+# --- load_seed_study ---
+
+
+def test_load_seed_study(tmp_path: Path):
+    """Reads a seed study YAML file by experiment ID."""
+    seed_dir = tmp_path / "seed_studies"
+    seed_dir.mkdir()
+    study = {"experiment_id": "exp-042", "mean": 0.8678, "std": 0.0071}
+    with open(seed_dir / "exp-042-seeds.yaml", "w") as f:
+        yaml.dump(study, f)
+
+    result = load_seed_study("exp-042", str(seed_dir))
+    assert result["experiment_id"] == "exp-042"
+    assert result["mean"] == 0.8678
+
+
+def test_load_seed_study_missing():
+    """Returns None for missing seed study."""
+    assert load_seed_study("exp-999", "/nonexistent") is None
+
+
+def test_load_seed_study_missing_dir(tmp_path: Path):
+    """Returns None when directory doesn't exist."""
+    assert load_seed_study("exp-001", str(tmp_path / "nonexistent")) is None
+
+
+# --- load_reproduction ---
+
+
+def test_load_reproduction(tmp_path: Path):
+    """Reads a reproduction report YAML file by experiment ID."""
+    repro_dir = tmp_path / "reproductions"
+    repro_dir.mkdir()
+    report = {"experiment_id": "exp-042", "verdict": "reproducible"}
+    with open(repro_dir / "exp-042-repro.yaml", "w") as f:
+        yaml.dump(report, f)
+
+    result = load_reproduction("exp-042", str(repro_dir))
+    assert result["experiment_id"] == "exp-042"
+    assert result["verdict"] == "reproducible"
+
+
+def test_load_reproduction_missing():
+    """Returns None for missing reproduction report."""
+    assert load_reproduction("exp-999", "/nonexistent") is None
+
+
+def test_load_reproduction_missing_dir(tmp_path: Path):
+    """Returns None when directory doesn't exist."""
+    assert load_reproduction("exp-001", str(tmp_path / "nonexistent")) is None
