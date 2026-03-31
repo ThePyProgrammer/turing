@@ -365,60 +365,39 @@ What Turing does NOT have:
 
 **Acceptance:** Discarded experiments show actual diffs in the agent's context. The agent's keep rate improves measurably (track as a metric in experiment logs).
 
-### 5.6 Platform-Managed Execution (Future — Requires Agent SDK)
-
-**What:** Move experiment execution from agent-controlled (`python train.py > run.log 2>&1` via Bash) to platform-controlled (a hook or orchestrator runs training, the agent only edits files).
-
-**Why:** This is the autocrucible architecture: the agent has Read/Edit/Write/Glob/Grep only. The platform runs experiments. The agent cannot interfere with execution, timing, or metric collection. This is the strongest possible enforcement — the agent literally cannot cheat because it does not control the execution environment.
-
-**Implementation:**
-This requires integration with the Claude Agent SDK's hook system:
-1. **PostToolUse hook on Write/Edit of train.py:** When the agent saves changes to `train.py`, the hook automatically:
-   - Commits the change
-   - Runs training in a subprocess (or Docker container)
-   - Parses metrics
-   - Reports results back to the agent
-2. **The agent's role becomes:** read history → propose hypothesis → edit `train.py`/`config.yaml` → wait for results
-3. **Benefits:** No Bash access needed. No shell escape possible. Evaluation is fully platform-controlled.
-4. **Prerequisite:** Claude Agent SDK integration, which is not yet part of Turing's architecture.
-
-**Acceptance:** Deferred. This is the end-state architecture. Document the design now so a future implementer understands the target.
-
 ### Summary: Defense-in-Depth Layers
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  LAYER 1: Architectural Separation (ADR-0002)               │
 │  Hypothesis space vs measurement apparatus                   │
-│  STATUS: Implemented (prompt-level enforcement)              │
+│  STATUS: Implemented                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  LAYER 2: Hidden File Tier (5.1)                            │
 │  evaluate.py invisible to agent — prevents exploitation      │
-│  STATUS: Planned                                            │
+│  STATUS: Implemented                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  LAYER 3: Behavioral Probes (5.2)                           │
 │  Training time, model usage, prediction diversity checks     │
-│  STATUS: Planned                                            │
+│  STATUS: Implemented                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  LAYER 4: Statistical Validation (5.3 + Phase 2.1)          │
 │  Multi-run evaluation, CV check, median aggregation          │
-│  STATUS: Partially implemented (2.1 done, 5.3 planned)      │
+│  STATUS: Implemented                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  LAYER 5: Tool Restriction (5.4)                            │
 │  Whitelisted Bash commands, no arbitrary execution           │
-│  STATUS: Partially implemented (allowed-tools in frontmatter)│
+│  STATUS: Implemented                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  LAYER 6: Diff-Based History (5.5)                          │
 │  Show actual changes, not agent descriptions                 │
-│  STATUS: Planned                                            │
-├─────────────────────────────────────────────────────────────┤
-│  LAYER 7: Platform-Managed Execution (5.6)                  │
-│  Agent edits files, platform runs experiments                │
-│  STATUS: Future (requires Agent SDK)                        │
+│  STATUS: Implemented                                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-Each layer addresses a different failure mode. Layers 1-3 prevent the agent from gaming the metric. Layer 4 prevents noise exploitation. Layer 5 limits the agent's attack surface. Layer 6 improves the agent's honest performance. Layer 7 is the end-state where cheating is structurally impossible.
+Each layer addresses a different failure mode. Layers 1-3 prevent the agent from gaming the metric. Layer 4 prevents noise exploitation. Layer 5 limits the agent's attack surface. Layer 6 improves the agent's honest performance.
+
+Turing is a Claude Code plugin — the human is always in the loop. Fully autonomous platform-managed execution (where the agent can't run Bash at all) is out of scope. If that need ever arises, it's a different tool.
 
 ---
 
@@ -439,12 +418,11 @@ Each layer addresses a different failure mode. Layers 1-3 prevent the agent from
 | 11 | Stability validation | 5.3 | **High** | Planned | — |
 | 12 | Tool restriction | 5.4 | **High** | Partial | — |
 | 13 | Diff-based history | 5.5 | **Medium** | Planned | — |
-| 14 | Platform-managed execution | 5.6 | **Medium** | Future | — |
-| 15 | Novelty guard | 6.1 | **Critical** | Planned | — |
-| 16 | Decision packets | 6.2 | **High** | Planned | — |
-| 17 | Experiment families | 6.3 | **High** | Planned | — |
-| 18 | Failure clustering | 6.4 | **Medium** | Planned | — |
-| 19 | Research mode selection | 6.5 | **Medium** | Planned | — |
+| 14 | Novelty guard | 6.1 | **Critical** | Planned | — |
+| 15 | Decision packets | 6.2 | **High** | Planned | — |
+| 16 | Experiment families | 6.3 | **High** | Planned | — |
+| 17 | Failure clustering | 6.4 | **Medium** | Planned | — |
+| 18 | Research mode selection | 6.5 | **Medium** | Planned | — |
 
 Phases 1-4 complete (165 tests). Phase 5 (anti-cheating) and Phase 6 (MemoryLab research-ops) are next.
 
