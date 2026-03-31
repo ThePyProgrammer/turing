@@ -89,6 +89,7 @@ TEMPLATE_DIRS = {
         "diff_configs.py",
         "export_results.py",
         "plot_trajectory.py",
+        "treequest_suggest.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
