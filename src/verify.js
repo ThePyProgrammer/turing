@@ -38,6 +38,7 @@ const EXPECTED_COMMANDS = [
   "frontier/SKILL.md",
   "profile/SKILL.md",
   "checkpoint/SKILL.md",
+  "export/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];

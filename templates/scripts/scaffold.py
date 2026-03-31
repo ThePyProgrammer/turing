@@ -97,6 +97,11 @@ TEMPLATE_DIRS = {
         "pareto_frontier.py",
         "profile_training.py",
         "checkpoint_manager.py",
+        "export_model.py",
+        "export_formats.py",
+        "equivalence_checker.py",
+        "latency_benchmark.py",
+        "export_card.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -112,6 +117,7 @@ DIRECTORIES_TO_CREATE = [
     "experiments/predictions",
     "experiments/profiles",
     "experiments/checkpoints",
+    "exports",
     "models/best",
     "models/archive",
 ]
