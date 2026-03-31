@@ -189,15 +189,15 @@ A system where:
 
 ## Implementation Order
 
-| # | Feature | Phase | Priority | Depends On |
-|---|---------|-------|----------|------------|
-| 1 | Hypothesis injection `/turing:try` | 1.1 | **Critical** | — |
-| 2 | Research briefing `/turing:brief` | 1.2 | **Critical** | 1.1 (reads hypothesis queue) |
-| 3 | Experiment dependency graph | 1.3 | **High** | — |
-| 4 | Multi-run statistical significance | 2.1 | **High** | — |
-| 5 | Bayesian-guided suggestions | 2.2 | **Medium** | — |
-| 6 | Automatic metric decomposition | 3.1 | **Medium** | — |
-| 7 | Train/val gap monitoring | 3.2 | **Medium** | 3.1 |
-| 8 | Structured experiment state | 4.1 | **Medium** | 1.1 (hypothesis queue is first structured state) |
+| # | Feature | Phase | Priority | Status | Tests |
+|---|---------|-------|----------|--------|-------|
+| 1 | Hypothesis injection `/turing:try` | 1.1 | **Critical** | **DONE** | 14 |
+| 2 | Research briefing `/turing:brief` | 1.2 | **Critical** | **DONE** | 9 |
+| 3 | Experiment dependency graph | 1.3 | **High** | **DONE** | 7 |
+| 4 | Multi-run statistical significance | 2.1 | **High** | Planned | — |
+| 5 | Bayesian-guided suggestions | 2.2 | **Medium** | Planned | — |
+| 6 | Automatic metric decomposition | 3.1 | **Medium** | Planned | — |
+| 7 | Train/val gap monitoring | 3.2 | **Medium** | Planned | — |
+| 8 | Structured experiment state | 4.1 | **Medium** | Planned | — |
 
-Phases 1.1 and 1.2 are the v2.1.0 release. They close the taste-leverage loop.
+Phase 1 (v2.1.0) is complete. The taste-leverage loop is functional.
