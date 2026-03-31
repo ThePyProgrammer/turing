@@ -101,6 +101,19 @@ def set_best(state: dict, experiment_id: str, metrics: dict) -> dict:
         "metrics": metrics,
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
+
+    # Check for seed study data
+    from scripts.turing_io import load_seed_study
+    seed_study = load_seed_study(experiment_id)
+    if seed_study and "mean" in seed_study:
+        state["best_result"]["seed_study"] = {
+            "mean": seed_study["mean"],
+            "std": seed_study.get("std", 0),
+            "cv_percent": seed_study.get("cv_percent", 0),
+            "seed_sensitive": seed_study.get("seed_sensitive", False),
+            "seeds_tested": len(seed_study.get("seeds_run", [])),
+        }
+
     return state
 
 
