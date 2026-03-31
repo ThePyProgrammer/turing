@@ -63,12 +63,18 @@ For systematic hyperparameter search:
 
 The autoresearch experiment loop. Each iteration is one experiment — one hypothesis tested.
 
-1. **OBSERVE** — Read recent results:
+1. **OBSERVE** — Read recent results and check the hypothesis queue:
    ```bash
    python scripts/show_metrics.py --last 5
+   python scripts/manage_hypotheses.py next 2>/dev/null || echo "No queued hypotheses"
    ```
 
-2. **HYPOTHESIZE** — Propose next experiment (different model, hyperparams, features, or config). Document what you expect and why.
+2. **HYPOTHESIZE** — If a queued hypothesis exists (especially human-injected, high priority), use it. Otherwise propose your own. Either way, document what you expect and why.
+
+   If using a queued hypothesis, mark it in-progress:
+   ```bash
+   python scripts/manage_hypotheses.py mark hyp-NNN in-progress
+   ```
 
 3. **PREPARE** — Modify `config.yaml` for hyperparameter changes. Only modify `train.py` for structural code changes.
 
@@ -105,6 +111,13 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
      '{"{{TARGET_METRIC}}": X.XX, ...}' \
      '{"model_type": "xgboost", "hyperparams": {...}}' \
      models/model.joblib "Description of hypothesis and outcome"
+   ```
+
+   If this experiment was from a queued hypothesis, update its status:
+   ```bash
+   python scripts/manage_hypotheses.py mark hyp-NNN tested --result exp-NNN
+   # or: mark hyp-NNN promising --result exp-NNN (if it improved significantly)
+   # or: mark hyp-NNN dead-end --result exp-NNN (if it clearly failed)
    ```
 
 9. **CONVERGE** — Check stopping conditions:
