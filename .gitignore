@@ -29,6 +29,9 @@ run.log
 experiments/
 models/
 
+# Superpowers artifacts
+docs/superpowers/
+
 # Test artifacts
 .pytest_cache/
 .coverage
