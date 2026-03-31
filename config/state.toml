@@ -16,8 +16,8 @@ last_retro = ""
 
 [counts]
 total_adrs = 16
-accepted = 14
-proposed = 2
+accepted = 16
+proposed = 0
 rejected = 0
 deferred = 0
 deprecated = 0
