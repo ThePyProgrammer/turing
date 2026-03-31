@@ -503,6 +503,16 @@ def main() -> None:
             print()
             print(footer)
 
+    # Show seed study status for #1 if available
+    if ranked and args.fmt not in ("csv",):
+        from scripts.turing_io import load_seed_study
+        best_id = ranked[0].get("experiment_id")
+        if best_id:
+            study = load_seed_study(best_id)
+            if study and "mean" in study:
+                sensitive = "SEED-SENSITIVE" if study.get("seed_sensitive") else "STABLE"
+                print(f"\n  Seed study: {metric}={study['mean']:.4f}±{study.get('std',0):.4f} ({sensitive})")
+
 
 if __name__ == "__main__":
     main()
