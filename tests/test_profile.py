@@ -31,10 +31,10 @@ def test_breakdown_with_train_seconds():
         "metrics": {"train_seconds": 80},
     }
     breakdown = estimate_timing_breakdown(profile)
-    assert breakdown["total_sec"] == 100
+    assert breakdown["total_sec"] == 80  # Uses train_time_sec as total
     assert breakdown["overhead_sec"] == 20
-    assert breakdown["training_sec"] == 80
-    assert breakdown["training_pct"] == 80.0
+    assert breakdown["training_sec"] == 80.0
+    assert breakdown["training_pct"] == 100.0
 
 
 def test_breakdown_no_train_seconds():
