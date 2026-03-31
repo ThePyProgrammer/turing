@@ -22,6 +22,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import sys
 from datetime import datetime, timezone
@@ -50,15 +51,15 @@ def load_state(path: str) -> dict:
     """Load experiment state from YAML, validating required keys."""
     p = Path(path)
     if not p.exists() or p.stat().st_size == 0:
-        return dict(EMPTY_STATE)
+        return copy.deepcopy(EMPTY_STATE)
     with open(p) as f:
         state = yaml.safe_load(f)
     if not isinstance(state, dict):
-        return dict(EMPTY_STATE)
+        return copy.deepcopy(EMPTY_STATE)
     # Ensure all required keys exist
     for key in REQUIRED_KEYS:
         if key not in state:
-            state[key] = EMPTY_STATE[key]
+            state[key] = copy.deepcopy(EMPTY_STATE[key])
     return state
 
 
