@@ -84,6 +84,11 @@ TEMPLATE_DIRS = {
         "preflight.py",
         "cleanup.py",
         "generate_model_card.py",
+        "cost_frontier.py",
+        "leaderboard.py",
+        "diff_configs.py",
+        "export_results.py",
+        "plot_trajectory.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
