@@ -85,6 +85,7 @@ cp "${TEMPLATES_DIR}/scripts/show_experiment_tree.py" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/statistical_compare.py" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/suggest_next.py" "${ML_DIR}/scripts/"
 cp "${TEMPLATES_DIR}/scripts/update_state.py" "${ML_DIR}/scripts/"
+cp "${TEMPLATES_DIR}/scripts/parse_metrics.py" "${ML_DIR}/scripts/"
 echo "    scripts/"
 
 mkdir -p "${ML_DIR}/tests"

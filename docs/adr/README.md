@@ -84,7 +84,7 @@ Sequential numbering, zero-padded to 4 digits. The number never changes, even if
 | [0012](0012-extract-convergence-detection-to-python.md) | Extract convergence detection from shell to testable Python | Accepted | Architecture Pattern | 2026-03-31 |
 | [0013](0013-standardize-experiment-status-vocabulary.md) | Standardize experiment status vocabulary to match lifecycle.toml | Accepted | Architecture Pattern | 2026-03-31 |
 | [0014](0014-enforce-placeholder-verification.md) | Enforce placeholder substitution verification after scaffolding | Accepted | Architecture Pattern | 2026-03-31 |
-| [0015](0015-document-metric-output-contract.md) | Extract metric output format into documented contract | Proposed | Architecture Pattern | 2026-03-31 |
+| [0015](0015-document-metric-output-contract.md) | Extract metric output format into documented contract | Accepted | Architecture Pattern | 2026-03-31 |
 | [0016](0016-unify-scaffolding-implementation.md) | Unify scaffolding into a single implementation | Proposed | Architecture Pattern | 2026-03-31 |
 
 ## Commands
