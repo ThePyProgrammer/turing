@@ -418,13 +418,13 @@ Turing is a Claude Code plugin — the human is always in the loop. Fully autono
 | 11 | Stability validation | 5.3 | **High** | **DONE** | — |
 | 12 | Tool restriction | 5.4 | **High** | **DONE** | — |
 | 13 | Diff-based history | 5.5 | **Medium** | **DONE** | — |
-| 14 | Novelty guard | 6.1 | **Critical** | Planned | — |
-| 15 | Decision packets | 6.2 | **High** | Planned | — |
-| 16 | Experiment families | 6.3 | **High** | Planned | — |
-| 17 | Failure clustering | 6.4 | **Medium** | Planned | — |
-| 18 | Research mode selection | 6.5 | **Medium** | Planned | — |
+| 14 | Novelty guard | 6.1 | **Critical** | **DONE** | 25 |
+| 15 | Decision packets | 6.2 | **High** | **DONE** | 16 |
+| 16 | Experiment families | 6.3 | **High** | **DONE** | 6 |
+| 17 | Failure clustering | 6.4 | **Medium** | **DONE** | — |
+| 18 | Research mode selection | 6.5 | **Medium** | **DONE** | — |
 
-Phases 1-5 complete. Phase 6 (MemoryLab research-ops) is next.
+Phases 1-6 complete. All roadmap items implemented.
 
 ---
 
@@ -640,3 +640,359 @@ Phase 6.1 (novelty guard) is the highest-priority item. It's the single MemoryLa
 3. **Hardcoded alias tables** — MemoryLab's `novelty.py` has 30+ hardcoded aliases for LLM training ("muon", "adamw", "kv", "fa", etc.). Turing must use a configurable YAML alias table since it supports arbitrary ML tasks.
 4. **TSV compatibility layer** — MemoryLab maintains a compatibility TSV for upstream-style workflows. Turing already has its own TSV via `log_experiment.py`. No need for a second one.
 5. **Fixed 5-minute budget** — MemoryLab assumes 5-minute training runs. Turing has configurable convergence via patience/threshold. Keep Turing's approach.
+
+---
+
+## Phase 7: Literature-Grounded Research Intelligence (Inspired by AERO)
+
+*Make the agent read the literature before flipping coins.*
+
+### Context: What AERO Is
+
+[AERO](https://github.com/aether-raid/AERO) (Automated Exploration, Research & Orchestration) is an open-source ML research framework built on LangGraph. It implements five LLM-driven workflows that automate the research lifecycle: model selection, research planning, experiment design, result analysis, and paper writing. Each workflow is a LangGraph `StateGraph` with typed state, conditional routing, iterative critique-and-refine loops, and arXiv/Tavily integration for literature grounding.
+
+AERO's five workflows:
+
+| # | Workflow | AERO Module | What It Does |
+|---|----------|-------------|-------------|
+| 1 | **Model Researcher** | `src/aero/model_researcher/` | Analyzes task properties → searches arXiv → validates papers → suggests models with citations |
+| 2 | **Research Planner** | `src/aero/research_planner/` | Generates problem statement → validates novelty via Tavily → creates structured research plan → critiques and refines |
+| 3 | **Experiment Designer** | `src/aero/experiment_designer/` | Extracts research components → optionally tree-searches for methodology → designs experiments → generates validated code |
+| 4 | **Experimentalist** | `src/aero/experimentalist/` | Analyzes results → identifies research directions → searches literature → generates follow-up experiments |
+| 5 | **Report Writer** | `src/aero/report_writer/` | Analyzes results → sets up paper structure → finds sources → generates content → critiques → finalizes |
+
+AERO's key architectural patterns that Turing can adapt:
+
+1. **arXiv semantic search pipeline** — query generation → paper retrieval via arXiv API (`utils/arxiv.py`) → chunking → `sentence-transformers` embedding → FAISS indexing → cosine similarity ranking → LLM-scored relevance filtering (custom ranking prompts per workflow type) → validated paper set
+2. **Iterative critique-and-refine loops** — generate → LLM critique with score (0-10) → conditional edge: if score >= 7.0 or refinements >= 3, finalize; else refine. Used in every AERO workflow.
+3. **Tree search for idea exploration** — Monte Carlo Tree Search via `treequest` library over hypothesis/methodology space (`experiment_designer/idea_tree.py`), scored by LLM evaluation. Used when initial hypothesis is vague.
+4. **Code generation with validation** — extract `[CODE_NEEDED]` tags from experiment designs → parallel LLM codegen → AST validation → iterative refinement (`experiment_designer/code.py`)
+5. **Typed state machines** — `TypedDict` states with explicit fields for each workflow phase, enabling structured data flow, checkpoint/resume, and streaming support
+6. **Task property classification** — 21 ML task categories in `model_researcher/shared_defs.py` (e.g., `temporal_structure`, `few_shot_learning`, `noise_robustness`) used to classify problems and generate targeted searches
+
+### What's Relevant to Turing (and What's Not)
+
+**Relevant — AERO workflows can feed INTO Turing's experiment loop:**
+- Model Researcher → "which architectures should I try?" → feeds `hypotheses.yaml`
+- Experiment Designer → "how should I structure this experiment?" → feeds `train.py` edits
+- Experimentalist → "given these results, what next?" → feeds OBSERVE step
+- Research Planner → "what's the research plan?" → feeds `/turing:init` setup
+
+**Not relevant — Turing's domain is different:**
+- Report Writer — Turing's output is trained models and experiment logs, not papers. The *critique-and-refine pattern* from Report Writer is relevant; the paper-generation workflow is not.
+- Full literature review as a primary workflow — too heavyweight for a single experiment loop iteration. But targeted searches (3-5 papers) to inform a hypothesis are valuable.
+
+### 7.1 Literature-Informed Model Selection — `/turing:suggest`
+
+**What:** A new command that takes the current task description (from `config.yaml`) and uses arXiv search + LLM analysis to suggest model architectures worth trying, grounded in recent literature.
+
+**Why:** Currently, the agent's model selection is based on whatever the LLM knows from training data. AERO's Model Researcher workflow demonstrates a better approach: analyze task properties → generate targeted arXiv search queries → retrieve and validate papers → extract model suggestions with citations. This gives the agent evidence-backed hypotheses instead of vibes.
+
+**AERO source reference:** `src/aero/model_researcher/` — the full workflow graph:
+```
+analyze_properties_and_task → generate_search_query → search_arxiv → validate_papers
+  ↓ (conditional: enough valid papers? _should_continue_with_papers)
+    YES → suggest_models → critique_response → (conditional: _should_revise_suggestions)
+      ACCEPT → END
+      REVISE → revise_suggestions → critique_response (loop)
+    NO  → search_arxiv (retry) or generate_search_query (new query)
+```
+
+Key implementation details from AERO:
+- `shared_defs.py` defines `ML_RESEARCH_CATEGORIES` — 21 task property categories used to classify the task. Each category has a description (e.g., `temporal_structure`: "Data has inherent time dependencies or ordering"). The LLM detects which categories apply.
+- `nodes/analyze_properties_nodes.py` — LLM classifies the user's task against the 21 categories, producing a `PropertyHit` list with `Evidence` objects (snippet, source, confidence score). Confidence is computed via independent-signal formula: `1 - product(1 - score_i)` with log-scaled evidence count bonus.
+- `nodes/arxiv_search_nodes.py` — generates arXiv-formatted search queries from detected properties, retrieves papers via arXiv API (`utils/arxiv.py` with `format_search_string` for `all:%22term%22+AND+all:term` encoding), processes via `ArxivPaperProcessor` (chunk → embed with `sentence-transformers` → FAISS index → cosine similarity → LLM relevance scoring with custom `model_suggestion` ranking prompt)
+- `nodes/suggestion_nodes.py` — synthesizes validated papers into model recommendations
+- `edges/conditional_edges.py` — `_should_continue_with_papers` (checks paper count/quality, routes to retry if insufficient), `_should_revise_suggestions` (checks critique score, routes to revision if below threshold)
+
+**Implementation for Turing:**
+1. Create `commands/suggest.md` — a `/turing:suggest` skill that delegates to `@ml-evaluator` (read-only — it searches and suggests but doesn't edit)
+2. Add `templates/scripts/suggest_models.py`:
+   - Reads task description from `config.yaml` (field: `task.description`, to be added)
+   - Classifies task against a configurable taxonomy (adapted from AERO's 21 categories, stored in `config/task_taxonomy.yaml`)
+   - Queries arXiv API using `urllib.request` (same approach as AERO's `utils/arxiv.py`)
+   - Embeds paper chunks with `sentence-transformers`, indexes in FAISS
+   - LLM scores papers for relevance (adapt AERO's ranking prompt from `shared_defs.py:create_custom_ranking_prompt`)
+   - LLM generates 3-5 model suggestions with citations and confidence scores
+   - Outputs structured suggestions to `hypotheses.yaml` with `source: "literature"` and `citations: [...]`
+3. Add `config/task_taxonomy.yaml` — configurable task property categories (fork of AERO's `ML_RESEARCH_CATEGORIES`, extensible per project)
+4. Update router in `commands/turing.md` — add "suggest", "what model", "recommend" to routing table
+5. Add tests for taxonomy classification, arXiv querying, paper scoring, and suggestion generation
+
+**Dependencies:** `sentence-transformers`, `faiss-cpu` (add to `pyproject.toml`)
+
+**Acceptance:** `/turing:suggest` reads the task config, searches arXiv, and produces 3-5 model architecture hypotheses with paper citations, auto-queued in `hypotheses.yaml`.
+
+### 7.2 Experiment Design Scaffolding — `/turing:design`
+
+**What:** Given a queued hypothesis (from `hypotheses.yaml`), generate a structured experiment design with implementation code — before the agent starts the main experiment loop.
+
+**Why:** Currently, the agent in `/turing:train` edits `train.py` directly based on free-text reasoning. AERO's Experiment Designer demonstrates a more structured approach: extract research components → optionally tree-search for methodology → design experiment with literature grounding → generate validated code. This front-loads the thinking before the coding.
+
+**AERO source reference:** `src/aero/experiment_designer/main.py` — the workflow graph:
+```
+extract_components → (conditional: has experiment ideas?)
+  YES → design_and_codegen
+  NO  → tree_search → design_and_codegen
+```
+
+The `design_and_codegen` node internally runs:
+```
+summarize → literature_search → plan → design → score
+  → (loop: if any score < 70, refine and re-design, max 3 rounds)
+  → codegen (4-node subgraph: extract_tags → generate_code [parallel] → validate_code [AST] → refine_code)
+```
+
+Key implementation details:
+- `experiment.py` defines `ExperimentState` with fields: `experiment_input`, `summary`, `literature_results`, `full_design_content`, `refined_design_content`, `scores` (dict), `refinement_round`, `refinement_suggestions`
+- `idea_tree.py` uses `treequest` (MCTS library) — `ExperimentTreeSystem` initializes with literature context from arXiv, then tree-searches over methodology space. Each node is an `IdeaState` with `level`, `content`, `score`, `citations`, `references`. The system runs 10 iterations per hypothesis.
+- `code.py` defines `CodeGenState` and a 4-node `build_codegen_graph()`: tags are extracted via regex `\[CODE_NEEDED(?::\s*([^\]]+))?\]`, code is generated in parallel with `asyncio.gather`, validated via `ast.parse`, and refined if invalid. Missing imports are detected by `importlib.util.find_spec`.
+- `search.py` builds a FAISS semantic index from arXiv papers for the current hypothesis, using Google Custom Search for dataset links from known repositories (OpenNeuro, PhysioNet, Kaggle, Zenodo, etc.)
+
+**Implementation for Turing:**
+1. Create `commands/design.md` — a `/turing:design [hypothesis-id]` skill
+2. Add `templates/scripts/design_experiment.py`:
+   - Reads the hypothesis from `hypotheses.yaml` by ID
+   - Searches arXiv for 3-5 relevant methodology papers (reuses arXiv pipeline from 7.1)
+   - LLM generates structured experiment design:
+     ```yaml
+     objective: "what we're testing"
+     method: "how we'll test it"
+     expected_outcome: "what success looks like"
+     code_changes:
+       - file: train.py
+         description: "change model from XGBoost to LightGBM"
+         diff_preview: "..."
+     evaluation_criteria: "which metrics, what threshold"
+     estimated_runs: 3
+     ```
+   - Optionally generates a `train.py` diff/patch as a starting point
+   - Validates generated code via AST parsing (from AERO's `code.py` pattern)
+   - LLM scores the design on feasibility (0-10), novelty (0-10), clarity (0-10)
+   - If any score < 7.0 and refinements < 3, refine (AERO's critique loop pattern)
+   - Outputs to `experiments/designs/hyp-NNN-design.md`
+3. The agent in `/turing:train` can optionally read the design before editing `train.py`
+4. Update router — add "design", "plan experiment" to routing table
+5. Add tests
+
+**Acceptance:** `/turing:design hyp-003` produces a structured experiment design with implementation guidance, scored for quality, with literature citations.
+
+### 7.3 Result-Driven Follow-Up Suggestions — Enhanced `/turing:brief --deep`
+
+**What:** Enhance the existing `/turing:brief` command to include literature-grounded follow-up experiment suggestions based on current results, adapting AERO's Experimentalist workflow.
+
+**Why:** Currently, `/turing:brief` generates recommendations from the agent's own reasoning + Bayesian suggestions (Phase 2.2). AERO's Experimentalist goes further: analyze results → identify research directions → search literature for methodology → distill paper methodologies → generate validated follow-up experiments with implementation roadmaps.
+
+**AERO source reference:** `src/aero/experimentalist/` — the workflow graph:
+```
+analyze_data → research_direction → generate_search_query → search_arxiv → validate_papers
+  → distill_methodologies → generate_experiments → validate_experiments
+    ↓ (conditional: PASS?)
+    YES → prioritize → implementation_roadmap → finalize
+    NO  → generate_experiments (retry with cumulative feedback, track past_experiment_mistakes)
+```
+
+Key implementation details:
+- `shared_defs.py:ExperimentSuggestionState` tracks: `past_fixed_issues`, `past_unresolved_issues`, `most_recent_generation_issues`, `cumulative_validation_feedback`, `past_experiment_mistakes` — the LLM learns from its own generation failures across iterations
+- `nodes/experiment_generation_nodes.py:_distill_paper_methodologies_node` — processes top 5 validated papers, extracting methodology in <=600 characters each (tight budget forces precision)
+- `nodes/research_direction_nodes.py` — analyzes experimental findings to identify promising research directions
+- The validation loop has explicit "past mistakes" tracking: each failed generation attempt is recorded with its issues, and the next generation attempt receives cumulative feedback so the LLM doesn't repeat the same mistakes
+
+**Implementation for Turing:**
+1. Extend `commands/brief.md` — add `--deep` flag for literature-grounded analysis
+2. Add `templates/scripts/suggest_next_literature.py`:
+   - Reads `log.jsonl` and `experiment_state.yaml` for current results
+   - Identifies improvement patterns and stagnation points (reuse `generate_brief.py` analysis)
+   - Searches arXiv for papers with similar experimental setups/challenges
+   - Distills methodology from retrieved papers (<=600 chars each, AERO's approach)
+   - Generates 3-5 follow-up experiment suggestions with:
+     - Literature citation
+     - Expected impact estimate
+     - Implementation complexity (low/medium/high)
+     - Specific `train.py` changes needed
+   - Tracks past suggestion failures to avoid repeating bad recommendations (AERO's `past_experiment_mistakes` pattern)
+   - Auto-queues as hypotheses with `source: "literature-brief"` and `priority: "medium"`
+3. Update `generate_brief.py` to include a "Literature-Grounded Suggestions" section when `--deep` is passed
+4. Add tests
+
+**Acceptance:** `/turing:brief --deep` includes a section with literature-backed suggestions referencing specific papers, auto-queued as hypotheses.
+
+### 7.4 Research Plan Generation — Enhanced `/turing:init --plan`
+
+**What:** Enhance the scaffolding command to optionally generate a research plan before the first experiment, using AERO's Research Planner pattern.
+
+**Why:** Currently, `/turing:init` scaffolds files and the agent starts experimenting immediately. AERO demonstrates value in planning first: generate problem statement → validate novelty via web search → create structured research plan → critique and refine.
+
+**AERO source reference:** `src/aero/research_planner/main.py` — the workflow graph:
+```
+initialize_clients → generate_problem → validate_problem
+  ↓ (conditional: _streamlined_validation_decision)
+    accept → create_research_plan → critique_plan
+      ↓ (conditional: _determine_refinement_path)
+        finalize → END
+        refine → create_research_plan (loop, max 3 refinements)
+    reject → process_rejection_feedback → generate_problem (retry, max 10 attempts)
+```
+
+Key implementation details:
+- `validate.py` uses Tavily web search to check if the problem is already solved (novelty validation)
+- `critique.py` scores plans on `overall_score` (0-10); threshold 7.0 for acceptance, max 3 refinements
+- Safety valve: after 10 generation attempts, force-accepts to prevent infinite loops
+
+**Implementation for Turing:**
+1. Extend `commands/init.md` — add `--plan` flag: `/turing:init --plan`
+2. Add `templates/scripts/generate_research_plan.py`:
+   - Reads task description from user input or `config.yaml`
+   - Generates a structured research plan:
+     - Model families to explore (ordered by expected relevance)
+     - Evaluation strategy (which metrics, multi-run config recommendation)
+     - Search budget allocation (how many experiments per family)
+     - Success criteria (target metric, convergence definition)
+     - Risk factors (overfitting risk, data quality concerns)
+   - Optionally validates against arXiv (is this well-studied? what approaches dominate?)
+   - LLM critiques and refines the plan (score → refine if < 7.0, max 3 rounds)
+   - Writes to `RESEARCH_PLAN.md` in the ML project root
+3. Update `templates/program.md` — the OBSERVE step reads `RESEARCH_PLAN.md` for strategic direction
+4. The plan is advisory — the agent can deviate but should note why in `experiment_state.yaml`
+5. Add tests
+
+**Acceptance:** `/turing:init --plan` produces a `RESEARCH_PLAN.md` giving the agent strategic direction for its first 5-10 experiments.
+
+---
+
+## Phase 8: Critique-and-Refine Loops (Inspired by AERO)
+
+*Make every generated artifact self-improving.*
+
+### What AERO Demonstrates
+
+Every AERO workflow uses the same meta-pattern: **generate → critique → refine (loop until quality threshold or max iterations)**. Implemented as conditional graph edges:
+
+```python
+# From AERO's research_planner/main.py
+workflow.add_conditional_edges(
+    "critique_plan",
+    _determine_refinement_path,
+    {
+        "finalize_plan": "finalize_plan",      # score >= 7.0 or refinements >= 3
+        "refine_plan": "create_research_plan",  # score < 7.0, try again
+    }
+)
+```
+
+Constants across all AERO workflows:
+- **Threshold:** 7.0/10 for acceptance
+- **Max refinements:** 3 (prevents infinite loops)
+- **Score history:** `critique_score_history: List[float]` for convergence detection
+- **Previous versions:** stored for diff-aware refinement
+- **Cumulative issues:** critique builds on prior issues rather than starting fresh
+
+### 8.1 Critique Loops for Hypothesis Generation
+
+**What:** When the agent generates hypotheses (in `/turing:train`'s OBSERVE step or via `/turing:suggest`), run a critique pass before committing to execution.
+
+**Why:** A 30-second LLM critique is cheaper than a 30-minute wasted training run. AERO's Model Researcher revision loop catches vague suggestions, unsupported claims, and redundant recommendations.
+
+**Implementation:**
+1. Add `templates/scripts/critique_hypothesis.py`:
+   - Takes a hypothesis description + experiment history context
+   - LLM scores on: novelty (cross-reference with novelty guard from 6.1), feasibility (given current infrastructure), expected impact (based on experiment history)
+   - Returns score (0-10) and specific concerns
+   - If score < 5.0, suggest modifications or reject
+   - Integrates with novelty guard — a "repeat_failure" hypothesis automatically scores 0 on novelty
+2. Integrate into `templates/program.md` HYPOTHESIZE step: critique before executing
+3. Update `manage_hypotheses.py` — add `critique` subcommand
+4. Track critique scores in `hypotheses.yaml` for meta-learning
+5. Add tests
+
+**Acceptance:** Hypotheses below score 5.0 are flagged before execution. The agent must modify or justify proceeding.
+
+### 8.2 Critique Loops for Briefing Reports
+
+**What:** Self-critique pass on generated briefing reports before presenting to the human.
+
+**Implementation:**
+1. Extend `generate_brief.py` — after generating, run LLM critique:
+   - Are recommendations specific enough to act on?
+   - Do "exhausted directions" cover all failed approaches in the log?
+   - Are convergence estimates grounded in data?
+2. If critique identifies gaps, regenerate affected sections (max 2 rounds)
+3. Add tests
+
+**Acceptance:** Briefing reports are self-critiqued. Recommendations are concrete and actionable.
+
+---
+
+## Phase 9: Semantic Experiment Memory (Inspired by AERO)
+
+*Give the agent a FAISS index instead of a text file.*
+
+### What AERO Demonstrates
+
+AERO uses `sentence-transformers` + FAISS for semantic retrieval across all workflows:
+1. Chunk documents into segments
+2. Embed with `sentence-transformers` (e.g., `all-MiniLM-L6-v2`)
+3. Index in FAISS (flat L2 index)
+4. At query time, embed the query, retrieve top-K similar chunks by cosine similarity
+5. Use retrieved chunks as LLM context
+
+AERO's `experiment_designer/search.py` demonstrates the full pipeline including dataset link discovery from known repositories (OpenNeuro, PhysioNet, Kaggle, Zenodo, etc.).
+
+### 9.1 Semantic Experiment Index
+
+**What:** Embed experiment descriptions and results in a FAISS index. When the agent asks "what have I tried that's similar to X?", retrieve by semantic similarity instead of scanning the full log.
+
+**Why:** Phase 4.1 structured the experiment state into YAML. But as experiments accumulate (50+), the agent's context window fills with irrelevant history. Phase 6.1's novelty guard uses heuristic token matching — fast but misses semantic similarity ("try a deeper tree" vs "increase max_depth"). A semantic index is complementary: novelty guard for fast blocking, semantic index for nuanced retrieval.
+
+**Implementation:**
+1. Add `templates/scripts/embed_experiments.py`:
+   - Reads `log.jsonl` entries
+   - Embeds each experiment: `f"{description} | config: {config_summary} | result: {metric}={value} | status: {kept/discarded}"`
+   - Stores in FAISS flat index at `experiments/index.faiss` + `experiments/index.pkl` (metadata)
+   - Supports incremental updates (track last-indexed experiment ID)
+2. Add `templates/scripts/query_experiments.py`:
+   - Takes natural language query (e.g., "experiments with high learning rate that overfit")
+   - Embeds query, retrieves top-K (default 5) similar experiments with similarity scores
+   - Outputs structured results with experiment IDs, descriptions, metrics
+3. Update `templates/program.md` OBSERVE step: query the index with current hypothesis before deciding
+4. Update `/turing:brief` — use index for "Exhausted Directions" section
+5. Add tests
+
+**Dependencies:** `sentence-transformers`, `faiss-cpu` (shared with Phase 7.1)
+
+**Acceptance:** With 50+ experiments, the agent retrieves relevant history in <1 second via semantic search instead of loading the entire log into context.
+
+---
+
+## Updated Full Implementation Order
+
+| # | Feature | Phase | Priority | Status | Tests |
+|---|---------|-------|----------|--------|-------|
+| 1 | Hypothesis injection `/turing:try` | 1.1 | **Critical** | **DONE** | 14 |
+| 2 | Research briefing `/turing:brief` | 1.2 | **Critical** | **DONE** | 9 |
+| 3 | Experiment dependency graph | 1.3 | **High** | **DONE** | 7 |
+| 4 | Multi-run statistical significance | 2.1 | **High** | **DONE** | 13 |
+| 5 | Bayesian-guided suggestions | 2.2 | **Medium** | **DONE** | 11 |
+| 6 | Automatic metric decomposition | 3.1 | **Medium** | **DONE** | 8 |
+| 7 | Train/val gap monitoring | 3.2 | **Medium** | **DONE** | — |
+| 8 | Structured experiment state | 4.1 | **Medium** | **DONE** | 13 |
+| 9 | Hidden file tier | 5.1 | **Critical** | Planned | — |
+| 10 | Behavioral probes | 5.2 | **Critical** | Planned | — |
+| 11 | Stability validation | 5.3 | **High** | Planned | — |
+| 12 | Tool restriction | 5.4 | **High** | Partial | — |
+| 13 | Diff-based history | 5.5 | **Medium** | Planned | — |
+| 14 | Platform-managed execution | 5.6 | **Medium** | Future | — |
+| 15 | Novelty guard | 6.1 | **Critical** | Planned | — |
+| 16 | Decision packets | 6.2 | **High** | Planned | — |
+| 17 | Experiment families | 6.3 | **High** | Planned | — |
+| 18 | Failure clustering | 6.4 | **Medium** | Planned | — |
+| 19 | Research mode selection | 6.5 | **Medium** | Planned | — |
+| 20 | Literature-informed model selection `/turing:suggest` | 7.1 | **High** | Planned | — |
+| 21 | Experiment design scaffolding `/turing:design` | 7.2 | **Medium** | Planned | — |
+| 22 | Literature-grounded briefing `/turing:brief --deep` | 7.3 | **Medium** | Planned | — |
+| 23 | Research plan generation `/turing:init --plan` | 7.4 | **Low** | Planned | — |
+| 24 | Critique loops for hypothesis generation | 8.1 | **High** | Planned | — |
+| 25 | Critique loops for briefing reports | 8.2 | **Low** | Planned | — |
+| 26 | Semantic experiment index (FAISS) | 9.1 | **Medium** | Planned | — |
+
+Phases 1-4 complete (143 tests). Phase 5 (anti-cheating) is next. Phase 6 (MemoryLab-inspired) follows. Phases 7-9 (AERO-inspired) build literature grounding, critique loops, and semantic memory on top of the existing infrastructure.

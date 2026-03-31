@@ -19,10 +19,10 @@ CONFIG_DIR = REPO_ROOT / "config"
 # --- ADR-0002: Hypothesis-measurement separation ---
 
 
-def test_evaluate_py_is_readonly():
-    """evaluate.py must be labeled READ-ONLY in its docstring."""
+def test_evaluate_py_is_hidden():
+    """evaluate.py must be labeled as restricted access (HIDDEN or READ-ONLY) in its docstring."""
     content = (TEMPLATES_DIR / "evaluate.py").read_text()
-    assert "READ-ONLY" in content
+    assert "HIDDEN" in content or "READ-ONLY" in content
     assert "MEASUREMENT APPARATUS" in content
 
 
