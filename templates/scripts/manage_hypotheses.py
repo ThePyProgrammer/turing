@@ -26,6 +26,7 @@ from pathlib import Path
 import yaml
 
 DEFAULT_QUEUE_PATH = "hypotheses.yaml"
+DETAIL_DIR = "hypotheses"
 
 VALID_STATUSES = {"queued", "in-progress", "tested", "promising", "dead-end"}
 VALID_PRIORITIES = {"high", "medium", "low"}
@@ -65,17 +66,102 @@ def get_next_id(queue: list[dict]) -> str:
     return f"hyp-{max_num + 1:03d}"
 
 
+def create_detail_file(
+    hid: str,
+    description: str,
+    source: str = "human",
+    priority: str = "high",
+    parent_experiment: str | None = None,
+    parent_hypothesis: str | None = None,
+    family: str | None = None,
+    tags: list[str] | None = None,
+    architecture: dict | None = None,
+    hyperparameters: dict | None = None,
+    features: dict | None = None,
+    expected_outcome: dict | None = None,
+) -> Path:
+    """Create a detailed hypothesis file at hypotheses/hyp-NNN.yaml."""
+    detail_dir = Path(DETAIL_DIR)
+    detail_dir.mkdir(parents=True, exist_ok=True)
+
+    detail = {
+        "id": hid,
+        "description": description,
+        "source": source,
+        "status": "queued",
+        "priority": priority,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "architecture": architecture or {},
+        "hyperparameters": hyperparameters or {},
+        "features": features or {"add": [], "remove": [], "transform": []},
+        "expected_outcome": expected_outcome or {},
+        "result": {
+            "experiment_id": None,
+            "metrics": {},
+            "verdict": None,
+            "notes": None,
+        },
+        "parent_experiment": parent_experiment,
+        "parent_hypothesis": parent_hypothesis,
+        "family": family,
+        "tags": tags or [],
+    }
+
+    detail_path = detail_dir / f"{hid}.yaml"
+    with open(detail_path, "w") as f:
+        yaml.dump(detail, f, default_flow_style=False, sort_keys=False)
+    return detail_path
+
+
+def load_detail(hid: str) -> dict | None:
+    """Load a detailed hypothesis file."""
+    detail_path = Path(DETAIL_DIR) / f"{hid}.yaml"
+    if not detail_path.exists():
+        return None
+    with open(detail_path) as f:
+        return yaml.safe_load(f) or None
+
+
+def update_detail(hid: str, updates: dict) -> bool:
+    """Update fields in a detailed hypothesis file."""
+    detail = load_detail(hid)
+    if detail is None:
+        return False
+
+    for key, value in updates.items():
+        if isinstance(value, dict) and isinstance(detail.get(key), dict):
+            detail[key].update(value)
+        else:
+            detail[key] = value
+
+    detail_path = Path(DETAIL_DIR) / f"{hid}.yaml"
+    with open(detail_path, "w") as f:
+        yaml.dump(detail, f, default_flow_style=False, sort_keys=False)
+    return True
+
+
 def add_hypothesis(
     queue_path: str,
     description: str,
     source: str = "human",
     priority: str = "high",
     parent_experiment: str | None = None,
+    parent_hypothesis: str | None = None,
+    family: str | None = None,
+    tags: list[str] | None = None,
+    architecture: dict | None = None,
+    hyperparameters: dict | None = None,
+    features: dict | None = None,
+    expected_outcome: dict | None = None,
 ) -> str:
-    """Add a hypothesis to the queue. Returns the new hypothesis ID."""
+    """Add a hypothesis to the queue and create its detail file.
+
+    Returns the new hypothesis ID.
+    """
     queue = load_queue(queue_path)
     hid = get_next_id(queue)
 
+    # Index entry (lightweight)
     entry = {
         "id": hid,
         "description": description,
@@ -88,6 +174,23 @@ def add_hypothesis(
     }
     queue.append(entry)
     save_queue(queue_path, queue)
+
+    # Detail file (rich)
+    create_detail_file(
+        hid=hid,
+        description=description,
+        source=source,
+        priority=priority,
+        parent_experiment=parent_experiment,
+        parent_hypothesis=parent_hypothesis,
+        family=family,
+        tags=tags,
+        architecture=architecture,
+        hyperparameters=hyperparameters,
+        features=features,
+        expected_outcome=expected_outcome,
+    )
+
     return hid
 
 
@@ -111,7 +214,7 @@ def get_next_hypothesis(queue_path: str) -> dict | None:
         return None
 
     priority_order = {"high": 0, "medium": 1, "low": 2}
-    source_order = {"human": 0, "agent": 1}
+    source_order = {"human": 0, "literature": 1, "taxonomy": 2, "agent": 3}
 
     queued.sort(key=lambda h: (
         priority_order.get(h.get("priority", "medium"), 1),
@@ -125,21 +228,49 @@ def mark_hypothesis(
     hypothesis_id: str,
     new_status: str,
     result_experiment: str | None = None,
+    result_metrics: dict | None = None,
+    result_notes: str | None = None,
 ) -> bool:
-    """Update a hypothesis status. Returns True if found and updated."""
+    """Update a hypothesis status in both the index and detail file.
+
+    Returns True if found and updated.
+    """
     if new_status not in VALID_STATUSES:
         print(f"Invalid status: {new_status}. Valid: {', '.join(sorted(VALID_STATUSES))}", file=sys.stderr)
         return False
 
+    # Update index
     queue = load_queue(queue_path)
+    found = False
     for entry in queue:
         if entry.get("id") == hypothesis_id:
             entry["status"] = new_status
             if result_experiment:
                 entry["result_experiment"] = result_experiment
             save_queue(queue_path, queue)
-            return True
-    return False
+            found = True
+            break
+
+    if not found:
+        return False
+
+    # Update detail file
+    detail_updates = {"status": new_status}
+    if result_experiment or result_metrics or result_notes:
+        result_update = {}
+        if result_experiment:
+            result_update["experiment_id"] = result_experiment
+        if result_metrics:
+            result_update["metrics"] = result_metrics
+        if result_notes:
+            result_update["notes"] = result_notes
+        verdict_map = {"tested": "tested", "promising": "promising", "dead-end": "dead-end"}
+        if new_status in verdict_map:
+            result_update["verdict"] = verdict_map[new_status]
+        detail_updates["result"] = result_update
+
+    update_detail(hypothesis_id, detail_updates)
+    return True
 
 
 def count_by_status(queue_path: str) -> dict[str, int]:
@@ -181,8 +312,14 @@ def main() -> None:
     add_parser = subparsers.add_parser("add", help="Add a hypothesis")
     add_parser.add_argument("description", help="What to try and why")
     add_parser.add_argument("--priority", default="high", choices=sorted(VALID_PRIORITIES))
-    add_parser.add_argument("--source", default="human", choices=["human", "agent"])
+    add_parser.add_argument("--source", default="human", choices=["human", "agent", "literature", "taxonomy"])
     add_parser.add_argument("--parent", default=None, help="Parent experiment ID")
+    add_parser.add_argument("--parent-hyp", default=None, help="Parent hypothesis ID")
+    add_parser.add_argument("--family", default=None, help="Experiment family (e.g., optimizer-sweep)")
+    add_parser.add_argument("--tags", default=None, help="Comma-separated tags")
+    add_parser.add_argument("--model-type", default=None, help="Proposed model type")
+    add_parser.add_argument("--hyperparams", default=None, help="JSON string of hyperparameters")
+    add_parser.add_argument("--expected", default=None, help="Expected outcome description")
 
     # list
     list_parser = subparsers.add_parser("list", help="List hypotheses")
@@ -191,11 +328,17 @@ def main() -> None:
     # next
     subparsers.add_parser("next", help="Get next queued hypothesis")
 
+    # show
+    show_parser = subparsers.add_parser("show", help="Show detailed hypothesis file")
+    show_parser.add_argument("id", help="Hypothesis ID")
+
     # mark
     mark_parser = subparsers.add_parser("mark", help="Update hypothesis status")
     mark_parser.add_argument("id", help="Hypothesis ID")
     mark_parser.add_argument("status", choices=sorted(VALID_STATUSES))
     mark_parser.add_argument("--result", default=None, help="Result experiment ID")
+    mark_parser.add_argument("--metrics", default=None, help="JSON string of result metrics")
+    mark_parser.add_argument("--notes", default=None, help="Notes about the result")
 
     # count
     subparsers.add_parser("count", help="Count hypotheses by status")

@@ -17,6 +17,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "try", "test this", "inject", "what if we", "I think we should" | `/turing:try` | Steer |
 | "brief", "briefing", "report", "what have we learned", "summary" | `/turing:brief` | Report |
 | "validate", "stability", "check variance", "noisy" | `/turing:validate` | Validate |
+| "suggest", "what model", "recommend", "which architecture", "literature" | `/turing:suggest` | Research |
 | "mode", "explore", "exploit", "replicate", "strategy" | `/turing:mode` | Strategy |
 
 ## Sub-commands
@@ -31,6 +32,7 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:brief` | Generate structured research intelligence report | @ml-evaluator |
 | `/turing:init` | Scaffold a new ML project | (inline) |
 | `/turing:validate` | Check metric stability, auto-fix if noisy | (inline) |
+| `/turing:suggest` | Literature-grounded model architecture suggestions | (inline, uses WebSearch) |
 | `/turing:mode <mode>` | Set research strategy (explore/exploit/replicate) | (inline) |
 
 ## Proactive Detection
