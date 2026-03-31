@@ -18,69 +18,40 @@ Ask the user for the following (or accept from `$ARGUMENTS` if provided as JSON)
 5. **ML directory** (`{{ML_DIR}}`): Where ML files go relative to project root (e.g., "ml/sentiment")
 6. **Data source** (`{{DATA_SOURCE}}`): Where training data comes from (e.g., "data/reviews.csv")
 
-## Scaffolding Steps
+## Scaffolding
 
-1. **Locate Turing plugin templates.** Search for them at the plugin's installed location under `templates/`. Use Glob to find: `~/.claude/plugins/*/templates/` or check the npm global installation.
+Once you have all 6 values, delegate to the unified scaffolding script:
 
-2. **Copy templates** to the ML directory, replacing all `{{PLACEHOLDER}}` markers:
-   - `prepare.py` — data loading and splitting (READ-ONLY infrastructure)
-   - `evaluate.py` — evaluation harness (READ-ONLY infrastructure)
-   - `train.py` — training code (AGENT-EDITABLE hypothesis space)
-   - `features/__init__.py` and `features/featurizers.py`
-   - `scripts/` — all utility scripts
-   - `tests/__init__.py` and `tests/conftest.py`
-   - `config.yaml`, `sweep_config.yaml`
-   - `program.md`, `README.md`
-   - `requirements.txt`, `pyproject.toml`
+```bash
+python3 <templates_dir>/scripts/scaffold.py \
+    --project-name "<project_name>" \
+    --target-metric "<target_metric>" \
+    --metric-direction "<metric_direction>" \
+    --task-description "<task_description>" \
+    --ml-dir "<ml_dir>" \
+    --data-source "<data_source>" \
+    --templates-dir "<templates_dir>"
+```
 
-3. **Replace placeholders** in all copied files:
-   - `{{PROJECT_NAME}}` -> project name
-   - `{{TARGET_METRIC}}` -> primary metric
-   - `{{TASK_DESCRIPTION}}` -> task description
-   - `{{ML_DIR}}` -> ML directory path
-   - `{{DATA_SOURCE}}` -> data source path
-   - `{{METRIC_DIRECTION}}` -> "lower" or "higher"
+The scaffold script handles everything in a single atomic operation:
+- Copies all template files with placeholder substitution
+- Creates data/, experiments/, models/ directories
+- Sets up agent memory at `.claude/agent-memory/ml-researcher/MEMORY.md`
+- Configures Claude Code hooks in `.claude/settings.local.json`
+- Creates Python virtual environment and installs requirements
+- Verifies all placeholders were replaced (fails loudly if any remain)
 
-4. **Create agent memory:**
-   ```
-   .claude/agent-memory/ml-researcher/MEMORY.md
-   ```
-   Copy the MEMORY.md template with placeholders replaced.
+## Locating Templates
 
-5. **Configure hooks** in `.claude/settings.local.json`:
-   - PostToolUse hook for auto-logging after training
-   - Stop hook for convergence detection
-   - Preserve any existing hooks
-
-6. **Create Python virtual environment:**
-   ```bash
-   cd {{ML_DIR}} && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
-   ```
-
-7. **Make shell scripts executable:**
-   ```bash
-   chmod +x {{ML_DIR}}/scripts/post-train-hook.sh {{ML_DIR}}/scripts/stop-hook.sh
-   ```
-
-8. **Create directories:**
-   ```bash
-   mkdir -p {{ML_DIR}}/{data/splits,experiments,models/best,models/archive}
-   ```
-
-9. **Verify all placeholders were replaced:**
-   ```bash
-   cd {{ML_DIR}} && python3 scripts/verify_placeholders.py .
-   ```
-   If any unreplaced `{{PLACEHOLDER}}` markers remain, the script will list them. Fix before proceeding — unreplaced placeholders produce code that runs but silently does the wrong thing.
-
-10. **Report** what was created:
-   - The separation: READ-ONLY (`prepare.py`, `evaluate.py`) vs AGENT-EDITABLE (`train.py`)
-   - Next steps: add data, run `python prepare.py`, then `/turing:train`
-   - The safety model: why immutable evaluation matters
-
-## Template Location
-
-Templates are at the Turing plugin installation path under `templates/`. Use Glob:
+Find the templates directory using Glob:
 ```
 ~/.claude/plugins/*/templates/
 ```
+Or check if installed via npm by looking for `node_modules/claude-turing/templates/`.
+
+## After Scaffolding
+
+Report what was created:
+- The separation: READ-ONLY (`prepare.py`, `evaluate.py`) vs AGENT-EDITABLE (`train.py`)
+- Next steps: add data to the configured data source path, run `python prepare.py`, then `/turing:train`
+- The taste-leverage loop: `/turing:try` to inject hypotheses, `/turing:brief` for intelligence reports
