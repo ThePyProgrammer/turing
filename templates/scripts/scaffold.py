@@ -46,6 +46,7 @@ TEMPLATE_FILES = [
     "program.md",
     "README.md",
     "MEMORY.md",
+    "model_registry.yaml",
     "requirements.txt",
     "pyproject.toml",
 ]
