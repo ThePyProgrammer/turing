@@ -212,6 +212,23 @@ def detect_environment_drift(experiments: list[dict]) -> list[str]:
     return warnings
 
 
+def load_profiles(profile_dir: str = "experiments/profiles") -> list[dict]:
+    """Load all profiling results from YAML files."""
+    path = Path(profile_dir)
+    if not path.exists():
+        return []
+    profiles = []
+    for f in sorted(path.glob("*-profile.yaml")):
+        try:
+            with open(f) as fh:
+                profile = yaml.safe_load(fh)
+                if profile and isinstance(profile, dict):
+                    profiles.append(profile)
+        except (yaml.YAMLError, OSError):
+            continue
+    return profiles
+
+
 def load_diagnoses(diag_dir: str = "experiments/diagnoses") -> list[dict]:
     """Load all diagnosis reports from YAML files."""
     path = Path(diag_dir)
@@ -278,6 +295,7 @@ def format_brief(
     seed_studies: list[dict] | None = None,
     reproductions: list[dict] | None = None,
     diagnoses: list[dict] | None = None,
+    profiles: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -454,6 +472,23 @@ def format_brief(
         if failed:
             lines.extend(["", f"*{len(failed)} experiment(s) failed reproducibility checks.*"])
 
+    # Profiles
+    if profiles:
+        lines.extend(["", "## Performance Profile", ""])
+        for prof in profiles[-1:]:  # Show most recent
+            exp_id = prof.get("experiment_id", "?")
+            p = prof.get("profile", {})
+            bn = prof.get("bottleneck", {})
+            lines.append(f"**{exp_id}:** {p.get('total_time_sec', 0):.1f}s total")
+            mem = p.get("memory", {})
+            if mem.get("peak_rss_mb"):
+                lines.append(f"- Peak memory: {mem['peak_rss_mb']:.0f} MB")
+            if bn.get("type") and bn["type"] != "none_detected":
+                lines.append(f"- Bottleneck: **{bn['type']}** ({bn.get('severity', 'unknown')})")
+            recs = prof.get("recommendations", [])
+            if recs:
+                lines.append(f"- Top recommendation: {recs[0]}")
+
     # Diagnoses (error analysis)
     if diagnoses:
         lines.extend(["", "## Error Analysis", ""])
@@ -529,10 +564,11 @@ def generate_brief(
     cost_records = load_cost_data(log_path, metric)
     pareto = compute_pareto_frontier(cost_records, lower_is_better) if cost_records else []
 
-    # Load seed studies, reproduction reports, and diagnoses
+    # Load seed studies, reproduction reports, diagnoses, and profiles
     seed_studies = load_seed_studies()
     reproductions = load_reproductions()
     diagnoses = load_diagnoses()
+    profiles = load_profiles()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -542,6 +578,7 @@ def generate_brief(
         seed_studies=seed_studies if seed_studies else None,
         reproductions=reproductions if reproductions else None,
         diagnoses=diagnoses if diagnoses else None,
+        profiles=profiles if profiles else None,
     )
 
 
