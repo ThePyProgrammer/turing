@@ -277,7 +277,7 @@ def get_next_hypothesis(queue_path: str) -> dict | None:
         return None
 
     priority_order = {"high": 0, "medium": 1, "low": 2}
-    source_order = {"human": 0, "literature": 1, "taxonomy": 2, "agent": 3}
+    source_order = {"human": 0, "literature": 1, "treequest": 2, "taxonomy": 3, "agent": 4}
 
     queued.sort(key=lambda h: (
         priority_order.get(h.get("priority", "medium"), 1),
@@ -376,7 +376,7 @@ def main() -> None:
     add_parser.add_argument("description", nargs="?", default=None, help="What to try and why")
     add_parser.add_argument("--archetype", default=None, help="Expand from archetype (e.g., model_comparison)")
     add_parser.add_argument("--priority", default="high", choices=sorted(VALID_PRIORITIES))
-    add_parser.add_argument("--source", default="human", choices=["human", "agent", "literature", "taxonomy"])
+    add_parser.add_argument("--source", default="human", choices=["human", "agent", "literature", "treequest", "taxonomy"])
     add_parser.add_argument("--parent", default=None, help="Parent experiment ID")
     add_parser.add_argument("--parent-hyp", default=None, help="Parent hypothesis ID")
     add_parser.add_argument("--family", default=None, help="Experiment family (e.g., optimizer-sweep)")
