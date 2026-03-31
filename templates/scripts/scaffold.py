@@ -79,6 +79,7 @@ TEMPLATE_DIRS = {
         "validate_stability.py",
         "show_environment.py",
         "turing_io.py",
+        "preflight.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
