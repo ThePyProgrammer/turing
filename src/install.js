@@ -33,6 +33,7 @@ const SUB_COMMANDS = [
   "xray", "sensitivity", "calibrate",
   "feature", "curriculum",
   "prune", "quantize", "merge", "surgery",
+  "trend", "flashback", "archive", "annotate", "search", "template", "replay",
 ];
 
 export async function install(opts = {}) {

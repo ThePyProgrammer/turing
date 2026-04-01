@@ -67,6 +67,13 @@ const EXPECTED_COMMANDS = [
   "quantize/SKILL.md",
   "merge/SKILL.md",
   "surgery/SKILL.md",
+  "trend/SKILL.md",
+  "flashback/SKILL.md",
+  "archive/SKILL.md",
+  "annotate/SKILL.md",
+  "search/SKILL.md",
+  "template/SKILL.md",
+  "replay/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
