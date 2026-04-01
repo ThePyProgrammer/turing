@@ -2820,9 +2820,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | Planned | Phase 13.1 (export for size comparison) |
 | 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | Planned | Phase 9.1 (semantic index) |
 | 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | Planned | Phases 10.1, 11.2, 14.2 |
-| 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | Planned | — (standalone) |
-| 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | Planned | Phase 10.1 (seed runner) |
-| 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | Planned | Phase 19.2 (audit integration) |
+| 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | **DONE** | — (standalone) |
+| 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
+| 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | **DONE** | Phase 19.2 (audit integration) |
 | 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
 | 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | Planned | Phase 10.1 (seed runner) |
 | 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | Planned | Phase 13.1 (export) |
