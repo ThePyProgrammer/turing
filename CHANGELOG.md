@@ -2,6 +2,25 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.0.0] — 2026-04-01 — Meta-Intelligence
+
+*The final milestone. Turing becomes project-aware — learning across projects, not just within one.*
+
+### Added
+- `/turing:transfer` — cross-project knowledge transfer: scan prior projects for similar task characteristics, compute similarity scores, surface winning strategies and key insights, generate transfer hypotheses, maintain local project index at `~/.turing/project_index.yaml`
+- `/turing:audit` — pre-submission methodology audit: 8 checks (data leakage, CV strategy, seed sensitivity, ablation completeness, baseline comparison, reproducibility, hyperparameter budget, regression stability) with venue-specific checklists (NeurIPS, ICML, ICLR) and auto-fix suggestions
+- Methodology Audit section in `/turing:brief`
+
+### Fixed
+- Handle empty signatures in similarity matching — require non-None task type and feature types
+
+### Phase
+- **19.1** Cross-Project Knowledge Transfer
+- **19.2** Pre-Submission Methodology Audit
+- All 19 phases (50 implementation items) complete
+
+**1272 tests | 41 commands | 60 scripts | 15 commits**
+
 ## [2.5.0] — 2026-04-01 — Scaling & Efficiency
 
 ### Added
@@ -210,6 +229,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.0.0
 [2.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.5.0
 [2.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.4.0
 [2.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.3.0
