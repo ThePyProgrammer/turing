@@ -108,7 +108,10 @@ def compute_rolling_stats(
     Returns:
         Dict with mean, std, trend (slope), min, max over the window.
     """
-    values = [h.get(metric) for h in history[-window:] if h.get(metric) is not None]
+    values = [
+        h.get(metric) for h in history[-window:]
+        if h.get(metric) is not None and not (isinstance(h.get(metric), float) and math.isnan(h.get(metric)))
+    ]
     if not values:
         return {}
 
