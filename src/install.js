@@ -26,6 +26,7 @@ const SUB_COMMANDS = [
   "diagnose", "ablate", "frontier", "profile", "checkpoint", "export",
   "lit", "paper", "queue", "retry", "fork",
   "diff", "watch", "regress",
+  "ensemble", "stitch", "warm",
 ];
 
 export async function install(opts = {}) {
