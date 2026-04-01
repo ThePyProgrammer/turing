@@ -1,0 +1,36 @@
+# Training monitor alert rules for /turing:watch
+#
+# Each alert has:
+#   condition:   alert type (loss_spike, nan_detected, overfitting, plateau)
+#   severity:    info | warning | critical
+#   action:      optional action on trigger (e.g., "pause")
+#   message:     alert message template with {epoch}, {value}, {mean}, etc.
+#
+# Customize thresholds to match your training dynamics.
+
+alerts:
+  loss_spike:
+    condition: loss_spike
+    multiplier: 3.0            # Trigger if loss > N * rolling_mean
+    severity: warning
+    message: "Loss spike at epoch {epoch}: {value} vs rolling mean {mean:.4f}"
+
+  nan_detected:
+    condition: nan_detected
+    severity: critical
+    action: pause              # Suggest pausing training on NaN
+    message: "NaN detected in {metric} at epoch {epoch}"
+
+  overfitting_onset:
+    condition: overfitting
+    gap_ratio: 0.5             # train_loss / val_loss ratio threshold
+    consecutive: 3             # N consecutive epochs of widening gap
+    severity: warning
+    message: "Overfitting detected — train/val gap widening since epoch {onset}"
+
+  plateau:
+    condition: plateau
+    min_improvement: 0.001     # Minimum metric change per epoch
+    consecutive: 5             # N consecutive flat epochs
+    severity: info
+    message: "Metric plateaued — consider early stopping or learning rate reduction"
