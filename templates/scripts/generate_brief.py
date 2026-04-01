@@ -309,6 +309,23 @@ def load_regression_checks(regress_dir: str = "experiments/regressions") -> list
     return reports
 
 
+def load_ensemble_results(ensemble_dir: str = "experiments/ensembles") -> list[dict]:
+    """Load ensemble result reports from YAML files."""
+    path = Path(ensemble_dir)
+    if not path.exists():
+        return []
+    reports = []
+    for f in sorted(path.glob("ensemble-*.yaml")):
+        try:
+            with open(f) as fh:
+                report = yaml.safe_load(fh)
+                if report and isinstance(report, dict):
+                    reports.append(report)
+        except (yaml.YAMLError, OSError):
+            continue
+    return reports
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -327,6 +344,7 @@ def format_brief(
     profiles: list[dict] | None = None,
     queue_summary: dict | None = None,
     regression_checks: list[dict] | None = None,
+    ensemble_results: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -546,6 +564,21 @@ def format_brief(
         if auto_hyps:
             lines.append(f"\n*{auto_hyps} auto-generated hypotheses from failure analysis.*")
 
+    # Ensemble results
+    if ensemble_results:
+        lines.extend(["", "## Ensembles", ""])
+        for ens in ensemble_results:
+            best_method = ens.get("best_method", "?")
+            improvement = ens.get("improvement", 0)
+            n_models = ens.get("n_candidates", 0)
+            if best_method != "best_single" and improvement > 0:
+                lines.append(
+                    f"- **{best_method}** ({n_models} models): "
+                    f"{metric} improvement {improvement:+.4f} over best single"
+                )
+            else:
+                lines.append(f"- {n_models}-model ensemble: no improvement over best single")
+
     # Regression check history (stability)
     if regression_checks:
         lines.extend(["", "## Stability", ""])
@@ -636,6 +669,7 @@ def generate_brief(
     profiles = load_profiles()
     queue_summary = load_queue_summary()
     regression_checks = load_regression_checks()
+    ensemble_results = load_ensemble_results()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -648,6 +682,7 @@ def generate_brief(
         profiles=profiles if profiles else None,
         queue_summary=queue_summary,
         regression_checks=regression_checks if regression_checks else None,
+        ensemble_results=ensemble_results if ensemble_results else None,
     )
 
 
