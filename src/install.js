@@ -78,6 +78,7 @@ export async function install(opts = {}) {
     "defaults.yaml", "lifecycle.toml", "taxonomy.toml",
     "experiment_archetypes.yaml", "novelty_aliases.yaml",
     "relationships.toml", "state.toml", "task_taxonomy.yaml",
+    "failure_modes.yaml",
   ];
   for (const file of CONFIG_FILES) {
     await copyFile(

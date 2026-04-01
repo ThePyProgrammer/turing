@@ -52,6 +52,7 @@ const EXPECTED_CONFIG = [
   "defaults.yaml", "lifecycle.toml", "taxonomy.toml",
   "experiment_archetypes.yaml", "novelty_aliases.yaml",
   "relationships.toml", "state.toml", "task_taxonomy.yaml",
+  "failure_modes.yaml",
 ];
 
 async function fileExists(path) {

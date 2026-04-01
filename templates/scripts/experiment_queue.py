@@ -109,10 +109,14 @@ def sort_queue(queue: list[dict]) -> list[dict]:
     """Sort queue by priority then creation time, respecting dependencies.
 
     Returns items in execution order: dependencies first, then by priority.
+    Uses topological sort — within each "ready" batch, items are sorted
+    by priority so that critical items run before low-priority ones
+    as long as dependency constraints are satisfied.
     """
     queued = [q for q in queue if q.get("status") == "queued"]
 
-    # Topological sort with priority
+    # Topological sort: process items whose dependencies are resolved,
+    # picking highest-priority items first within each batch
     resolved = []
     remaining = list(queued)
     resolved_ids = set()
@@ -121,22 +125,23 @@ def sort_queue(queue: list[dict]) -> list[dict]:
     iteration = 0
     while remaining and iteration < max_iterations:
         iteration += 1
-        progress = False
-        for item in list(remaining):
-            dep = item.get("depends_on")
-            if dep is None or dep in resolved_ids:
-                resolved.append(item)
-                resolved_ids.add(item["id"])
-                remaining.remove(item)
-                progress = True
-        if not progress:
+        # Find all items whose deps are satisfied
+        ready = [
+            item for item in remaining
+            if item.get("depends_on") is None or item["depends_on"] in resolved_ids
+        ]
+        if not ready:
             # Circular dependency — add remaining in priority order
             remaining.sort(key=lambda x: PRIORITY_ORDER.get(x.get("priority", "medium"), 2))
             resolved.extend(remaining)
             break
+        # Sort ready batch by priority
+        ready.sort(key=lambda x: PRIORITY_ORDER.get(x.get("priority", "medium"), 2))
+        for item in ready:
+            resolved.append(item)
+            resolved_ids.add(item["id"])
+            remaining.remove(item)
 
-    # Sort by priority within dependency levels
-    resolved.sort(key=lambda x: PRIORITY_ORDER.get(x.get("priority", "medium"), 2))
     return resolved
 
 
