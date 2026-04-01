@@ -214,13 +214,6 @@ def sensitivity_analysis(
     eval_cfg = config.get("evaluation", {})
     primary_metric = eval_cfg.get("primary_metric", "accuracy")
 
-    tunable = extract_tunable_params(config)
-    if params:
-        tunable = {k: v for k, v in tunable.items() if k in params}
-
-    if not tunable:
-        return {"error": "No tunable hyperparameters found in config"}
-
     sensitivities = []
 
     if sweep_data:
@@ -230,6 +223,13 @@ def sensitivity_analysis(
             sensitivities.append(sens)
     else:
         # Generate sweep plan (actual execution done by agent)
+        tunable = extract_tunable_params(config)
+        if params:
+            tunable = {k: v for k, v in tunable.items() if k in params}
+
+        if not tunable:
+            return {"error": "No tunable hyperparameters found in config"}
+
         sweep_plans = {}
         for param, value in tunable.items():
             sweep_plans[param] = generate_sweep(param, value)
