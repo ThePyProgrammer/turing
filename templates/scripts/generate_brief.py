@@ -404,6 +404,38 @@ def load_simulation_results(sim_dir: str = "experiments/simulations") -> dict | 
         return None
 
 
+def load_registry_summary(registry_path: str = "experiments/registry.yaml") -> dict | None:
+    """Load model registry summary for briefing."""
+    path = Path(registry_path)
+    if not path.exists():
+        return None
+    try:
+        with open(path) as f:
+            data = yaml.safe_load(f)
+        if isinstance(data, dict) and data.get("models"):
+            return data
+    except (yaml.YAMLError, OSError):
+        pass
+    return None
+
+
+def load_update_history(update_dir: str = "experiments/updates") -> list[dict]:
+    """Load recent incremental update reports."""
+    path = Path(update_dir)
+    if not path.exists():
+        return []
+    results = []
+    for f in sorted(path.glob("*-update-*.yaml"))[-3:]:
+        try:
+            with open(f) as fh:
+                data = yaml.safe_load(fh)
+                if isinstance(data, dict):
+                    results.append(data)
+        except (yaml.YAMLError, OSError):
+            continue
+    return results
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -428,6 +460,8 @@ def format_brief(
     audit_report: dict | None = None,
     whatif_results: list[dict] | None = None,
     simulation_result: dict | None = None,
+    registry_summary: dict | None = None,
+    update_history: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -758,6 +792,29 @@ def format_brief(
             lines.append(f"**Last simulation:** {run} configs recommended, {skip} skipped ({savings}% budget savings)")
             lines.append("")
 
+    # Model Lifecycle section
+    if registry_summary or update_history:
+        lines.extend(["", "## Model Lifecycle", ""])
+
+        if registry_summary:
+            models = registry_summary.get("models", [])
+            for m in models:
+                if m.get("stage") != "archived":
+                    metric = f"{m['metric']:.4f}" if m.get("metric") is not None else "—"
+                    lines.append(f"- **{m['stage']}:** {m['exp_id']} ({m.get('version', '?')}, {m.get('metric_name', 'metric')}={metric})")
+            if not any(m.get("stage") != "archived" for m in models):
+                lines.append("- All models archived — register a new candidate with `/turing:registry register`")
+            lines.append("")
+
+        if update_history:
+            lines.append(f"**Recent updates:** {len(update_history)}")
+            for u in update_history[-2:]:
+                verdict = u.get("verdict", "?")
+                exp_id = u.get("experiment_id", "?")
+                strategy = u.get("plan", {}).get("strategy", "?")
+                lines.append(f"- {exp_id}: {strategy} — {verdict}")
+            lines.append("")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -830,6 +887,8 @@ def generate_brief(
     audit_report = load_audit_report()
     whatif_results = load_whatif_results()
     simulation_result = load_simulation_results()
+    registry_summary = load_registry_summary()
+    update_history = load_update_history()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -848,6 +907,8 @@ def generate_brief(
         audit_report=audit_report,
         whatif_results=whatif_results if whatif_results else None,
         simulation_result=simulation_result,
+        registry_summary=registry_summary,
+        update_history=update_history if update_history else None,
     )
 
 
