@@ -2,6 +2,28 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.5.0] — 2026-04-01 — Experiment Archaeology
+
+### Added
+- `/turing:trend` — long-term trend analysis: improvement velocity, family ROI, diminishing returns detection, phase transition detection
+- `/turing:flashback` — session context restoration: current best, recent experiments, pending hypotheses, annotations, budget, suggested next action
+- `/turing:archive` — experiment lifecycle cleanup: identify archivable experiments, compress artifacts, create queryable summary index, dry-run support
+- `/turing:annotate` — retrospective annotations: add human notes + tags to experiments, search by content/tag, list by experiment
+- `/turing:search` — natural language experiment search: keyword + structured filters (metric>0.85, status:kept, family:baseline), ranked results
+- `/turing:template` — experiment template library: save/list/apply/delete reusable configs at ~/.turing/templates/ (cross-project)
+- `/turing:replay` — experiment replay: re-run old approach with current infrastructure, compare original vs replayed metrics, verdict
+
+### Phase
+- **24.1** Long-Term Trend Analysis
+- **24.2** Session Context Restoration
+- **24.3** Experiment Lifecycle Cleanup
+- **24.4** Retrospective Annotations
+- **24.5** Natural Language Search
+- **24.6** Template Library
+- **24.7** Experiment Replay
+
+**1547 tests | 60 commands | 79 scripts | 26 commits**
+
 ## [3.4.0] — 2026-04-01 — Model Surgery
 
 ### Added
@@ -288,6 +310,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.5.0
 [3.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.4.0
 [3.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.3.0
 [3.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.2.0
