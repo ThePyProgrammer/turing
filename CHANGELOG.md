@@ -2,6 +2,21 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.4.0] — 2026-04-01 — Model Composition
+
+### Added
+- `/turing:ensemble` — automated ensemble construction: voting, weighted voting, stacking, and blending from top-K models with diversity filtering and correlation analysis
+- `/turing:stitch` — pipeline composition: decompose ML pipelines into swappable stages (preprocess, features, model, postprocess) with stage hashing and intermediate caching
+- `/turing:warm` — warm-start from prior model: auto-detects model type (tree/neural/sklearn), plans continue-boosting, weight loading with layer freezing, or warm_start param
+- Ensembles section in `/turing:brief`
+
+### Phase
+- **17.1** Automated Ensemble Construction
+- **17.2** Pipeline Composition
+- **17.3** Warm-Start from Prior Model
+
+**1072 tests | 36 commands | 55 scripts | 18 commits**
+
 ## [2.3.0] — 2026-04-01 — Deep Analysis
 
 ### Added
@@ -180,6 +195,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[2.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.4.0
 [2.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.3.0
 [2.2.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.1
 [2.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.0
