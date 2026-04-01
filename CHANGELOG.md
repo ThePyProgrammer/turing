@@ -2,6 +2,20 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.1.0] — 2026-04-01 — Pre-Training Intelligence
+
+### Added
+- `/turing:sanity` — pre-training sanity checks: initial loss vs theory, single-batch overfit test, gradient flow analysis, output validation, data pipeline check, config consistency
+- `/turing:baseline` — automatic baseline generation: random, majority class/mean, stratified/median, logistic regression/ridge, k-NN with comparison table
+- `/turing:leak` — targeted leakage detection: feature-target correlation, single-feature predictiveness, train/test hash overlap detection
+
+### Phase
+- **20.1** Pre-Training Sanity Checks
+- **20.2** Automatic Baseline Generation
+- **20.3** Targeted Leakage Detection
+
+**1339 tests | 44 commands | 63 scripts | 15 commits**
+
 ## [3.0.0] — 2026-04-01 — Meta-Intelligence
 
 *The final milestone. Turing becomes project-aware — learning across projects, not just within one.*
@@ -229,6 +243,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.1.0
 [3.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.0.0
 [2.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.5.0
 [2.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.4.0
