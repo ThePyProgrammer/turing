@@ -3,6 +3,21 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.1.0] — 2026-04-01 — Collaboration
+
+### Added
+- `/turing:onboard` — project onboarding walkthrough for new collaborators with audience adaptation (researcher/engineer/stakeholder)
+- `/turing:share` — experiment packaging into portable archives with manifest, README, optional model/code/figures
+- `/turing:review` — peer review simulation with 10 checks, venue calibration (NeurIPS/ICML), fix commands, 1-10 scoring
+
+### Phase
+- **26.1** Project Onboarding
+- **26.2** Experiment Packaging
+- **26.3** Peer Review Simulation
+
+**1576 tests | 66 commands | 85 scripts | 15 commits**
+
+
 ## [4.0.0] — 2026-04-01 — Research Communication
 
 *The v4.0 milestone. Every result becomes a shareable artifact — citations tracked, presentations generated, progress communicated. All 25 phases complete.*
@@ -328,6 +343,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
 [4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
 [3.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.5.0
 [3.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.4.0
