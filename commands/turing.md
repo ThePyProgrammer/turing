@@ -31,6 +31,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "diagnose", "error analysis", "failure modes", "where does it fail", "confusion matrix" | `/turing:diagnose` | Analyze |
 | "ablate", "ablation", "remove component", "which features matter", "component impact" | `/turing:ablate` | Analyze |
 | "frontier", "pareto", "tradeoff", "tradeoffs", "multi-objective", "which model is best" | `/turing:frontier` | Analyze |
+| "lit", "literature", "papers", "SOTA", "baseline", "related work", "citations" | `/turing:lit` | Research |
+| "paper", "draft paper", "write paper", "results table", "latex", "experimental setup" | `/turing:paper` | Document |
 | "export", "deploy", "production", "onnx", "torchscript", "tflite", "ship model" | `/turing:export` | Deploy |
 | "profile", "profiling", "bottleneck", "slow training", "why is it slow", "timing" | `/turing:profile` | Check |
 | "checkpoint", "checkpoints", "prune checkpoints", "disk space", "resume training" | `/turing:checkpoint` | Check |
@@ -61,6 +63,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:diagnose [exp-id]` | Error analysis: failure modes, confused pairs, feature-range bias | (inline) |
 | `/turing:ablate [--components]` | Ablation study: remove components, measure impact, flag dead weight | (inline) |
 | `/turing:frontier [--metrics]` | Pareto frontier: multi-objective tradeoff visualization | (inline) |
+| `/turing:lit <query>` | Literature search: papers, SOTA baselines, related work | (inline, uses WebSearch) |
+| `/turing:paper [--sections] [--format]` | Draft paper sections from experiment logs (setup, results, ablation, hyperparams) | (inline) |
 | `/turing:export [exp-id] [--format]` | Export model to production format with equivalence check + latency benchmark | (inline) |
 | `/turing:profile [exp-id]` | Computational profiling: timing, memory, throughput, bottleneck detection | (inline) |
 | `/turing:checkpoint <action>` | Smart checkpoint management: list, prune (Pareto), average, resume, stats | (inline) |
