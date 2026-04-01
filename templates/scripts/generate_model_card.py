@@ -18,6 +18,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import yaml
+
 from scripts.turing_io import load_config, load_experiments
 
 
@@ -93,22 +95,113 @@ def load_model_contract(contract_path: str) -> dict:
     return {"version": version, "bundle_format": bundle_format, "raw": text}
 
 
+def load_registry_status(registry_path: str = "experiments/registry.yaml") -> dict | None:
+    """Load registry status for the best model."""
+    path = Path(registry_path)
+    if not path.exists():
+        return None
+    try:
+        with open(path) as f:
+            data = yaml.safe_load(f)
+        if isinstance(data, dict) and data.get("models"):
+            return data
+    except (Exception,):
+        pass
+    return None
+
+
+def compute_fairness_metrics(
+    predictions: list | None = None,
+    labels: list | None = None,
+    protected_attribute: list | None = None,
+    group_names: list[str] | None = None,
+) -> dict | None:
+    """Compute demographic parity and equal opportunity metrics.
+
+    Args:
+        predictions: Model predictions.
+        labels: True labels.
+        protected_attribute: Group membership for each sample.
+        group_names: Names of groups.
+
+    Returns:
+        Fairness metrics dict or None if insufficient data.
+    """
+    if predictions is None or protected_attribute is None:
+        return None
+    if len(predictions) != len(protected_attribute):
+        return None
+    if len(predictions) == 0:
+        return None
+
+    import numpy as np
+
+    preds = np.array(predictions)
+    groups = np.array(protected_attribute)
+    unique_groups = sorted(set(groups))
+
+    if group_names is None:
+        group_names = [str(g) for g in unique_groups]
+
+    # Demographic parity: P(Y_hat=1 | G=g) for each group
+    group_positive_rates = {}
+    for g, name in zip(unique_groups, group_names):
+        mask = groups == g
+        if mask.sum() == 0:
+            continue
+        rate = float(preds[mask].mean()) if preds[mask].size > 0 else 0
+        group_positive_rates[name] = round(rate, 4)
+
+    # Demographic parity difference
+    rates = list(group_positive_rates.values())
+    dp_diff = round(max(rates) - min(rates), 4) if len(rates) >= 2 else 0
+
+    result = {
+        "group_positive_rates": group_positive_rates,
+        "demographic_parity_difference": dp_diff,
+        "n_groups": len(unique_groups),
+    }
+
+    # Equal opportunity (if labels available): P(Y_hat=1 | Y=1, G=g)
+    if labels is not None and len(labels) == len(predictions):
+        labs = np.array(labels)
+        group_tpr = {}
+        for g, name in zip(unique_groups, group_names):
+            mask = (groups == g) & (labs == 1)
+            if mask.sum() == 0:
+                continue
+            tpr = float(preds[mask].mean()) if preds[mask].size > 0 else 0
+            group_tpr[name] = round(tpr, 4)
+
+        result["group_true_positive_rates"] = group_tpr
+        tpr_vals = list(group_tpr.values())
+        result["equal_opportunity_difference"] = round(max(tpr_vals) - min(tpr_vals), 4) if len(tpr_vals) >= 2 else 0
+
+    return result
+
+
 def generate_card(
     config_path: str = "config.yaml",
     log_path: str = "experiments/log.jsonl",
     contract_path: str = "model_contract.md",
     output_path: str | None = None,
+    include_fairness: bool = False,
+    fairness_data: dict | None = None,
+    registry_path: str = "experiments/registry.yaml",
 ) -> str:
     """Produce a model card markdown document.
 
     Combines information from the project config, experiment log,
-    and model contract into a standardized model card.
+    model contract, registry, and optional fairness data.
 
     Args:
         config_path: Path to config.yaml.
         log_path: Path to experiments/log.jsonl.
         contract_path: Path to model_contract.md.
         output_path: If given, write the card to this file.
+        include_fairness: If True, add fairness section.
+        fairness_data: Pre-computed fairness data {predictions, labels, protected_attribute}.
+        registry_path: Path to registry YAML.
 
     Returns:
         The model card as a markdown string.
@@ -247,7 +340,6 @@ def generate_card(
     if best:
         seed_study_path = Path("experiments/seed_studies") / f"{best.get('experiment_id', 'unknown')}-seeds.yaml"
         if seed_study_path.exists():
-            import yaml
             with open(seed_study_path) as f:
                 seed_study = yaml.safe_load(f) or {}
             if seed_study and "mean" in seed_study:
@@ -306,6 +398,57 @@ def generate_card(
         "- Not intended for: <placeholder for user to fill>",
     ])
 
+    # --- Registry Status ---
+    registry_data = load_registry_status(registry_path)
+    if registry_data and best:
+        exp_id = best.get("experiment_id", "")
+        for model in registry_data.get("models", []):
+            if model.get("exp_id") == exp_id:
+                lines.extend([
+                    "",
+                    "## Registry Status",
+                    "",
+                    f"- **Stage:** {model.get('stage', 'unregistered')}",
+                    f"- **Version:** {model.get('version', 'N/A')}",
+                    f"- **Registered:** {model.get('registered_at', 'N/A')[:10]}",
+                    f"- **Gates passed:** {', '.join(model.get('gates_passed', [])) or 'none'}",
+                ])
+                break
+
+    # --- Fairness ---
+    if include_fairness:
+        lines.extend([
+            "",
+            "## Fairness Analysis",
+            "",
+        ])
+        if fairness_data:
+            fairness = compute_fairness_metrics(
+                predictions=fairness_data.get("predictions"),
+                labels=fairness_data.get("labels"),
+                protected_attribute=fairness_data.get("protected_attribute"),
+                group_names=fairness_data.get("group_names"),
+            )
+            if fairness:
+                lines.append("### Demographic Parity")
+                lines.append("")
+                for group, rate in fairness.get("group_positive_rates", {}).items():
+                    lines.append(f"- **{group}:** {rate:.4f}")
+                lines.append(f"- **Parity difference:** {fairness['demographic_parity_difference']:.4f}")
+
+                if "group_true_positive_rates" in fairness:
+                    lines.append("")
+                    lines.append("### Equal Opportunity")
+                    lines.append("")
+                    for group, tpr in fairness["group_true_positive_rates"].items():
+                        lines.append(f"- **{group}:** {tpr:.4f}")
+                    lines.append(f"- **Opportunity difference:** {fairness['equal_opportunity_difference']:.4f}")
+            else:
+                lines.append("- Fairness analysis requested but insufficient data provided")
+        else:
+            lines.append("- Fairness analysis requested but no protected attribute data available")
+            lines.append("- Provide `--fairness-data` with predictions, labels, and protected attributes")
+
     # --- Ethical Considerations ---
     lines.extend([
         "",
@@ -354,9 +497,17 @@ def main() -> None:
     parser.add_argument("--log", default="experiments/log.jsonl", help="Path to experiment log")
     parser.add_argument("--contract", default="model_contract.md", help="Path to model contract")
     parser.add_argument("--output", default=None, help="Output path (default: print to stdout)")
+    parser.add_argument("--include", default=None, help="Include extra sections (e.g., 'fairness')")
+    parser.add_argument("--registry", default="experiments/registry.yaml", help="Path to model registry")
     args = parser.parse_args()
 
-    card = generate_card(args.config, args.log, args.contract, args.output)
+    include_fairness = args.include and "fairness" in args.include
+
+    card = generate_card(
+        args.config, args.log, args.contract, args.output,
+        include_fairness=include_fairness,
+        registry_path=args.registry,
+    )
     if args.output:
         print(f"Model card written to {args.output}")
     else:
