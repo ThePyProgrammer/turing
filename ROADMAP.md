@@ -2091,6 +2091,706 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 
 ---
 
+## Phase 20: Pre-Training Intelligence (v3.1.0)
+
+*Catch problems before you waste a single GPU cycle.*
+
+### 20.1 Pre-Training Sanity Checks — `/turing:sanity`
+
+**What:** Run a battery of fast sanity checks before committing to a full training run: Can the model overfit a single batch? Do gradients flow? Is the loss at initialization what theory predicts? Does a forward pass produce valid outputs?
+
+**Why:** The most frustrating ML failure mode: train for 2 hours, get garbage results, realize there was a bug in data loading that was detectable in 30 seconds. `/turing:sanity` catches wiring bugs, shape mismatches, and configuration errors before they cost real compute.
+
+**Implementation:**
+1. Create `commands/sanity.md` — `/turing:sanity [--quick] [--verbose]`
+2. Add `templates/scripts/sanity_checks.py`:
+   - **Initial loss check:** compute loss on first batch, compare to theoretical expectation (e.g., `−log(1/num_classes)` for cross-entropy). Flag if >2x expected.
+   - **Single-batch overfit:** train on one batch for 50 steps. If loss doesn't approach zero, the model can't even memorize — something is broken.
+   - **Gradient flow:** check that gradients are non-zero and non-exploding for every parameter. Flag dead layers (zero gradient) and unstable layers (gradient > 100x mean).
+   - **Output validation:** forward pass produces valid (non-NaN, non-constant) outputs with reasonable range.
+   - **Data pipeline check:** first batch loads correctly, shapes match model expectations, no NaN/Inf in inputs.
+   - **Config consistency:** learning rate and batch size are in reasonable ranges for model size.
+   - Report:
+     ```
+     Sanity Check Report (14 seconds):
+     ✓ PASS  Data pipeline: batch loads, shapes correct (X: [32,128], y: [32])
+     ✓ PASS  Initial loss: 2.31 (expected: 2.30 for 10-class CE)
+     ✓ PASS  Gradient flow: all 47 parameters have non-zero gradients
+     ✗ FAIL  Single-batch overfit: loss stuck at 1.82 after 50 steps
+              → Model cannot memorize 1 batch. Check: architecture, learning rate, loss function
+     ⚠ WARN  Output range: predictions in [-12.4, 15.7], consider adding output clamping
+     
+     Verdict: 1 FAIL — do not proceed to full training
+     ```
+3. Integration with `/turing:train` — optionally auto-run sanity before first experiment
+4. Add `--quick` flag: skip single-batch overfit (fastest, 5 seconds)
+5. Add tests
+
+**Acceptance:** `/turing:sanity` catches a broken data loader or misconfigured loss function in under 30 seconds, before the researcher commits to a full training run.
+
+### 20.2 Automatic Baseline Generation — `/turing:baseline`
+
+**What:** Auto-generate trivial baselines: majority class predictor, mean predictor, random predictor, linear model, k-NN. Every experiment needs a "is this better than dumb?" reference point.
+
+**Why:** Reviewers always ask "how does this compare to a simple baseline?" and researchers always forget to include one. Worse, sometimes the fancy model barely beats a linear classifier — knowing this early changes the research direction entirely. `/turing:baseline` takes 60 seconds and saves weeks of misguided optimization.
+
+**Implementation:**
+1. Create `commands/baseline.md` — `/turing:baseline [--methods all|simple|linear]`
+2. Add `templates/scripts/generate_baselines.py`:
+   - Auto-detects task type from `config.yaml` (classification vs regression)
+   - For classification:
+     - **Random:** uniform random predictions
+     - **Majority:** always predict the most common class
+     - **Stratified:** predict class proportional to training distribution
+     - **Linear:** `LogisticRegression(max_iter=1000)` with default params
+     - **k-NN:** `KNeighborsClassifier(n_neighbors=5)` with default params
+   - For regression:
+     - **Mean:** always predict training set mean
+     - **Median:** always predict training set median
+     - **Linear:** `Ridge(alpha=1.0)` with default params
+     - **k-NN:** `KNeighborsRegressor(n_neighbors=5)` with default params
+   - Evaluates all baselines with the same `evaluate.py` protocol
+   - Runs with seed study (Phase 10.1) for stochastic baselines
+   - Produces comparison table:
+     ```
+     Baselines for binary_classification (accuracy):
+     | Method          | Accuracy | Notes                    |
+     |-----------------|----------|--------------------------|
+     | Random          | 0.502    | Floor — below this = bug |
+     | Majority class  | 0.627    | Naive floor              |
+     | Logistic Reg.   | 0.814    | Linear ceiling           |
+     | k-NN (k=5)      | 0.793    | Non-parametric reference  |
+     | Current best    | 0.872    | +0.058 over linear       |
+     
+     Your model beats the linear baseline by 5.8%.
+     ```
+   - Logs each baseline as an experiment with `family: "baseline"`
+3. Integration with `/turing:audit` (Phase 19.2) — satisfies the "baseline comparison" audit check
+4. Integration with `/turing:paper` (Phase 14.2) — baseline rows auto-included in results tables
+5. Add tests
+
+**Depends on:** Phase 10.1 (seed runner), Phase 19.2 (audit integration)
+
+**Acceptance:** `/turing:baseline` produces 4-5 trivial baselines in under 60 seconds. The researcher immediately knows if their model is meaningfully better than simple approaches.
+
+### 20.3 Targeted Leakage Detection — `/turing:leak`
+
+**What:** Actively probe for data leakage by training on single features, checking temporal splits for future information, detecting target encoding leakage, and flagging features that perform suspiciously well in isolation.
+
+**Why:** Leakage is the #1 cause of "too good to be true" results and the #1 cause of ML paper retractions. It's also the hardest bug to catch because the model trains fine and metrics look great — until deployment. `/turing:leak` probes for specific leakage patterns that aggregate statistics can't detect.
+
+**Implementation:**
+1. Create `commands/leak.md` — `/turing:leak [--deep] [--features "feature_1,feature_2"]`
+2. Add `templates/scripts/leakage_detector.py`:
+   - **Single-feature test:** train a simple model on each feature individually. Flag any feature where single-feature accuracy > 80% of full-model accuracy (suspiciously predictive).
+     ```
+     Leakage scan (single-feature analysis):
+     ⚠ FLAG  feature_12 alone achieves accuracy=0.91 (full model: 0.87)
+              → This feature is MORE predictive alone than the full model.
+              → Likely leakage. Investigate: is this derived from the target?
+     ✓ OK    feature_3 alone: accuracy=0.63 (expected for informative feature)
+     ✓ OK    feature_7 alone: accuracy=0.51 (near-random, weak feature)
+     ```
+   - **Temporal leakage:** if timestamps exist, check whether any feature contains future information relative to the prediction target.
+   - **Target encoding leakage:** detect if categorical encoding was fit on the full dataset (including test) rather than train-only.
+   - **Train/test overlap:** hash-based deduplication to find identical or near-identical samples across splits.
+   - **Feature-target correlation:** flag features with Pearson/Spearman correlation > 0.95 with the target.
+   - Writes to `experiments/leakage/leak-YYYY-MM-DD.md`
+3. Add `--deep` flag: runs full single-feature analysis (slow but thorough)
+4. Integration with `/turing:audit` (Phase 19.2) — satisfies the "data leakage" audit check
+5. Add tests
+
+**Depends on:** Phase 19.2 (audit integration)
+
+**Acceptance:** `/turing:leak` detects a leaked feature that achieves 91% accuracy alone when the full model achieves 87%. The researcher removes it before publishing.
+
+---
+
+## Phase 21: Model Debugging (v3.2.0)
+
+*Understand what the model is actually doing, not just what numbers come out.*
+
+### 21.1 Internal Model Diagnostics — `/turing:xray`
+
+**What:** Inspect model internals: gradient flow per layer, activation statistics, dead neurons, weight distributions, decision path analysis. Answers "what is the model doing internally?" rather than "what are its predictions?"
+
+**Why:** When a model underperforms, the fix depends on *why*. Dead neurons → reinitialize. Vanishing gradients → skip connections or residual learning. Saturated activations → different normalization. Without `/turing:xray`, the researcher guesses. With it, the diagnosis is direct.
+
+**Implementation:**
+1. Create `commands/xray.md` — `/turing:xray [exp-id] [--layer "encoder.layer.2"]`
+2. Add `templates/scripts/model_xray.py`:
+   - Auto-detects model type and runs appropriate diagnostics:
+   - **Neural networks:**
+     - Layer-wise gradient magnitudes (mean, max, min per parameter group)
+     - Activation statistics (mean, std, % zeros for each layer)
+     - Dead neuron detection: neurons with zero activation across the full validation set
+     - Weight distribution: mean, std, % near-zero per layer (pruning candidates)
+     - Gradient-to-weight ratio: learning rate effectiveness per layer
+     ```
+     X-Ray: exp-042 (3-layer MLP)
+     | Layer      | Grad Mean | Grad Max | Act Mean | Dead % | Weight Std |
+     |------------|-----------|----------|----------|--------|------------|
+     | linear_1   | 3.2e-03   | 1.1e-01  | 0.42     | 0%     | 0.31       |
+     | linear_2   | 8.1e-05   | 2.3e-03  | 0.08     | 23%    | 0.28       |  ← ISSUE
+     | linear_3   | 1.4e-04   | 5.6e-03  | 0.31     | 2%     | 0.15       |
+     
+     Issues detected:
+     ⚠ linear_2: 23% dead neurons — consider reducing layer width or adding batch norm
+     ⚠ linear_2: gradient 40x weaker than linear_1 — possible vanishing gradient
+     ```
+   - **Tree models (XGBoost/LightGBM):**
+     - Tree depth utilization: are trees using their full allowed depth?
+     - Leaf purity: how pure are the leaf nodes?
+     - Feature split frequency: which features dominate the splits?
+     - Decision path analysis: for misclassified samples, trace the decision path
+   - **scikit-learn:**
+     - Coefficient magnitudes (linear models)
+     - Feature importance confidence intervals (ensemble models)
+   - Writes to `experiments/xrays/exp-NNN-xray.md`
+3. Integration with `/turing:diagnose` (Phase 11.1) — xray findings inform diagnosis
+4. Add `--compare exp-a exp-b` flag: side-by-side xray of two models
+5. Add tests
+
+**Acceptance:** `/turing:xray` identifies 23% dead neurons in layer 2 and suggests batch normalization. The fix improves accuracy by 1.5%.
+
+### 21.2 Hyperparameter Sensitivity Analysis — `/turing:sensitivity`
+
+**What:** Vary each hyperparameter individually while holding others fixed, measure the metric response curve, and rank hyperparameters by sensitivity. Answers "which hyperparameters actually matter and which are noise?"
+
+**Why:** Researchers waste hours tuning hyperparameters that have no effect. Learning rate sensitivity is 10x higher than max_depth sensitivity for this model — stop grid-searching max_depth and focus on learning rate. `/turing:sensitivity` produces a definitive ranking so tuning effort is allocated to where it matters.
+
+**Implementation:**
+1. Create `commands/sensitivity.md` — `/turing:sensitivity [exp-id] [--params "learning_rate,max_depth,n_estimators"]`
+2. Add `templates/scripts/sensitivity_analysis.py`:
+   - Takes the best experiment's config
+   - For each hyperparameter, generates a sweep: 5 values spanning a reasonable range around the current value (e.g., 0.5x, 0.75x, 1x, 1.5x, 2x)
+   - Runs each configuration with seed study (Phase 10.1) for error bars
+   - Computes sensitivity = metric range / parameter range (normalized)
+   - Produces sensitivity ranking:
+     ```
+     Hyperparameter Sensitivity Analysis (exp-042):
+     | Parameter      | Current | Range Tested     | Metric Range | Sensitivity |
+     |----------------|---------|-----------------|--------------|-------------|
+     | learning_rate  | 0.1     | [0.01, 0.5]     | 0.831–0.872  | HIGH (0.041)|
+     | n_estimators   | 500     | [100, 1000]      | 0.858–0.874  | MED (0.016) |
+     | max_depth      | 6       | [3, 12]          | 0.866–0.873  | LOW (0.007) |
+     | min_child_wt   | 1       | [1, 10]          | 0.869–0.872  | NONE (0.003)|
+     
+     Recommendation: Focus tuning on learning_rate and n_estimators.
+     Stop tuning max_depth and min_child_weight — they don't matter.
+     ```
+   - Detects non-monotonic relationships (e.g., accuracy peaks at max_depth=8 then drops)
+   - Detects interactions: if varying A changes B's sensitivity, flag the interaction
+   - Writes to `experiments/sensitivity/exp-NNN-sensitivity.md`
+3. Integration with `/turing:paper` (Phase 14.2) — sensitivity table for appendix
+4. Integration with `/turing:brief` — sensitivity summary informs tuning recommendations
+5. Add tests
+
+**Depends on:** Phase 10.1 (seed runner for error bars)
+
+**Acceptance:** `/turing:sensitivity` correctly identifies that learning_rate has 6x more impact than max_depth, redirecting the researcher's tuning effort.
+
+### 21.3 Probability Calibration — `/turing:calibrate`
+
+**What:** Measure whether model probabilities are well-calibrated (does 80% confidence mean 80% correct?), compute expected calibration error, plot reliability diagrams, and apply post-hoc calibration (Platt scaling, isotonic regression).
+
+**Why:** Any model whose probability outputs drive decisions (medical diagnosis, fraud detection, risk scoring) must be calibrated. Most ML models are overconfident by default. `/turing:calibrate` measures the problem and fixes it with standard post-hoc techniques — often improving downstream decision quality without touching the model itself.
+
+**Implementation:**
+1. Create `commands/calibrate.md` — `/turing:calibrate [exp-id] [--method platt|isotonic|auto]`
+2. Add `templates/scripts/calibration.py`:
+   - Runs the model on validation set, collects predicted probabilities vs actual outcomes
+   - **Reliability diagram:** bin predictions into 10 bins, compute accuracy per bin:
+     ```
+     Reliability Diagram (exp-042):
+     Bin       | Predicted | Actual  | Gap
+     [0.0-0.1] | 0.05      | 0.03    | -0.02  ✓
+     [0.1-0.2] | 0.15      | 0.12    | -0.03  ✓
+     ...
+     [0.8-0.9] | 0.85      | 0.71    | -0.14  ⚠ overconfident
+     [0.9-1.0] | 0.95      | 0.78    | -0.17  ⚠ overconfident
+     
+     Expected Calibration Error (ECE): 0.068
+     Maximum Calibration Error (MCE): 0.170
+     Verdict: Model is overconfident in high-probability predictions
+     ```
+   - **Post-hoc calibration:**
+     - **Platt scaling:** fit a logistic regression on model logits → calibrated probabilities
+     - **Isotonic regression:** non-parametric calibration (more flexible, needs more data)
+     - **Temperature scaling:** single scalar temperature parameter (neural nets)
+     - **auto:** tries all methods, picks the one with lowest ECE on a held-out calibration set
+   - Reports calibration improvement:
+     ```
+     Calibration results:
+     | Method    | ECE Before | ECE After | Accuracy Change |
+     |-----------|------------|-----------|-----------------|
+     | Platt     | 0.068      | 0.021     | 0.872 → 0.872   |  ← BEST
+     | Isotonic  | 0.068      | 0.024     | 0.872 → 0.871   |
+     | Temp (T=1.7) | 0.068   | 0.031     | 0.872 → 0.872   |
+     ```
+   - Saves calibrated model as a new experiment with `family: "calibration"`
+3. Integration with `/turing:export` (Phase 13.1) — export calibrated model with calibration metadata in model card
+4. Integration with `/turing:fairness` — calibration checked per demographic group
+5. Add tests for ECE computation, calibration methods, reliability diagram
+
+**Depends on:** Phase 13.1 (export for model card integration)
+
+**Acceptance:** `/turing:calibrate` reduces ECE from 0.068 to 0.021 with Platt scaling, making the model's probability outputs trustworthy for downstream decision-making.
+
+---
+
+## Phase 22: Feature & Training Intelligence (v3.3.0)
+
+*Smarter data handling and smarter training strategies.*
+
+### 22.1 Automated Feature Selection — `/turing:feature`
+
+**What:** Run multiple feature selection methods (mutual information, permutation importance, recursive elimination, L1 regularization), compute consensus, and optionally generate interaction/polynomial features from the consensus set.
+
+**Why:** Feature engineering is the highest-ROI activity in applied ML — often more impactful than model selection. But it's tedious and researcher-dependent. `/turing:feature` systematically evaluates feature importance across multiple methods, identifies redundant features, and suggests new interaction features — turning a craft into a process.
+
+**Implementation:**
+1. Create `commands/feature.md` — `/turing:feature [--method all|importance|selection|generation] [--top-k 20]`
+2. Add `templates/scripts/feature_intelligence.py`:
+   - **Importance ranking** (run all, report consensus):
+     - Mutual information (model-agnostic)
+     - Permutation importance (model-specific, uses current best model)
+     - L1 regularization coefficients (Lasso/LogisticRegression)
+     - Tree-based importance (if applicable)
+   - **Consensus ranking:** features ranked by number of methods that place them in top-K:
+     ```
+     Feature Importance Consensus (top 10):
+     | Feature    | MI Rank | Perm Rank | L1 Rank | Tree Rank | Consensus |
+     |------------|---------|-----------|---------|-----------|-----------|
+     | feature_3  | 1       | 2         | 1       | 1         | 4/4 ★     |
+     | feature_7  | 3       | 1         | 2       | 4         | 4/4 ★     |
+     | feature_12 | 2       | 5         | 3       | 2         | 4/4 ★     |
+     | feature_1  | 4       | 3         | 8       | 3         | 3/4       |
+     ...
+     | feature_22 | 18      | 21        | 19      | 17        | 0/4 — DROP |
+     
+     Recommendation: drop 8 features with 0/4 consensus (13% of features)
+     ```
+   - **Redundancy detection:** correlation matrix, flag feature pairs with |r| > 0.95
+   - **Feature generation:** generate candidate interaction features (product, ratio, sum) from top-K consensus features, evaluate each for lift
+   - Logs results and auto-queues a hypothesis: "Re-train with top-15 features only"
+3. Integration with `/turing:ablate` (Phase 11.2) — feature ablation as a special case
+4. Integration with `/turing:paper` (Phase 14.2) — feature importance table for appendix
+5. Add tests
+
+**Acceptance:** `/turing:feature` identifies 8 redundant features. Dropping them improves accuracy by 0.3% and reduces training time by 20%.
+
+### 22.2 Training Curriculum Optimization — `/turing:curriculum`
+
+**What:** Order training data by difficulty (easy-to-hard, hard-to-easy, anti-curriculum, or mixed strategies) and measure whether curriculum learning improves convergence speed or final performance.
+
+**Why:** The order in which a model sees training data matters — curriculum learning can improve convergence speed by 2-3x and sometimes final performance by 1-2%. Particularly effective for imbalanced or noisy datasets. But finding the right curriculum is empirical — `/turing:curriculum` systematically tests strategies.
+
+**Implementation:**
+1. Create `commands/curriculum.md` — `/turing:curriculum [exp-id] [--strategies easy-to-hard,hard-to-easy,anti,random]`
+2. Add `templates/scripts/curriculum_optimizer.py`:
+   - **Difficulty scoring:** for each training sample, estimate difficulty:
+     - **Loss-based:** samples with high loss on a pre-trained model are "hard"
+     - **Margin-based:** samples close to the decision boundary are "hard"
+     - **Noise-based:** samples that different seeds disagree on are "hard" (likely mislabeled)
+   - **Curriculum strategies:**
+     - **Easy-to-hard (classic curriculum):** sort by ascending difficulty, train in order
+     - **Hard-to-easy (anti-curriculum):** sort by descending difficulty
+     - **Pacing function:** start with easy 20%, gradually include harder samples over epochs
+     - **Self-paced:** dynamically adjust which samples to include based on current loss
+     - **Random baseline:** standard random shuffling (control)
+   - Runs each strategy with seed study (Phase 10.1):
+     ```
+     Curriculum results (exp-042):
+     | Strategy      | Final Acc | Convergence Epoch | Time to 0.85 |
+     |---------------|-----------|-------------------|--------------|
+     | Random         | 0.872     | 47                | 32 epochs    |
+     | Easy-to-hard   | 0.878     | 38                | 24 epochs    | ← BEST
+     | Hard-to-easy   | 0.869     | 52                | 41 epochs    |
+     | Self-paced     | 0.876     | 41                | 28 epochs    |
+     
+     Verdict: Easy-to-hard curriculum converges 25% faster and improves final accuracy by 0.6%.
+     ```
+   - Identifies "impossible" samples: consistently high loss across all strategies (likely mislabeled)
+   - Writes to `experiments/curriculum/exp-NNN-curriculum.md`
+3. Integration with `/turing:clean` — flag impossible samples for review
+4. Add tests
+
+**Depends on:** Phase 10.1 (seed runner)
+
+**Acceptance:** `/turing:curriculum` identifies that easy-to-hard training converges 25% faster. The researcher saves hours of training time on future experiments.
+
+---
+
+## Phase 23: Model Surgery (v3.4.0)
+
+*Optimize the model you have without retraining from scratch.*
+
+### 23.1 Weight Pruning — `/turing:prune`
+
+**What:** Structured and unstructured weight pruning. Measures accuracy at different sparsity levels (50%, 75%, 90%, 95%), finds the knee point, and produces a pruned model. Complementary to distillation (Phase 18.3) — pruning preserves architecture, distillation changes it.
+
+**Why:** Most neural network weights are redundant — you can remove 50-90% with minimal accuracy loss. Pruning gives faster inference and smaller models without changing the architecture. Combined with quantization (Phase 23.2), it's the fastest path from research model to edge deployment.
+
+**Implementation:**
+1. Create `commands/prune.md` — `/turing:prune <exp-id> [--sparsity 0.5,0.75,0.9,0.95] [--method magnitude|structured|lottery]`
+2. Add `templates/scripts/model_pruning.py`:
+   - **Magnitude pruning (unstructured):** zero out weights below a threshold, sorted by absolute value
+   - **Structured pruning:** remove entire neurons/filters/attention heads based on importance scores
+   - **Lottery ticket search:** iterative magnitude pruning with weight rewinding to find the "winning ticket" subnetwork
+   - For tree models: reduce `n_estimators` progressively, measure impact per tree removed
+   - Sparsity sweep:
+     ```
+     Pruning sweep (exp-042, magnitude pruning):
+     | Sparsity | Accuracy | Δ from Dense | Speedup | Size Reduction |
+     |----------|----------|--------------|---------|----------------|
+     | 0%       | 0.872    | —            | 1.0x    | 0%             |
+     | 50%      | 0.871    | -0.001       | 1.3x    | 50%            |
+     | 75%      | 0.868    | -0.004       | 1.8x    | 75%            |
+     | 90%      | 0.859    | -0.013       | 2.4x    | 90%            | ← knee point
+     | 95%      | 0.831    | -0.041       | 2.7x    | 95%            |
+     
+     Recommended sparsity: 75% (0.4% accuracy loss for 1.8x speedup)
+     ```
+   - Optionally fine-tune pruned model for recovery (few epochs, reduced learning rate)
+   - Logs as new experiment with `family: "pruning"` and parent link
+3. Integration with `/turing:frontier` (Phase 11.3) — pruned models appear on Pareto frontier
+4. Integration with `/turing:export` (Phase 13.1) — export pruned model in sparse format
+5. Add tests
+
+**Depends on:** Phase 11.3 (Pareto frontier), Phase 13.1 (export)
+
+**Acceptance:** `/turing:prune` achieves 1.8x speedup at 75% sparsity with only 0.4% accuracy loss.
+
+### 23.2 Post-Training Quantization — `/turing:quantize`
+
+**What:** Quantize model weights from FP32 to INT8/FP16, measure accuracy loss per precision level. Apply quantization-aware training if post-training quantization degrades accuracy too much.
+
+**Why:** Quantization is the lowest-effort production optimization: 2-4x speedup and 2-4x memory reduction with typically <0.5% accuracy loss. Every model heading to production should be quantized, but researchers rarely bother during experimentation. `/turing:quantize` makes it a one-command operation.
+
+**Implementation:**
+1. Create `commands/quantize.md` — `/turing:quantize <exp-id> [--precision int8|fp16|dynamic] [--aware]`
+2. Add `templates/scripts/model_quantization.py`:
+   - **Post-training quantization (PTQ):**
+     - **Dynamic quantization:** quantize weights statically, activations dynamically (simplest, works for most models)
+     - **Static quantization:** calibrate activation ranges on a representative dataset, then quantize (better accuracy, needs calibration data)
+     - **FP16:** half-precision floating point (GPU inference)
+   - **Quantization-aware training (QAT):** if PTQ accuracy loss > threshold, insert fake quantization nodes into the model and fine-tune for a few epochs
+   - Framework-specific:
+     - **PyTorch:** `torch.quantization` API
+     - **scikit-learn/XGBoost:** weight precision reduction, feature importance-based rounding
+   - Accuracy and latency comparison:
+     ```
+     Quantization results (exp-042):
+     | Precision | Accuracy | Δ       | Latency (ms) | Size (MB) | 
+     |-----------|----------|---------|--------------|-----------|
+     | FP32      | 0.872    | —       | 12.3         | 48.2      |
+     | FP16      | 0.872    | -0.000  | 7.1          | 24.1      |
+     | INT8 (dyn)| 0.870    | -0.002  | 4.8          | 12.3      | ← BEST
+     | INT8 (sta)| 0.871    | -0.001  | 4.6          | 12.1      |
+     
+     Recommended: INT8 dynamic (0.2% accuracy loss for 2.6x speedup)
+     ```
+   - Logs as new experiment with `family: "quantization"`
+3. Integration with `/turing:prune` — combined pruning + quantization pipeline
+4. Integration with `/turing:export` (Phase 13.1) — export quantized model
+5. Add tests
+
+**Depends on:** Phase 13.1 (export for deployment)
+
+**Acceptance:** `/turing:quantize` achieves 2.6x speedup with INT8 dynamic quantization at 0.2% accuracy loss.
+
+---
+
+## Phase 24: Experiment Archaeology (v3.5.0)
+
+*Manage a research project that spans months, not just sessions.*
+
+### 24.1 Long-Term Trend Analysis — `/turing:trend`
+
+**What:** Analyze the full experiment history for strategic patterns: are improvements slowing down? Which experiment families are exhausted? Is the search space being efficiently explored? Produces a "state of the research" that's more strategic than `/turing:brief`.
+
+**Why:** After 100+ experiments, `/turing:brief` shows recent activity. `/turing:trend` shows the arc: "You spent 40 experiments on architecture search with diminishing returns. The last 10 feature engineering experiments had a steeper improvement curve. Shift focus." This strategic view is invisible in individual experiment logs.
+
+**Implementation:**
+1. Create `commands/trend.md` — `/turing:trend [--window 30d] [--metric accuracy]`
+2. Add `templates/scripts/trend_analysis.py`:
+   - **Improvement velocity:** metric improvement per experiment over time. Is it accelerating, steady, or decelerating?
+   - **Family ROI:** for each experiment family, compute experiments-per-unit-improvement. Which families are high-ROI vs exhausted?
+   - **Search space coverage:** cluster experiments by config similarity. Are experiments spreading across the search space or clustering?
+   - **Diminishing returns detection:** fit a logarithmic curve to improvement-over-experiments. Predict how many more experiments for the next 0.5% gain.
+   - **Phase transition detection:** identify moments where a new approach caused a step-change vs incremental improvement
+   - Report:
+     ```
+     Research Trend Analysis (127 experiments over 3 weeks):
+     
+     Improvement Velocity:
+       Week 1: +0.082 (high — initial exploration)
+       Week 2: +0.031 (moderate — refinement)
+       Week 3: +0.008 (low — diminishing returns) ← YOU ARE HERE
+     
+     Family ROI:
+       feature-engineering: 0.004/experiment (HIGH — still productive)
+       architecture-search: 0.001/experiment (LOW — exhausted after 40 experiments)
+       hyperparameter-tuning: 0.002/experiment (MEDIUM — some room left)
+     
+     Prediction: next 0.5% gain will take ~25 experiments at current rate.
+     
+     Recommendation: Stop architecture search. Double down on feature engineering.
+     Consider new families: ensemble construction, data augmentation.
+     ```
+   - Writes to `experiments/trends/trend-YYYY-MM-DD.md`
+3. Integration with `/turing:budget` (Phase 18.2) — trend predictions inform budget remaining
+4. Add tests
+
+**Acceptance:** `/turing:trend` identifies that architecture search is exhausted after 40 experiments and recommends shifting to feature engineering.
+
+### 24.2 Session Context Restoration — `/turing:flashback`
+
+**What:** Restore the researcher's mental state after days away from a project. Reads the last brief, recent decision packets, pending hypotheses, and recent experiment outcomes to produce a "where was I?" summary.
+
+**Why:** Context switching is the biggest productivity killer in ML research. Coming back to a project after a week, the researcher has forgotten: what was the current best? What was I about to try? What failed? `/turing:flashback` takes 10 seconds to reconstruct what would otherwise take 30 minutes of log-reading.
+
+**Implementation:**
+1. Create `commands/flashback.md` — `/turing:flashback [--depth 7d]`
+2. Add `templates/scripts/session_flashback.py`:
+   - Reads recent artifacts (configurable lookback window):
+     - Last `/turing:brief` report
+     - Recent decision packets (Phase 6.2)
+     - Pending hypotheses in queue
+     - Last 5 experiments with outcomes
+     - Last research mode (Phase 6.5)
+     - Any `/turing:annotate` notes (Phase 24.4)
+   - Produces a compact summary:
+     ```
+     Flashback (last active: 2026-03-25, 7 days ago):
+     
+     Current best: exp-089 — LightGBM, accuracy=0.883 ± 0.005
+     Research mode: exploit
+     Budget: 73/100 experiments used (73%)
+     
+     Last session:
+       ✓ exp-087: Added polynomial features → 0.879 (kept, marginal)
+       ✓ exp-088: Feature selection (top 15) → 0.881 (kept)
+       ✓ exp-089: LightGBM + selected features → 0.883 (NEW BEST)
+       ✗ exp-090: Neural net attempt → 0.861 (discarded)
+     
+     Pending hypotheses:
+       1. [HIGH] "Try CatBoost with native categorical handling" (human-injected)
+       2. [MED]  "Ensemble top 3 models" (from decision packet)
+     
+     Your note (2026-03-25): "Neural net failed because dataset is too small.
+     Don't try deep learning again unless we get more data."
+     
+     Suggested next action: Execute hypothesis #1 (CatBoost)
+     ```
+3. Integration with all experiment tracking phases — reads their artifacts
+4. Add `--oneline` flag for ultra-brief summary: "Best: exp-089 (0.883). Pending: CatBoost, ensemble. 27 experiments left."
+5. Add tests
+
+**Acceptance:** After a week away, `/turing:flashback` reconstructs the project state in under 10 seconds. The researcher starts working immediately instead of re-reading logs.
+
+### 24.3 Experiment Lifecycle Cleanup — `/turing:archive`
+
+**What:** Compress old experiment artifacts, prune dominated checkpoints, summarize archived experiments into a compact index. Keeps the project directory manageable after 200+ experiments.
+
+**Why:** Experiment directories grow without bound: 200 experiments × checkpoints × logs × profiles × diagnoses = gigabytes of files. Disk fills up, directory listings are unreadable, and loading the full log into context becomes expensive. `/turing:archive` compresses the past while preserving queryable history.
+
+**Implementation:**
+1. Create `commands/archive.md` — `/turing:archive [--older-than 30d] [--keep-best 10] [--dry-run]`
+2. Add `templates/scripts/experiment_archive.py`:
+   - **Identify archivable experiments:** older than threshold, not Pareto-optimal, not the current best, not referenced by pending hypotheses
+   - **Compress:** tar+gzip experiment artifacts (logs, profiles, diagnoses) into `experiments/archive/exp-NNN.tar.gz`
+   - **Summarize:** create a compact summary entry for each archived experiment in `experiments/archive/index.yaml`:
+     ```yaml
+     - id: exp-023
+       description: "XGBoost baseline with default params"
+       metric: {accuracy: 0.834}
+       status: discarded
+       family: architecture-search
+       archived: 2026-04-01
+     ```
+   - **Prune checkpoints:** use Phase 12.2's Pareto pruning on archived experiments (more aggressive — keep zero checkpoints for discarded experiments)
+   - **Report:**
+     ```
+     Archive summary:
+       Archived: 143 experiments (of 200)
+       Preserved: 57 experiments (Pareto-optimal, recent, best, referenced)
+       Space reclaimed: 8.7 GB → 1.2 GB (saved 7.5 GB)
+       Summaries written to experiments/archive/index.yaml
+     ```
+   - Archived experiments remain queryable via the summary index and semantic search (Phase 9.1)
+3. Add `--dry-run` flag: show what would be archived without doing it
+4. Integration with `/turing:trend` — trend analysis works on both active and archived experiments
+5. Add tests
+
+**Depends on:** Phase 12.2 (checkpoint Pareto pruning)
+
+**Acceptance:** `/turing:archive` reclaims 7.5 GB from a 200-experiment project while keeping all experiments queryable via the summary index.
+
+### 24.4 Retrospective Experiment Annotations — `/turing:annotate`
+
+**What:** Add human notes to any experiment after the fact. "This only worked because the data was pre-sorted" or "Don't try this again, the improvement was a data bug." Structured post-hoc knowledge that experiment logs can't capture.
+
+**Why:** Experiment logs capture what happened. Annotations capture *why it mattered* and *what to learn from it*. Six months later, the researcher (or a collaborator) needs context that no automated metric can provide: "we tried this approach because a reviewer suggested it, but it turned out the reviewer was wrong about the dataset."
+
+**Implementation:**
+1. Create `commands/annotate.md` — `/turing:annotate <exp-id> "note text"` or `/turing:annotate --list`
+2. Add `templates/scripts/experiment_annotations.py`:
+   - **add:** `/turing:annotate exp-042 "This result is fragile — only works with the specific preprocessing in commit abc123"`
+   - **tag:** `/turing:annotate exp-042 --tag "reviewer-requested" --tag "fragile"`
+   - **list:** show all annotations for an experiment or across all experiments
+   - **search:** find experiments by annotation content or tag
+   - Annotations stored in `experiments/annotations.yaml`:
+     ```yaml
+     exp-042:
+       - text: "This result is fragile — only works with specific preprocessing"
+         author: human
+         date: 2026-04-01
+         tags: [fragile, preprocessing-dependent]
+       - text: "Reviewer 2 specifically asked for this comparison"
+         author: human
+         date: 2026-04-02
+         tags: [reviewer-requested]
+     ```
+   - Annotations surface in `/turing:brief`, `/turing:flashback`, `/turing:diff`
+3. Integration with `/turing:paper` (Phase 14.2) — annotations with tag "paper-note" appear as footnotes
+4. Integration with `/turing:transfer` (Phase 19.1) — annotations transfer as lessons to similar projects
+5. Add tests
+
+**Acceptance:** `/turing:annotate exp-042 "fragile result"` attaches a note that appears in all subsequent briefs and comparisons involving exp-042.
+
+---
+
+## Phase 25: Research Communication (v4.0.0)
+
+*The v4.0 milestone. Turing goes from research tool to research-to-communication pipeline. Every result becomes a shareable artifact — citations tracked, presentations generated, progress communicated.*
+
+### 25.1 Citation & Attribution Manager — `/turing:cite`
+
+**What:** Track which papers, codebases, datasets, and methods influenced each experiment. Generate bibliography, ensure proper attribution, and catch missing citations before submission.
+
+**Why:** Citation management in ML is a mess: the researcher uses a method from a 2019 paper, bases preprocessing on a GitHub repo, and evaluates on a dataset with its own citation requirements. Forgetting any of these is embarrassing at best and an integrity issue at worst. `/turing:cite` makes attribution automatic and auditable.
+
+**Implementation:**
+1. Create `commands/cite.md` — `/turing:cite [add|list|check|bib]`
+2. Add `templates/scripts/citation_manager.py`:
+   - **add:** `/turing:cite add exp-042 --paper "Chen2016XGBoost" --url "https://arxiv.org/abs/1603.02754"` — associate a citation with an experiment
+   - **add from lit:** automatically capture citations from `/turing:lit` searches (Phase 14.1)
+   - **add from suggest:** capture citations from `/turing:suggest` model suggestions (Phase 7.1)
+   - **list:** show all citations grouped by experiment, method, dataset, or codebase:
+     ```
+     Project citations (23 sources):
+     
+     Methods:
+       [Chen2016] XGBoost — used in exp-031, exp-042, exp-053
+       [Ke2017] LightGBM — used in exp-056, exp-089
+     
+     Datasets:
+       [UCI] Heart Disease Dataset — used in all experiments
+     
+     Techniques:
+       [Chawla2002] SMOTE — used in exp-044, exp-045
+       [Platt1999] Platt Scaling — used in exp-078 (calibration)
+     
+     Missing citations:
+       ⚠ exp-089 uses LightGBM but no citation for the `dart` boosting method
+       ⚠ exp-078 uses isotonic regression calibration but no Zadrozny2002 citation
+     ```
+   - **check:** audit for missing citations — methods used without attribution
+   - **bib:** generate BibTeX file from all project citations:
+     ```bibtex
+     @inproceedings{chen2016xgboost,
+       title={XGBoost: A Scalable Tree Boosting System},
+       author={Chen, Tianqi and Guestrin, Carlos},
+       booktitle={KDD},
+       year={2016}
+     }
+     ```
+   - Citations stored in `experiments/citations.yaml` with DOI/arXiv IDs for deduplication
+3. Integration with `/turing:paper` (Phase 14.2) — auto-generate bibliography and inline citations
+4. Integration with `/turing:audit` (Phase 19.2) — add "proper attribution" to the audit checklist
+5. Add tests
+
+**Depends on:** Phase 14.1 (lit), Phase 7.1 (suggest), Phase 14.2 (paper)
+
+**Acceptance:** `/turing:cite check` catches 2 missing method citations before paper submission. `/turing:cite bib` produces a complete BibTeX file.
+
+### 25.2 Presentation Figure Generation — `/turing:present`
+
+**What:** Generate presentation-ready figures from experiment data: training curves, comparison bar charts, ablation tables, Pareto plots, sensitivity heatmaps. Formatted for talks (large fonts, clean aesthetics), not papers.
+
+**Why:** Researchers spend hours making figures for lab meetings, conference talks, and stakeholder presentations. The data is already in the experiment log — the transformation to visual form is purely mechanical. `/turing:present` generates publication-quality figures in seconds.
+
+**Implementation:**
+1. Create `commands/present.md` — `/turing:present [--figures training,comparison,ablation,pareto,sensitivity] [--format svg|png] [--style dark|light|poster]`
+2. Add `templates/scripts/generate_figures.py`:
+   - **Training curve:** metric over experiments/epochs with error bands (from seed studies):
+     - Clean axes, large labels, legend outside plot
+   - **Comparison bar chart:** model families side-by-side with error bars:
+     - Sorted by metric, best highlighted, baseline marked
+   - **Ablation table figure:** formatted ablation results as a visual table:
+     - Delta bars, color-coded (green=helps, red=hurts, gray=negligible)
+   - **Pareto plot:** scatter of accuracy vs latency/size with Pareto frontier line:
+     - Points labeled with experiment IDs, dominated points faded
+   - **Sensitivity heatmap:** hyperparameter sensitivity as a colored grid:
+     - Rows = hyperparameters, columns = values, color = metric
+   - Style presets:
+     - `light`: white background, clean for papers and slides
+     - `dark`: dark background, good for live demos
+     - `poster`: extra large fonts, simplified axes
+   - Outputs to `paper/figures/` directory
+   - Uses matplotlib with a custom Turing style sheet
+3. Integration with `/turing:paper` — auto-include figures in paper sections
+4. Add `--deck` flag: generate a reveal.js/Mermaid slide deck from all available figures with auto-generated captions
+5. Add tests
+
+**Acceptance:** `/turing:present` produces 5 publication-quality figures from experiment data in under 30 seconds. The researcher pastes them directly into their slide deck.
+
+### 25.3 Model Changelog Generation — `/turing:changelog`
+
+**What:** Auto-generate a human-readable changelog of model improvements from experiment history. "v3: switched from XGBoost to LightGBM (+1.2%), added polynomial features (+0.5%)." For communicating progress to non-technical stakeholders.
+
+**Why:** ML researchers track progress in experiment logs. Stakeholders (PMs, executives, clients) want a simple narrative: "what improved, by how much, and why?" Translating between these formats is tedious and error-prone. `/turing:changelog` automates the translation.
+
+**Implementation:**
+1. Create `commands/changelog.md` — `/turing:changelog [--since exp-id|date] [--audience technical|stakeholder]`
+2. Add `templates/scripts/generate_changelog.py`:
+   - Reads experiment history, identifies "keep" decisions that improved the primary metric
+   - Groups improvements by family/category:
+     ```
+     Model Changelog (since exp-001 baseline):
+     
+     ## v4 — Current (exp-089, accuracy: 0.883)
+     - Switched to LightGBM with dart boosting (+0.011)
+     - Applied feature selection: top 15 features (+0.002)
+     - Added Platt calibration for probability outputs (ECE: 0.068 → 0.021)
+     
+     ## v3 (exp-078, accuracy: 0.872)
+     - Added polynomial features for top 5 features (+0.005)
+     - Increased n_estimators from 300 to 500 (+0.003)
+     
+     ## v2 (exp-042, accuracy: 0.864)
+     - Switched from random forest to XGBoost (+0.021)
+     - Tuned learning rate from 0.3 to 0.1 (+0.009)
+     
+     ## v1 — Baseline (exp-001, accuracy: 0.834)
+     - Logistic regression baseline
+     
+     Total improvement: +0.049 (5.9%) over 89 experiments
+     ```
+   - **Audience adaptation:**
+     - `technical`: includes hyperparameters, experiment IDs, metrics
+     - `stakeholder`: plain English, percentage improvements, no jargon
+   - Writes to `paper/CHANGELOG.md`
+3. Integration with `/turing:brief` — changelog summary appended to briefings
+4. Integration with `/turing:annotate` — changelog entries can be manually overridden with human explanations
+5. Add tests for changelog generation, version detection, audience formatting
+
+**Acceptance:** `/turing:changelog --audience stakeholder` produces a 1-page summary that a PM can read in 2 minutes and understand the current model's evolution.
+
+---
+
 ## Updated Full Implementation Order
 
 | # | Feature | Phase | Version | Priority | Status | Depends On |
@@ -2106,20 +2806,37 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | **DONE** | Phase 10.1 (seed study for model card) |
 | 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | **DONE** | Phase 7.1 (scholarly API infra) |
 | 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | **DONE** | Phases 10.1, 11.2, 14.1, 6.3 |
-| 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | **DONE** | — (standalone) |
-| 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | **DONE** | Phase 11.1 (diagnose) |
-| 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | **DONE** | Phase 1.3 (dependency graph) |
-| 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | **DONE** | Phase 11.3 (frontier metrics) |
-| 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | **DONE** | Phase 12.1 (profiling infra) |
-| 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | **DONE** | Phase 10.2 (reproduce) |
-| 43 | Automated ensemble construction `/turing:ensemble` | 17.1 | v2.4.0 | **High** | **DONE** | Phase 11.3 (Pareto for model selection) |
-| 44 | Pipeline composition `/turing:stitch` | 17.2 | v2.4.0 | **High** | **DONE** | Phase 11.2 (ablation for stage testing) |
-| 45 | Warm-start from prior model `/turing:warm` | 17.3 | v2.4.0 | **Medium** | **DONE** | Phase 12.2 (checkpoint manager) |
-| 46 | Scaling law estimator `/turing:scale` | 18.1 | v2.5.0 | **High** | **DONE** | Phase 10.1 (seed for statistical fit) |
-| 47 | Compute budget manager `/turing:budget` | 18.2 | v2.5.0 | **High** | **DONE** | Phase 15.1 (queue integration) |
-| 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | **DONE** | Phase 13.1 (export for size comparison) |
-| 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | **DONE** | Phase 9.1 (semantic index) |
-| 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | **DONE** | Phases 10.1, 11.2, 14.2 |
+| 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | Planned | — (standalone) |
+| 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
+| 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | Planned | Phase 1.3 (dependency graph) |
+| 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | Planned | Phase 11.3 (frontier metrics) |
+| 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | Planned | Phase 12.1 (profiling infra) |
+| 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | Planned | Phase 10.2 (reproduce) |
+| 43 | Automated ensemble construction `/turing:ensemble` | 17.1 | v2.4.0 | **High** | Planned | Phase 11.3 (Pareto for model selection) |
+| 44 | Pipeline composition `/turing:stitch` | 17.2 | v2.4.0 | **High** | Planned | Phase 11.2 (ablation for stage testing) |
+| 45 | Warm-start from prior model `/turing:warm` | 17.3 | v2.4.0 | **Medium** | Planned | Phase 12.2 (checkpoint manager) |
+| 46 | Scaling law estimator `/turing:scale` | 18.1 | v2.5.0 | **High** | Planned | Phase 10.1 (seed for statistical fit) |
+| 47 | Compute budget manager `/turing:budget` | 18.2 | v2.5.0 | **High** | Planned | Phase 15.1 (queue integration) |
+| 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | Planned | Phase 13.1 (export for size comparison) |
+| 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | Planned | Phase 9.1 (semantic index) |
+| 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | Planned | Phases 10.1, 11.2, 14.2 |
+| 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | Planned | — (standalone) |
+| 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | Planned | Phase 10.1 (seed runner) |
+| 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | Planned | Phase 19.2 (audit integration) |
+| 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
+| 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | Planned | Phase 10.1 (seed runner) |
+| 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | Planned | Phase 13.1 (export) |
+| 57 | Automated feature selection `/turing:feature` | 22.1 | v3.3.0 | **High** | Planned | Phase 11.2 (ablation) |
+| 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | Planned | Phase 10.1 (seed runner) |
+| 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | Planned | Phase 11.3 (Pareto), Phase 13.1 (export) |
+| 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | Planned | Phase 13.1 (export) |
+| 61 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
+| 62 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.4 |
+| 63 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
+| 64 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | Planned | — (standalone) |
+| 65 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
+| 66 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
+| 67 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
 
 ### Dependency Graph
 
@@ -2141,6 +2858,32 @@ Phase 17 (Model Composition)          Phase 18 (Scaling & Efficiency)
                                       Phase 19 (Meta-Intelligence) ← v3.0
                                         19.1 transfer ← 9.1 semantic index
                                         19.2 audit ← 10.1, 11.2, 14.2
+                                                 │
+           ┌─────────────────────────────────────┘
+           ▼
+Phase 20 (Pre-Training Intel)         Phase 21 (Model Debugging)
+  20.1 sanity (standalone)              21.1 xray ← 11.1 diagnose
+  20.2 baseline ← 10.1 seed            21.2 sensitivity ← 10.1 seed
+  20.3 leak ← 19.2 audit               21.3 calibrate ← 13.1 export
+           │                                     │
+           ▼                                     ▼
+Phase 22 (Feature & Training)         Phase 23 (Model Surgery)
+  22.1 feature ← 11.2 ablation         23.1 prune ← 11.3 Pareto, 13.1 export
+  22.2 curriculum ← 10.1 seed          23.2 quantize ← 13.1 export
+                                                 │
+           ┌─────────────────────────────────────┘
+           ▼
+Phase 24 (Experiment Archaeology)
+  24.1 trend ← 18.2 budget
+  24.2 flashback ← 6.2, 6.5, 24.4
+  24.3 archive ← 12.2 checkpoint
+  24.4 annotate (standalone)
+           │
+           ▼
+Phase 25 (Research Communication) ← v4.0
+  25.1 cite ← 14.1, 7.1, 14.2
+  25.2 present ← 11.2, 11.3, 21.2
+  25.3 changelog ← 24.4 annotate
 ```
 
 ### Version Release Criteria
@@ -2157,3 +2900,9 @@ Phase 17 (Model Composition)          Phase 18 (Scaling & Efficiency)
 | v2.4.0 | 17 (Model Composition) | `/turing:ensemble` beats the best single model on 3 tasks; `/turing:stitch` swaps a pipeline stage without rewriting train.py |
 | v2.5.0 | 18 (Scaling & Efficiency) | `/turing:scale` predicts full-dataset accuracy within 2% from 10% data runs; `/turing:budget` halts exploration when budget exhausted |
 | **v3.0.0** | **19 (Meta-Intelligence)** | **`/turing:transfer` surfaces a winning hypothesis from a prior project; `/turing:audit` catches a real methodological error — Turing becomes project-aware, not just experiment-aware** |
+| v3.1.0 | 20 (Pre-Training Intelligence) | `/turing:sanity` catches a broken data loader in <30s; `/turing:leak` detects a leaked feature before training |
+| v3.2.0 | 21 (Model Debugging) | `/turing:xray` identifies dead neurons; `/turing:sensitivity` redirects tuning effort to high-impact hyperparameters |
+| v3.3.0 | 22 (Feature & Training Intelligence) | `/turing:feature` identifies redundant features that hurt generalization; `/turing:curriculum` demonstrates faster convergence |
+| v3.4.0 | 23 (Model Surgery) | `/turing:prune` achieves 1.8x speedup at <1% accuracy loss; `/turing:quantize` produces INT8 model with <0.5% degradation |
+| v3.5.0 | 24 (Experiment Archaeology) | `/turing:flashback` restores context in <10s after days away; `/turing:archive` reclaims >50% disk on a 200-experiment project |
+| **v4.0.0** | **25 (Research Communication)** | **`/turing:cite` catches missing attributions; `/turing:present` generates publication-quality figures; `/turing:changelog` produces stakeholder-readable progress narrative — Turing becomes a research-to-communication pipeline** |
