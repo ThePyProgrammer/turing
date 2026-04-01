@@ -267,7 +267,7 @@ def test_draft_paper_specific_sections(tmp_path):
 def test_save_sections(tmp_path):
     """Should save each section to its own file."""
     sections = {
-        "setup": r"\subsection{Setup} test",
+        "setup": r"\begin{document}\subsection{Setup} test\end{document}",
         "results": "## Results\n| col |",
     }
     saved = save_paper_sections(sections, str(tmp_path))
