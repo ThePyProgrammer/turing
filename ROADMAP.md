@@ -2109,9 +2109,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | **DONE** | — (standalone) |
 | 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | **DONE** | Phase 11.1 (diagnose) |
 | 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | **DONE** | Phase 1.3 (dependency graph) |
-| 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | Planned | Phase 11.3 (frontier metrics) |
-| 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | Planned | Phase 12.1 (profiling infra) |
-| 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | Planned | Phase 10.2 (reproduce) |
+| 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | **DONE** | Phase 11.3 (frontier metrics) |
+| 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | **DONE** | Phase 12.1 (profiling infra) |
+| 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | **DONE** | Phase 10.2 (reproduce) |
 | 43 | Automated ensemble construction `/turing:ensemble` | 17.1 | v2.4.0 | **High** | Planned | Phase 11.3 (Pareto for model selection) |
 | 44 | Pipeline composition `/turing:stitch` | 17.2 | v2.4.0 | **High** | Planned | Phase 11.2 (ablation for stage testing) |
 | 45 | Warm-start from prior model `/turing:warm` | 17.3 | v2.4.0 | **Medium** | Planned | Phase 12.2 (checkpoint manager) |
