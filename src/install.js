@@ -30,6 +30,7 @@ const SUB_COMMANDS = [
   "scale", "budget", "distill",
   "transfer", "audit",
   "sanity", "baseline", "leak",
+  "xray", "sensitivity", "calibrate",
 ];
 
 export async function install(opts = {}) {
