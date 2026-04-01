@@ -43,8 +43,8 @@ ROUTE_PATTERNS = [
     {
         "name": "ablation",
         "patterns": [
-            r"(?:remove|drop|exclude|without|ablate)\s+(?:class|feature|component|column|variable)",
-            r"(?:class|feature|component)\s+(?:\d+|[A-Za-z_]+)\s+(?:removed|dropped|excluded)",
+            r"(?:remov\w*|drop\w*|exclud\w*|without|ablat\w*)\s+(?:class|feature|component|column|variable)",
+            r"(?:class|feature|component)\s+(?:\d+|[A-Za-z_]+)\s+(?:remov\w*|drop\w*|exclud\w*)",
         ],
         "source": "ablation study from `/turing:ablate`",
         "verify_cmd": "/turing:ablate",
@@ -73,7 +73,7 @@ ROUTE_PATTERNS = [
     {
         "name": "ensemble",
         "patterns": [
-            r"(?:ensemble|combine|blend|stack|vote)\s+(?:these|the|top|best)?\s*(?:models|experiments)",
+            r"(?:ensembl\w*|combine|blend\w*|stack\w*|vot\w*)\s+(?:(?:these|the|top|best)\s+)*(?:models|experiments)",
             r"(?:voting|stacking|blending)\s+(?:of|with|from)",
         ],
         "source": "prediction correlation from `/turing:ensemble`",
@@ -93,8 +93,9 @@ ROUTE_PATTERNS = [
     {
         "name": "budget",
         "patterns": [
-            r"(?:spend|spent|budget|allocate|invest)\s+.*(?:on|in|for)\s+\w+\s+(?:vs|versus|or|instead)",
+            r"(?:spend|spent|budget|allocate|invest)\s+.*(?:budget|remaining).*(?:on|in|for)",
             r"(?:remaining|left)\s+(?:budget|experiments|compute)",
+            r"(?:budget)\s+(?:on|for|between)",
         ],
         "source": "budget allocation from `/turing:budget`",
         "verify_cmd": "/turing:budget",
