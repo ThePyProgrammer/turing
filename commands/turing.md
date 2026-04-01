@@ -56,6 +56,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "xray", "model internals", "dead neurons", "gradient flow", "weight distribution", "inside the model" | `/turing:xray` | Analyze |
 | "sensitivity", "which params matter", "hyperparameter importance", "parameter ranking" | `/turing:sensitivity` | Analyze |
 | "calibrate", "calibration", "ECE", "reliability diagram", "overconfident", "probability calibration" | `/turing:calibrate` | Analyze |
+| "feature", "features", "feature selection", "feature importance", "which features matter", "redundant features" | `/turing:feature` | Analyze |
+| "curriculum", "training order", "easy to hard", "data ordering", "curriculum learning" | `/turing:curriculum` | Optimize |
 
 ## Sub-commands
 
@@ -108,6 +110,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:xray [exp-id]` | Internal model diagnostics: gradient flow, dead neurons, weight distributions, tree analysis | (inline) |
 | `/turing:sensitivity [exp-id]` | Hyperparameter sensitivity analysis: rank parameters by impact, detect non-monotonic responses | (inline) |
 | `/turing:calibrate [exp-id]` | Probability calibration: ECE/MCE, reliability diagrams, Platt/isotonic/temperature scaling | (inline) |
+| `/turing:feature [--method]` | Automated feature selection: multi-method consensus ranking, redundancy, interaction generation | (inline) |
+| `/turing:curriculum [exp-id]` | Training curriculum optimization: difficulty scoring, strategy comparison, impossible sample detection | (inline) |
 
 ## Proactive Detection
 
