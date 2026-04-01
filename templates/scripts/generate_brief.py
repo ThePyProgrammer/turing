@@ -371,6 +371,39 @@ def load_audit_report(audit_dir: str = "experiments/audits") -> dict | None:
         return None
 
 
+def load_whatif_results(whatif_dir: str = "experiments/whatif") -> list[dict]:
+    """Load recent what-if analysis results."""
+    path = Path(whatif_dir)
+    if not path.exists():
+        return []
+    results = []
+    for f in sorted(path.glob("whatif-*.yaml"))[-5:]:  # Last 5
+        try:
+            with open(f) as fh:
+                data = yaml.safe_load(fh)
+                if isinstance(data, dict):
+                    results.append(data)
+        except (yaml.YAMLError, OSError):
+            continue
+    return results
+
+
+def load_simulation_results(sim_dir: str = "experiments/simulations") -> dict | None:
+    """Load the most recent simulation result."""
+    path = Path(sim_dir)
+    if not path.exists():
+        return None
+    files = sorted(path.glob("simulation-*.yaml"))
+    if not files:
+        return None
+    try:
+        with open(files[-1]) as f:
+            data = yaml.safe_load(f)
+            return data if isinstance(data, dict) else None
+    except (yaml.YAMLError, OSError):
+        return None
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -393,6 +426,8 @@ def format_brief(
     budget_status: dict | None = None,
     scaling_results: list[dict] | None = None,
     audit_report: dict | None = None,
+    whatif_results: list[dict] | None = None,
+    simulation_result: dict | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -698,6 +733,31 @@ def format_brief(
         total = len(regression_checks)
         lines.append(f"\n*{passed}/{total} regression checks passed.*")
 
+    # What-If & Simulation section
+    if whatif_results or simulation_result:
+        lines.extend(["", "## What-If Analysis & Simulation", ""])
+
+        if whatif_results:
+            lines.append(f"**Recent what-if queries:** {len(whatif_results)}")
+            for wf in whatif_results[-3:]:
+                q = wf.get("question", "N/A")
+                route = wf.get("route", "?")
+                result = wf.get("result", {})
+                est = result.get("estimate")
+                conf = result.get("confidence", "?")
+                if est is not None:
+                    lines.append(f"- *\"{q}\"* → {est} ({conf} confidence) [{route}]")
+                elif "error" in result:
+                    lines.append(f"- *\"{q}\"* → {result['error']} [{route}]")
+            lines.append("")
+
+        if simulation_result and "error" not in simulation_result:
+            run = simulation_result.get("run_count", 0)
+            skip = simulation_result.get("skip_count", 0)
+            savings = simulation_result.get("budget_savings_pct", 0)
+            lines.append(f"**Last simulation:** {run} configs recommended, {skip} skipped ({savings}% budget savings)")
+            lines.append("")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -768,6 +828,8 @@ def generate_brief(
     budget_status = load_budget_status(log_path=log_path)
     scaling_results = load_scaling_results()
     audit_report = load_audit_report()
+    whatif_results = load_whatif_results()
+    simulation_result = load_simulation_results()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -784,6 +846,8 @@ def generate_brief(
         budget_status=budget_status,
         scaling_results=scaling_results if scaling_results else None,
         audit_report=audit_report,
+        whatif_results=whatif_results if whatif_results else None,
+        simulation_result=simulation_result,
     )
 
 
