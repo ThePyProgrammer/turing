@@ -75,6 +75,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "search", "find experiment", "query experiments", "which experiments" | `/turing:search` | Query |
 | "template", "recipe", "save config", "reusable config", "starting point" | `/turing:template` | Manage |
 | "replay", "re-run", "revisit", "retry old", "would it work now" | `/turing:replay` | Validate |
+| "what if", "what-if", "hypothetical", "estimate impact", "would it help" | `/turing:whatif` | Analyze |
+| "counterfactual", "flip prediction", "why this prediction", "minimum change", "explanation" | `/turing:counterfactual` | Explain |
+| "simulate", "predict outcome", "pre-filter", "which configs will work", "forecast" | `/turing:simulate` | Predict |
 
 ## Sub-commands
 
@@ -146,6 +149,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:onboard [--audience]` | Project onboarding: full walkthrough for new collaborators | (inline) |
 | `/turing:share <exp-ids...>` | Experiment packaging: portable archive with manifest and README | (inline) |
 | `/turing:review [--venue]` | Peer review simulation: weaknesses, questions, fix commands, score | (inline) |
+| `/turing:whatif "<question>"` | What-if analysis: route hypotheticals to existing estimators (scaling, ablation, sensitivity, ensemble, pruning) | (inline) |
+| `/turing:counterfactual <exp-id> --sample <index>` | Input-level counterfactual explanations: minimum input change to flip a prediction | (inline) |
+| `/turing:simulate [--configs] [--top-k]` | Experiment outcome prediction: pre-filter configs using surrogate model, save budget | (inline) |
 
 ## Proactive Detection
 
