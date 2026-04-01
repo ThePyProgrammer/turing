@@ -2,6 +2,24 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+
+## [4.0.0] — 2026-04-01 — Research Communication
+
+*The v4.0 milestone. Every result becomes a shareable artifact — citations tracked, presentations generated, progress communicated. All 25 phases complete.*
+
+### Added
+- `/turing:cite` — citation & attribution manager: add/list/check/bib, track papers/datasets/methods per experiment, audit missing citations, generate BibTeX
+- `/turing:present` — presentation figure generation: training curves, comparison charts, ablation tables, Pareto plots, sensitivity heatmaps with light/dark/poster styles
+- `/turing:changelog` — model changelog generation: version-grouped improvements, technical and stakeholder audiences, narrative progress summaries
+
+### Phase
+- **25.1** Citation & Attribution Manager
+- **25.2** Presentation Figure Generation
+- **25.3** Model Changelog Generation
+- All 25 phases (72 implementation items) complete
+
+**1566 tests | 63 commands | 82 scripts | 14 commits**
+
 ## [3.5.0] — 2026-04-01 — Experiment Archaeology
 
 ### Added
@@ -310,6 +328,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
 [3.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.5.0
 [3.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.4.0
 [3.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.3.0
