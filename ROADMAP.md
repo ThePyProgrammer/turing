@@ -2823,9 +2823,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | **DONE** | — (standalone) |
 | 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
 | 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | **DONE** | Phase 19.2 (audit integration) |
-| 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
-| 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | Planned | Phase 10.1 (seed runner) |
-| 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | Planned | Phase 13.1 (export) |
+| 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | **DONE** | Phase 11.1 (diagnose) |
+| 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
+| 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | **DONE** | Phase 13.1 (export) |
 | 57 | Automated feature selection `/turing:feature` | 22.1 | v3.3.0 | **High** | Planned | Phase 11.2 (ablation) |
 | 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | Planned | Phase 10.1 (seed runner) |
 | 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | Planned | Phase 11.3 (Pareto), Phase 13.1 (export) |
