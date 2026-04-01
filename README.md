@@ -352,6 +352,9 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:distill <exp-id>` | Model compression — distill teacher into smaller student with accuracy/size tradeoff |
 | `/turing:transfer [--from]` | Cross-project knowledge transfer — find similar projects, surface what worked |
 | `/turing:audit [--strict]` | Pre-submission methodology audit — data leakage, baselines, seeds, ablations, reproducibility |
+| `/turing:sanity [--quick]` | Pre-training sanity checks — initial loss, single-batch overfit, gradient flow, output validation |
+| `/turing:baseline [--methods]` | Automatic baseline generation — random, majority/mean, linear, k-NN |
+| `/turing:leak [--deep]` | Targeted leakage detection — single-feature tests, correlation, train/test overlap |
 
 And for fully hands-off operation:
 
@@ -536,11 +539,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-41 commands, 2 agents, 10 config files, 60 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), model composition (ensemble + stitch + warm), scaling & efficiency (scale + budget + distill), meta-intelligence (transfer + audit), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+44 commands, 2 agents, 10 config files, 63 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), model composition (ensemble + stitch + warm), scaling & efficiency (scale + budget + distill), meta-intelligence (transfer + audit), pre-training intelligence (sanity + baseline + leak), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              40 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis + model composition + scaling & efficiency + meta-intelligence)
+├── commands/              43 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis + model composition + scaling & efficiency + meta-intelligence + pre-training intelligence)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
