@@ -58,6 +58,10 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "calibrate", "calibration", "ECE", "reliability diagram", "overconfident", "probability calibration" | `/turing:calibrate` | Analyze |
 | "feature", "features", "feature selection", "feature importance", "which features matter", "redundant features" | `/turing:feature` | Analyze |
 | "curriculum", "training order", "easy to hard", "data ordering", "curriculum learning" | `/turing:curriculum` | Optimize |
+| "prune", "pruning", "sparsity", "remove weights", "smaller model", "weight pruning" | `/turing:prune` | Optimize |
+| "quantize", "quantization", "int8", "fp16", "reduce precision", "faster inference" | `/turing:quantize` | Optimize |
+| "merge", "model soup", "merge weights", "average models", "TIES", "DARE" | `/turing:merge` | Compose |
+| "surgery", "architecture", "add layer", "widen", "modify model", "swap activation" | `/turing:surgery` | Modify |
 
 ## Sub-commands
 
@@ -112,6 +116,10 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:calibrate [exp-id]` | Probability calibration: ECE/MCE, reliability diagrams, Platt/isotonic/temperature scaling | (inline) |
 | `/turing:feature [--method]` | Automated feature selection: multi-method consensus ranking, redundancy, interaction generation | (inline) |
 | `/turing:curriculum [exp-id]` | Training curriculum optimization: difficulty scoring, strategy comparison, impossible sample detection | (inline) |
+| `/turing:prune <exp-id>` | Weight pruning: magnitude/structured/lottery, sparsity sweep, knee point detection | (inline) |
+| `/turing:quantize <exp-id>` | Post-training quantization: FP16/INT8, accuracy-latency comparison, QAT suggestion | (inline) |
+| `/turing:merge <exp-ids...>` | Model merging: uniform/greedy soup, TIES, DARE — free accuracy, zero latency cost | (inline) |
+| `/turing:surgery <exp-id>` | Architecture modification: add/remove layer, widen/narrow, swap activation, skip connections | (inline) |
 
 ## Proactive Detection
 
