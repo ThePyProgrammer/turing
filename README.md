@@ -344,6 +344,9 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:diff <a> <b>` | Deep experiment comparison — config diffs, metric significance, per-class regressions, curve divergence |
 | `/turing:watch [--analyze]` | Live training monitor — loss spikes, NaN detection, overfitting, plateau alerts |
 | `/turing:regress [--tolerance]` | Performance regression gate — verify metrics haven't degraded after changes |
+| `/turing:ensemble [--top-k]` | Automated ensemble — voting, stacking, blending from top-K models |
+| `/turing:stitch <action>` | Pipeline composition — show, swap, cache, and run stages independently |
+| `/turing:warm <exp-id>` | Warm-start from prior model — load checkpoint, freeze layers, adjust LR |
 
 And for fully hands-off operation:
 
@@ -528,11 +531,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-33 commands, 2 agents, 10 config files, 52 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+36 commands, 2 agents, 10 config files, 55 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), model composition (ensemble + stitch + warm), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              32 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis)
+├── commands/              35 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis + model composition)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
