@@ -36,6 +36,7 @@ const SUB_COMMANDS = [
   "trend", "flashback", "archive", "annotate", "search", "template", "replay",
   "cite", "present", "changelog",
   "onboard", "share", "review",
+  "whatif", "counterfactual", "simulate",
 ];
 
 export async function install(opts = {}) {
