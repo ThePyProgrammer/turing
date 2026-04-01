@@ -74,6 +74,9 @@ const EXPECTED_COMMANDS = [
   "search/SKILL.md",
   "template/SKILL.md",
   "replay/SKILL.md",
+  "cite/SKILL.md",
+  "present/SKILL.md",
+  "changelog/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];

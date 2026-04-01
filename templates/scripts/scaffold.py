@@ -137,6 +137,9 @@ TEMPLATE_DIRS = {
         "experiment_search.py",
         "experiment_templates.py",
         "experiment_replay.py",
+        "citation_manager.py",
+        "generate_figures.py",
+        "generate_changelog.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -184,6 +187,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/archive",
     "experiments/searches",
     "experiments/replays",
+    "experiments/citations",
+    "paper/figures",
     "experiments/logs",
     "models/best",
     "models/archive",

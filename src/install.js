@@ -34,6 +34,7 @@ const SUB_COMMANDS = [
   "feature", "curriculum",
   "prune", "quantize", "merge", "surgery",
   "trend", "flashback", "archive", "annotate", "search", "template", "replay",
+  "cite", "present", "changelog",
 ];
 
 export async function install(opts = {}) {
