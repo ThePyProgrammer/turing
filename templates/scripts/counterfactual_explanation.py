@@ -159,10 +159,16 @@ def _compute_distance(
     for feat in original:
         orig_val = original[feat]
         cf_val = counterfactual.get(feat, orig_val)
-        low, high = feature_ranges.get(feat, (0, 1))
-        span = high - low if high != low else 1
-        normalized_diff = (cf_val - orig_val) / span
-        total += normalized_diff ** 2
+        feat_range = feature_ranges.get(feat, (0, 1))
+
+        if isinstance(orig_val, str) or (isinstance(feat_range, (tuple, list)) and len(feat_range) > 2):
+            # Categorical: 1 if changed, 0 if same
+            total += 0.0 if orig_val == cf_val else 1.0
+        else:
+            low, high = feat_range[0], feat_range[1]
+            span = high - low if high != low else 1
+            normalized_diff = (cf_val - orig_val) / span
+            total += normalized_diff ** 2
     return float(np.sqrt(total))
 
 
