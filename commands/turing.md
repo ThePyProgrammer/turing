@@ -45,6 +45,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "ensemble", "combine models", "voting", "stacking", "blending", "merge models" | `/turing:ensemble` | Compose |
 | "stitch", "pipeline", "swap stage", "cache stage", "pipeline composition" | `/turing:stitch` | Compose |
 | "warm", "warm start", "fine-tune", "continue training", "transfer learning", "from checkpoint" | `/turing:warm` | Compose |
+| "scale", "scaling law", "how much data", "is more data worth it", "power law", "data efficiency" | `/turing:scale` | Analyze |
+| "budget", "compute budget", "how many experiments", "spending limit", "stop after" | `/turing:budget` | Manage |
+| "distill", "compress", "smaller model", "student model", "knowledge distillation", "model compression" | `/turing:distill` | Deploy |
 
 ## Sub-commands
 
@@ -86,6 +89,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:ensemble [--top-k] [--methods]` | Automated ensemble: voting, weighted voting, stacking, blending from top-K models | (inline) |
 | `/turing:stitch <action> [stage]` | Pipeline composition: show/swap/cache/run stages independently | (inline) |
 | `/turing:warm <exp-id>` | Warm-start from prior model: load checkpoint, freeze layers, adjust LR | (inline) |
+| `/turing:scale [--axis]` | Scaling law estimator: fit power law, predict full-scale performance | (inline) |
+| `/turing:budget <action>` | Compute budget manager: set limits, track allocation, auto-shift modes | (inline) |
+| `/turing:distill <exp-id>` | Model compression: distill teacher into smaller student model | (inline) |
 
 ## Proactive Detection
 
