@@ -162,16 +162,25 @@ def predict_with_surrogate(
     if all(d == 0 for d in dists):
         predicted = np.mean(metrics)
         uncertainty = 0.0
+    elif all(d == float("inf") for d in dists):
+        predicted = np.mean(metrics)
+        uncertainty = float(np.std(metrics)) if len(metrics) > 1 else 0.0
     else:
-        weights = [1.0 / (d + 1e-6) for d in dists]
-        total_weight = sum(weights)
-        predicted = sum(w * m for w, m in zip(weights, metrics)) / total_weight
-        uncertainty = float(np.std(metrics))
+        weights = [1.0 / (d + 1e-6) for d in dists if d != float("inf")]
+        valid_metrics = [m for d, m in zip(dists, metrics) if d != float("inf")]
+        if not weights:
+            predicted = np.mean(metrics)
+            uncertainty = float(np.std(metrics)) if len(metrics) > 1 else 0.0
+        else:
+            total_weight = sum(weights)
+            predicted = sum(w * m for w, m in zip(weights, valid_metrics)) / total_weight
+            uncertainty = float(np.std(valid_metrics)) if len(valid_metrics) > 1 else 0.0
 
     # Novelty penalty: discount if far from training distribution
-    min_dist = dists[0] if dists else 0
-    avg_dist = np.mean([d for d, _ in distances]) if distances else 1
-    novelty = min_dist / avg_dist if avg_dist > 0 else 0
+    finite_dists = [d for d, _ in distances if d != float("inf")]
+    min_dist = min(finite_dists) if finite_dists else float("inf")
+    avg_dist = float(np.mean(finite_dists)) if finite_dists else 1.0
+    novelty = min_dist / avg_dist if avg_dist > 0 and min_dist != float("inf") else 1.0
     novelty_penalty = novelty * NOVELTY_PENALTY_FACTOR
 
     return {
