@@ -44,6 +44,9 @@ const EXPECTED_COMMANDS = [
   "queue/SKILL.md",
   "retry/SKILL.md",
   "fork/SKILL.md",
+  "diff/SKILL.md",
+  "watch/SKILL.md",
+  "regress/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
@@ -53,6 +56,7 @@ const EXPECTED_CONFIG = [
   "experiment_archetypes.yaml", "novelty_aliases.yaml",
   "relationships.toml", "state.toml", "task_taxonomy.yaml",
   "failure_modes.yaml",
+  "watch_alerts.yaml",
 ];
 
 async function fileExists(path) {

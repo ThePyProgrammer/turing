@@ -25,6 +25,7 @@ const SUB_COMMANDS = [
   "report", "mode", "preflight", "card", "seed", "reproduce",
   "diagnose", "ablate", "frontier", "profile", "checkpoint", "export",
   "lit", "paper", "queue", "retry", "fork",
+  "diff", "watch", "regress",
 ];
 
 export async function install(opts = {}) {
@@ -79,6 +80,7 @@ export async function install(opts = {}) {
     "experiment_archetypes.yaml", "novelty_aliases.yaml",
     "relationships.toml", "state.toml", "task_taxonomy.yaml",
     "failure_modes.yaml",
+    "watch_alerts.yaml",
   ];
   for (const file of CONFIG_FILES) {
     await copyFile(
