@@ -1530,8 +1530,8 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 32 | Computational profiling `/turing:profile` | 12.1 | v1.5.0 | **High** | **DONE** | — (standalone) |
 | 33 | Smart checkpoint manager `/turing:checkpoint` | 12.2 | v1.5.0 | **Medium** | **DONE** | Phase 11.3 (Pareto logic) |
 | 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | **DONE** | Phase 10.1 (seed study for model card) |
-| 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | Planned | Phase 7.1 (scholarly API infra) |
-| 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | Planned | Phases 10.1, 11.2, 14.1, 6.3 |
+| 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | **DONE** | Phase 7.1 (scholarly API infra) |
+| 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | **DONE** | Phases 10.1, 11.2, 14.1, 6.3 |
 
 ### Dependency Graph
 
