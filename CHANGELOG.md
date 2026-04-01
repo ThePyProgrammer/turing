@@ -2,6 +2,22 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.4.0] — 2026-04-01 — Model Surgery
+
+### Added
+- `/turing:prune` — weight pruning: magnitude/structured/lottery methods, sparsity sweep with knee point detection, speedup and size estimates
+- `/turing:quantize` — post-training quantization: FP16/INT8 dynamic/static, accuracy-latency comparison, QAT recommendation when loss > 1%
+- `/turing:merge` — model merging: uniform soup, greedy soup, TIES, DARE — free accuracy with zero latency overhead
+- `/turing:surgery` — architecture modification: add/remove layer, widen/narrow, swap activation, inject skip connections, add normalization, auto warm-start
+
+### Phase
+- **23.1** Weight Pruning
+- **23.2** Post-Training Quantization
+- **23.3** Model Merging
+- **23.4** Architecture Modification
+
+**1494 tests | 53 commands | 72 scripts | 18 commits**
+
 ## [3.3.0] — 2026-04-01 — Feature & Training Intelligence
 
 ### Added
@@ -272,6 +288,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.4.0
 [3.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.3.0
 [3.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.2.0
 [3.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.1.0
