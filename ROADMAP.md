@@ -1517,6 +1517,580 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 
 ---
 
+## Phase 15: Orchestration (v2.2.0)
+
+*Control how experiments run, not just what they run.*
+
+### 15.1 Experiment Scheduler — `/turing:queue`
+
+**What:** Queue multiple experiments for batch execution with priority ordering, dependency chains, and resource-aware scheduling. The researcher loads the queue Friday afternoon, reads `/turing:brief` Monday morning.
+
+**Why:** Currently `/turing:train` runs one iterative loop. The researcher must babysit it or use `/loop`. A proper queue decouples experiment *planning* from experiment *execution* — the human front-loads taste (which hypotheses, in what order, with what constraints), and the system executes overnight with no supervision.
+
+**Implementation:**
+1. Create `commands/queue.md` — `/turing:queue [add|list|run|pause|clear]`
+2. Add `templates/scripts/experiment_queue.py`:
+   - **add:** `/turing:queue add "try LightGBM" --priority high --after hyp-003` — adds to queue with optional dependency
+   - **list:** shows queue with status, priority, estimated runtime, dependencies
+   - **run:** executes the queue sequentially (respecting dependencies and priorities):
+     - For each queued item: edit `train.py` per hypothesis → run → evaluate → log → decision packet → next
+     - Pause on crash if `--halt-on-error`; otherwise `retry` (Phase 15.2) and continue
+     - Write a batch summary when queue drains
+   - **pause:** save queue state and stop after current experiment finishes
+   - **clear:** discard all queued items
+   - Queue persists in `experiments/queue.yaml`
+3. Integration with hypothesis queue (`hypotheses.yaml`) — `/turing:queue add` can pull directly from queued hypotheses
+4. Integration with `/turing:brief` — batch summary appears as a "Queue Report" section
+5. Resource awareness: estimate runtime per experiment from `/turing:profile` data (Phase 12.1) if available
+6. Add tests
+
+**Acceptance:** Researcher queues 10 experiments, runs `/turing:queue run`, walks away. All 10 execute in priority/dependency order with a summary report at the end.
+
+### 15.2 Smart Failure Recovery — `/turing:retry`
+
+**What:** When an experiment crashes (OOM, NaN loss, timeout, import error), auto-diagnose the failure mode and retry with a targeted fix. Turns crashes from dead ends into one-step recoveries.
+
+**Why:** The most common experiment failures have mechanical fixes: OOM → reduce batch size, NaN → add gradient clipping, timeout → increase patience. Currently the researcher reads the traceback, edits config, and re-runs manually. `/turing:retry` automates the diagnosis-fix-rerun cycle for known failure patterns.
+
+**Implementation:**
+1. Create `commands/retry.md` — `/turing:retry [exp-id] [--max-attempts 3]`
+2. Add `templates/scripts/smart_retry.py`:
+   - Reads the experiment's `run.log` and exit code
+   - Classifies failure against a taxonomy:
+     ```yaml
+     failure_modes:
+       oom:
+         patterns: ["CUDA out of memory", "MemoryError", "RuntimeError: out of memory"]
+         fix: "Reduce batch_size by 50%"
+         config_change: {batch_size: "//2"}
+       nan_loss:
+         patterns: ["loss is NaN", "nan", "RuntimeWarning: invalid value"]
+         fix: "Add gradient clipping at 1.0, reduce learning_rate by 10x"
+         config_change: {gradient_clip: 1.0, learning_rate: "//10"}
+       timeout:
+         patterns: ["TimeoutError", "exceeded time limit"]
+         fix: "Increase max_epochs or reduce early_stopping patience"
+         config_change: {max_epochs: "*2"}
+       import_error:
+         patterns: ["ModuleNotFoundError", "ImportError"]
+         fix: "Install missing dependency"
+         action: "pip_install"
+       convergence_failure:
+         patterns: ["loss did not decrease", "no improvement"]
+         fix: "Increase learning_rate by 3x for warm-up, add learning rate scheduler"
+         config_change: {learning_rate: "*3"}
+     ```
+   - Applies the fix, re-runs, and logs the retry as a child experiment of the original
+   - Tracks retry attempts to prevent infinite loops (max 3 by default)
+   - If all retries fail, creates a decision packet with `investigate_crash` verdict
+3. Configurable taxonomy in `config/failure_modes.yaml` — researchers can add project-specific patterns
+4. Integration with `/turing:queue` — crashed experiments auto-retry before moving to the next queue item
+5. Add tests
+
+**Depends on:** Phase 11.1 (diagnose) for failure pattern infrastructure
+
+**Acceptance:** An OOM crash triggers automatic batch size reduction and re-run. The researcher sees "exp-051 crashed (OOM), retried as exp-052 with batch_size=16 → succeeded" in the log.
+
+### 15.3 Experiment Branching — `/turing:fork`
+
+**What:** Branch an experiment into parallel tracks. "Try both approach A and approach B from this point" — creates two child experiments from the same parent, runs both, and reports which branch wins.
+
+**Why:** Researchers constantly face "should I try A or B?" decisions. Currently they pick one, run it, then try the other — sequential and slow. `/turing:fork` runs both in parallel (or queued back-to-back) and lets the results decide.
+
+**Implementation:**
+1. Create `commands/fork.md` — `/turing:fork <exp-id> --branches "LightGBM with dart" "XGBoost with deeper trees"`
+2. Add `templates/scripts/fork_experiment.py`:
+   - Reads the parent experiment's config
+   - For each branch: creates a child hypothesis, applies the described modification, queues for execution
+   - Branches share the same parent in the dependency tree (Phase 1.3)
+   - After all branches complete, generates a comparison report:
+     ```
+     Fork from exp-042:
+     ├── exp-053: LightGBM with dart → accuracy=0.878 ✓ WINNER
+     └── exp-054: XGBoost deeper trees → accuracy=0.869
+     Recommendation: promote exp-053, abandon exp-054
+     ```
+   - Auto-generates decision packets for each branch
+3. Integration with `/turing:queue` — branches are queued as a dependency group (all must complete before the comparison fires)
+4. Integration with experiment families (Phase 6.3) — forked branches share a family tag
+5. Add `--auto-promote` flag: automatically keeps the best branch and discards the rest
+6. Add tests
+
+**Depends on:** Phase 1.3 (experiment dependency graph), Phase 15.1 (queue for parallel execution)
+
+**Acceptance:** `/turing:fork exp-042 --branches "A" "B"` queues two experiments, runs both, and reports the winner with a recommendation.
+
+---
+
+## Phase 16: Deep Analysis (v2.3.0)
+
+*See what your experiments are actually doing, not just their final numbers.*
+
+### 16.1 Deep Experiment Comparison — `/turing:diff`
+
+**What:** Side-by-side diff of two experiments showing config differences, metric deltas, per-class performance differences, training curve divergence points, and feature importance shifts. Goes beyond "which metric is higher" to answer "at what point did these two experiments diverge and why?"
+
+**Why:** `/turing:compare` (existing) shows metric tables. `/turing:diff` is a diagnostic tool — when two experiments have similar aggregate metrics but feel different, it finds where and why they diverge. Essential for understanding whether a change actually helped or just shifted errors around.
+
+**Implementation:**
+1. Create `commands/diff.md` — `/turing:diff <exp-a> <exp-b>`
+2. Add `templates/scripts/experiment_diff.py`:
+   - **Config diff:** which hyperparameters changed, with magnitude:
+     ```
+     max_depth:      6 → 8      (+33%)
+     learning_rate:  0.1 → 0.1  (unchanged)
+     n_estimators:   500 → 300  (-40%)
+     ```
+   - **Metric diff:** all tracked metrics with deltas and significance (reuse Phase 2.1):
+     ```
+     accuracy:  0.872 → 0.878  (+0.006, p=0.03 significant)
+     f1:        0.869 → 0.871  (+0.002, p=0.41 not significant)
+     ```
+   - **Per-class diff:** which classes improved and which regressed (reuse Phase 3.1):
+     ```
+     class_0: precision 0.91 → 0.93  (+0.02)
+     class_1: precision 0.83 → 0.79  (-0.04) ← REGRESSION
+     ```
+   - **Training curve divergence:** if epoch-level metrics are logged, find the epoch where curves separate
+   - **Feature importance diff:** if available, show which features gained/lost importance
+   - Writes to `experiments/diffs/exp-A-vs-B.md`
+3. Integration with `/turing:brief` — diff between current best and previous best appears automatically
+4. Add `--code` flag: includes the `git diff` of `train.py` between the two experiments
+5. Add tests
+
+**Depends on:** Phase 11.3 (frontier for multi-metric comparison), Phase 3.1 (per-class metrics)
+
+**Acceptance:** `/turing:diff exp-042 exp-053` shows exactly which config changes caused which metric shifts, including per-class regressions hidden by aggregate improvement.
+
+### 16.2 Live Training Monitor — `/turing:watch`
+
+**What:** Stream metrics during a training run with early-warning alerts: loss spikes, gradient explosion, learning rate too aggressive, train/val gap widening mid-epoch. Catches problems 10 minutes into a 2-hour run instead of at the end.
+
+**Why:** Long training runs fail silently. Loss goes to NaN at epoch 47 of 100, but the signs were visible at epoch 5. `/turing:watch` surfaces those signals in real-time so the researcher can intervene early — or the system can auto-pause and suggest fixes (integrating with `/turing:retry`).
+
+**Implementation:**
+1. Create `commands/watch.md` — `/turing:watch [--alerts] [--interval 10s]`
+2. Add `templates/scripts/training_monitor.py`:
+   - Tails `run.log` during an active training run
+   - Parses epoch-level metrics as they're written
+   - Computes rolling statistics: loss trend, train/val gap, metric velocity
+   - Alert rules (configurable in `config/watch_alerts.yaml`):
+     ```yaml
+     alerts:
+       loss_spike:
+         condition: "loss > 3 * rolling_mean_loss"
+         severity: warning
+         message: "Loss spike at epoch {epoch}: {loss} vs rolling mean {mean}"
+       nan_detected:
+         condition: "loss == NaN"
+         severity: critical
+         action: pause
+       overfitting_onset:
+         condition: "train_loss < 0.5 * val_loss for 3 consecutive epochs"
+         severity: warning
+         message: "Overfitting detected — train/val gap widening since epoch {onset}"
+       plateau:
+         condition: "val_metric improvement < 0.001 for 5 epochs"
+         severity: info
+         message: "Metric plateaued — consider early stopping or learning rate reduction"
+     ```
+   - On critical alert with `action: pause`: saves checkpoint, pauses training, notifies researcher
+   - Displays a compact live dashboard:
+     ```
+     Epoch 23/100 | loss: 0.342 ↓ | acc: 0.865 ↑ | gap: 0.018 | ⚠ plateau (5 epochs)
+     ```
+3. Integration with `/turing:retry` — if auto-paused, suggest a fix
+4. Checkpoint save on alert: never lose progress when a problem is detected
+5. Add tests for alert rule evaluation, metric parsing
+
+**Depends on:** Phase 12.1 (profiling infrastructure for metric instrumentation)
+
+**Acceptance:** `/turing:watch` catches a loss spike at epoch 12 and alerts the researcher before the run wastes 88 more epochs.
+
+### 16.3 Performance Regression Gate — `/turing:regress`
+
+**What:** After any code or dependency change, automatically re-run the best experiment and verify metrics haven't degraded. CI for your model — catch silent regressions from library upgrades, data pipeline changes, or accidental `train.py` edits.
+
+**Why:** ML projects have a unique fragility: a scikit-learn patch, a pandas dtype change, or an accidental data preprocessing edit can silently shift results by 2-3%. Nobody notices until the next paper revision. `/turing:regress` makes metric stability a verifiable property.
+
+**Implementation:**
+1. Create `commands/regress.md` — `/turing:regress [--tolerance 0.01] [--against exp-id]`
+2. Add `templates/scripts/regression_gate.py`:
+   - Identifies the current best experiment from `experiment_state.yaml`
+   - Re-runs it with identical config (reuses `/turing:reproduce` infrastructure from Phase 10.2)
+   - Compares against the stored metrics:
+     - **Pass:** all metrics within tolerance → "No regression detected"
+     - **Warning:** some metrics degraded within 2x tolerance → "Minor regression, investigate"
+     - **Fail:** any metric degraded beyond tolerance → "REGRESSION DETECTED" with diff
+   - On failure, captures environment diff: `pip freeze` comparison, git diff, data hash comparison
+   - Writes verdict to `experiments/regressions/check-YYYY-MM-DD.yaml`
+3. Integration with git hooks (optional): run `/turing:regress` before committing changes to `train.py` or `prepare.py`
+4. Integration with `/turing:brief` — regression check history appears as a "Stability" section
+5. Add `--quick` flag: runs with 1 seed instead of full seed study for fast checks
+6. Add tests
+
+**Depends on:** Phase 10.2 (reproduce infrastructure)
+
+**Acceptance:** After a library upgrade, `/turing:regress` detects a 1.5% accuracy drop and reports the environment diff showing which package version changed.
+
+---
+
+## Phase 17: Model Composition (v2.4.0)
+
+*Combine what you've already trained into something better.*
+
+### 17.1 Automated Ensemble Construction — `/turing:ensemble`
+
+**What:** Build ensembles from the top-K experiments automatically. Tries voting, stacking, and blending. Often yields 1-3% improvement from models you've already trained — zero additional training cost.
+
+**Why:** Ensembling is the most reliably effective technique in applied ML (virtually every Kaggle winner uses it). But manually combining models is tedious: load each model, align predictions, try different combination strategies, evaluate. `/turing:ensemble` automates the mechanical work.
+
+**Implementation:**
+1. Create `commands/ensemble.md` — `/turing:ensemble [--top-k 5] [--methods voting,stacking,blending]`
+2. Add `templates/scripts/build_ensemble.py`:
+   - Selects top-K models by primary metric (or Pareto-optimal set from Phase 11.3)
+   - Filters for diversity: models with similar predictions add no value. Use prediction correlation to select diverse members.
+   - Tries ensemble methods:
+     - **Voting:** majority vote (classification) or mean (regression)
+     - **Weighted voting:** weights proportional to individual model performance
+     - **Stacking:** train a meta-learner (logistic regression / ridge) on out-of-fold predictions
+     - **Blending:** holdout-based alternative to stacking (simpler, less data-efficient)
+   - Evaluates each ensemble with full seed study (Phase 10.1)
+   - Reports:
+     ```
+     Ensemble results (from 5 base models):
+     | Method           | Accuracy | Δ vs Best Single |
+     |------------------|----------|------------------|
+     | Best single      | 0.872    | —                |
+     | Voting (uniform) | 0.879    | +0.007           |
+     | Voting (weighted)| 0.881    | +0.009           |
+     | Stacking (LR)    | 0.884    | +0.012 ← BEST   |
+     | Blending         | 0.882    | +0.010           |
+     ```
+   - Logs the best ensemble as a new experiment with `family: "ensemble"`
+3. Integration with `/turing:export` (Phase 13.1) — export the ensemble as a single deployable artifact
+4. Diversity analysis: report correlation matrix of base model predictions
+5. Add tests
+
+**Depends on:** Phase 11.3 (Pareto for model selection), Phase 10.1 (seed study for evaluation)
+
+**Acceptance:** `/turing:ensemble` combines 5 trained models into a stacking ensemble that beats the best individual model, with zero additional training.
+
+### 17.2 Pipeline Composition — `/turing:stitch`
+
+**What:** Define preprocessing, feature engineering, model, and postprocessing as swappable stages. Independently test any stage without rewriting `train.py`. "Keep the feature pipeline from exp-031 but swap the model from exp-042."
+
+**Why:** ML pipelines are monolithic — everything lives in one `train.py`. Changing the model means also re-running preprocessing. Changing features means also re-training the model. `/turing:stitch` decomposes the pipeline into stages so each can be independently varied, cached, and reused.
+
+**Implementation:**
+1. Create `commands/stitch.md` — `/turing:stitch [show|swap|cache|run]`
+2. Add `templates/scripts/pipeline_manager.py`:
+   - **show:** parse `train.py` and display the pipeline as stages:
+     ```
+     Pipeline stages:
+     1. preprocess  → StandardScaler, handle_missing   (hash: a3b2c1)
+     2. features    → polynomial_features, log_transform (hash: d4e5f6)
+     3. model       → XGBoostClassifier(max_depth=6)     (hash: g7h8i9)
+     4. postprocess → calibration, threshold_tuning       (hash: j0k1l2)
+     ```
+   - **swap:** replace one stage with a version from another experiment:
+     `/turing:stitch swap model --from exp-031` — takes exp-031's model config, keeps current preprocessing and features
+   - **cache:** save intermediate outputs (preprocessed data, engineered features) to disk. Subsequent experiments that only change the model skip preprocessing entirely.
+   - **run:** execute the stitched pipeline and log as a new experiment
+   - Stage hashing: detect when a stage hasn't changed and skip re-computation
+3. Stage definition in `config.yaml`:
+   ```yaml
+   pipeline:
+     stages: [preprocess, features, model, postprocess]
+     cache_dir: experiments/cache/
+   ```
+4. Integration with `/turing:ablate` (Phase 11.2) — ablate a stage by replacing it with a no-op
+5. Add tests
+
+**Depends on:** Phase 11.2 (ablation for stage-level testing)
+
+**Acceptance:** `/turing:stitch swap model --from exp-031` creates a hybrid experiment in under 30 seconds (skipping cached preprocessing).
+
+### 17.3 Warm-Start from Prior Model — `/turing:warm`
+
+**What:** Take a trained checkpoint and use it as initialization for a different configuration. Automates the "start from here but change X" pattern.
+
+**Why:** Transfer learning and fine-tuning are standard practice but operationally clumsy: find the checkpoint, load it, modify the architecture to accept the weights, freeze/unfreeze layers, adjust the optimizer. `/turing:warm` handles the plumbing so the researcher can focus on what to change.
+
+**Implementation:**
+1. Create `commands/warm.md` — `/turing:warm <exp-id> [--freeze-layers "encoder"] [--unfreeze-after 5]`
+2. Add `templates/scripts/warm_start.py`:
+   - Loads the checkpoint from the specified experiment (via Phase 12.2 checkpoint manager)
+   - Detects model type and applies appropriate warm-start strategy:
+     - **Tree models (XGBoost/LightGBM):** continue boosting from existing trees with modified hyperparameters
+     - **Neural networks:** load weights, optionally freeze layers, reset optimizer state
+     - **scikit-learn:** use `warm_start=True` parameter where supported
+   - Creates a modified `train.py` with warm-start initialization
+   - Logs the new experiment as a child of the source experiment
+   - Reports: "Warm-started from exp-042 (epoch 50). Frozen: encoder layers. Training: decoder + head."
+3. Layer freezing schedule: `--unfreeze-after N` unfreezes all layers after N epochs (gradual unfreezing)
+4. Learning rate adjustment: automatically reduces learning rate for warm-started training (fine-tuning convention)
+5. Add tests
+
+**Depends on:** Phase 12.2 (checkpoint manager for loading)
+
+**Acceptance:** `/turing:warm exp-042 --freeze-layers encoder` creates a fine-tuning experiment that starts from exp-042's weights with the encoder frozen.
+
+---
+
+## Phase 18: Scaling & Efficiency (v2.5.0)
+
+*Do more with less. Know when to stop.*
+
+### 18.1 Scaling Law Estimator — `/turing:scale`
+
+**What:** Run 3-4 small experiments at different data/compute sizes, fit a power-law curve, and predict what performance you'd get at full scale. Answers "is it worth training on the full dataset?" before you commit the compute.
+
+**Why:** Scaling laws (Kaplan et al., Hoffmann et al.) show that ML performance follows predictable power-law relationships with data size, model size, and compute. Researchers waste days training on full datasets when a 30-minute scaling study would show the expected gain is 0.3%. `/turing:scale` makes this estimation trivial.
+
+**Implementation:**
+1. Create `commands/scale.md` — `/turing:scale [--axis data|compute|params] [--points 4]`
+2. Add `templates/scripts/scaling_estimator.py`:
+   - Takes the current best experiment config
+   - Generates scaled-down versions along the chosen axis:
+     - **data:** train on 10%, 25%, 50%, 75% of the dataset
+     - **compute:** train for 10%, 25%, 50%, 75% of max epochs
+     - **params:** scale model size (reduce layers/width/depth/estimators)
+   - Runs each scaled experiment (with seed study from Phase 10.1 for error bars)
+   - Fits a power law: `performance = a * scale^b + c`
+   - Extrapolates to full scale and beyond:
+     ```
+     Scaling analysis (data axis):
+     | Data % | Accuracy (mean±std) |
+     |--------|---------------------|
+     | 10%    | 0.821 ± 0.012       |
+     | 25%    | 0.847 ± 0.008       |
+     | 50%    | 0.862 ± 0.006       |
+     | 75%    | 0.869 ± 0.005       |
+     
+     Power law fit: acc = 0.723 * n^0.089 + 0.142 (R²=0.997)
+     
+     Predictions:
+       100% data → 0.874 ± 0.004 (expected gain from 75%: +0.005)
+       200% data → 0.882 ± 0.003 (hypothetical, requires more data)
+     
+     Verdict: Diminishing returns — 100% data gains only +0.005 over 75%.
+     Consider investing in feature engineering instead of more data.
+     ```
+   - Writes to `experiments/scaling/scale-YYYY-MM-DD.md`
+3. Integration with `/turing:budget` (Phase 18.2) — scaling predictions inform budget allocation
+4. Add `--plot` flag: ASCII plot of the scaling curve with prediction bands
+5. Add tests for power law fitting, extrapolation, confidence intervals
+
+**Depends on:** Phase 10.1 (seed runner for error bars at each scale point)
+
+**Acceptance:** `/turing:scale --axis data` runs 4 scaled experiments, fits a power law, and correctly predicts full-scale accuracy within 2% margin.
+
+### 18.2 Compute Budget Manager — `/turing:budget`
+
+**What:** Set a total compute budget (hours, experiment count, or estimated cost), and the system allocates across exploration vs. exploitation. Automatically shifts to exploit mode when budget runs low. Prevents runaway compute spend.
+
+**Why:** Autonomous experiment loops are dangerous without a budget. `/turing:train` with no constraints will run indefinitely, exploring dead ends. `/turing:budget` gives the researcher a spend ceiling and lets the system optimize within it — exploring broadly early, exploiting the best direction late.
+
+**Implementation:**
+1. Create `commands/budget.md` — `/turing:budget [set|status|reset]`
+2. Add `templates/scripts/budget_manager.py`:
+   - **set:** `/turing:budget set --experiments 50 --hours 8` — set budget constraints
+   - **status:** show remaining budget, burn rate, and projected exhaustion:
+     ```
+     Budget status:
+       Experiments: 23/50 used (46%), 27 remaining
+       Time: 3.2/8.0 hours used (40%), 4.8h remaining
+       Burn rate: 7.2 experiments/hour
+       Projected: budget exhausts in ~3.75 hours
+       
+       Allocation:
+         Explore: 15 experiments (65%) — 8 remaining
+         Exploit: 8 experiments (35%) — 19 remaining
+       
+       Auto-mode shift: switching to exploit at 80% budget (exp 40)
+     ```
+   - **Budget allocation policy:**
+     - 0-50% budget: explore mode (try diverse hypotheses)
+     - 50-80% budget: mixed (explore promising, exploit best)
+     - 80-100% budget: exploit only (refine the winner)
+   - Integrates with research mode (Phase 6.5) — auto-switches mode based on budget phase
+   - Hard stop: at 100% budget, `/turing:train` refuses to start new experiments
+   - Budget stored in `experiment_state.yaml` under `budget` key
+3. Integration with `/turing:queue` (Phase 15.1) — queue respects budget limits
+4. Integration with `/turing:scale` (Phase 18.1) — scaling predictions inform whether remaining budget is worth spending
+5. Cost estimation: if `/turing:profile` data exists, estimate wall-clock cost per experiment
+6. Add tests
+
+**Depends on:** Phase 15.1 (queue for budget-aware scheduling), Phase 6.5 (research mode for auto-switching)
+
+**Acceptance:** With a 50-experiment budget, the system auto-shifts from explore to exploit at experiment 40 and refuses to run experiment 51.
+
+### 18.3 Model Compression — `/turing:distill`
+
+**What:** Take a large accurate model (teacher) and train a smaller model (student) to match its predictions. Measures the accuracy/size/latency tradeoff. Bridges the gap between "best research model" and "model that fits in production constraints."
+
+**Why:** The best model from `/turing:train` is often too large or slow for production. Distillation is the standard technique to compress it, but it requires writing a custom training loop with soft labels, temperature scaling, and student architecture selection. `/turing:distill` automates this.
+
+**Implementation:**
+1. Create `commands/distill.md` — `/turing:distill <teacher-exp-id> [--compression 4x] [--method soft-labels|feature-matching]`
+2. Add `templates/scripts/model_distiller.py`:
+   - Loads the teacher model from the specified experiment
+   - Auto-selects student architecture based on compression target:
+     - **Tree models:** fewer estimators, shallower depth
+     - **Neural networks:** fewer layers, narrower hidden dims, quantization-aware training
+     - **scikit-learn:** simpler model family (e.g., teacher=RandomForest, student=DecisionTree)
+   - Distillation methods:
+     - **Soft labels:** train student on teacher's probability outputs (temperature-scaled)
+     - **Feature matching:** align intermediate representations (neural nets only)
+     - **Dataset distillation:** train student on teacher-labeled synthetic data
+   - Evaluates the student with full metrics + speed comparison:
+     ```
+     Distillation results (4x compression):
+     | Model    | Accuracy | Size (MB) | Latency (ms) |
+     |----------|----------|-----------|---------------|
+     | Teacher  | 0.884    | 48.2      | 12.3          |
+     | Student  | 0.877    | 11.8      | 3.1           |
+     | Δ        | -0.007   | -75%      | -75%          |
+     
+     Verdict: 0.7% accuracy loss for 4x compression. Acceptable for production.
+     ```
+   - Logs as a new experiment with `family: "distillation"` and parent link to teacher
+3. Integration with `/turing:export` (Phase 13.1) — export the distilled model directly
+4. Integration with `/turing:frontier` (Phase 11.3) — student appears on the Pareto frontier
+5. Add `--target-latency` flag: auto-select compression ratio to meet a latency target
+6. Add tests
+
+**Depends on:** Phase 13.1 (export for size/latency comparison)
+
+**Acceptance:** `/turing:distill exp-042 --compression 4x` produces a student model with <1% accuracy loss and 4x smaller size.
+
+---
+
+## Phase 19: Meta-Intelligence (v3.0.0)
+
+*The v3.0 milestone. Turing becomes project-aware — learning across projects, not just within one. The system accumulates institutional ML knowledge.*
+
+### 19.1 Cross-Project Knowledge Transfer — `/turing:transfer`
+
+**What:** Scan prior Turing projects for similar task characteristics and surface what worked. "Last time you had a tabular classification with class imbalance, SMOTE + LightGBM beat everything else by 3%." Builds institutional memory across projects.
+
+**Why:** ML researchers repeat the same discoveries across projects: "random forests work well on small tabular data," "batch normalization helps deep networks converge," "learning rate 3e-4 is a good default." This knowledge lives in the researcher's head and is lost when they leave. `/turing:transfer` makes it systematic and persistent.
+
+**Implementation:**
+1. Create `commands/transfer.md` — `/turing:transfer [--from project-path] [--auto]`
+2. Add `templates/scripts/knowledge_transfer.py`:
+   - Scans all Turing projects on the machine (searches for `config.yaml` + `experiments/log.jsonl` patterns)
+   - For each project, extracts a project signature:
+     - Task type (classification/regression/ranking)
+     - Dataset characteristics (size, dimensionality, class balance, feature types)
+     - Best model family and key hyperparameters
+     - What worked (kept experiments) and what didn't (discarded)
+   - Compares current project's signature against prior projects by similarity
+   - Generates transfer recommendations:
+     ```
+     Similar prior projects found:
+     
+     1. ~/projects/fraud-detection/ (similarity: 0.87)
+        Task: binary classification, tabular, imbalanced (5:1)
+        Winner: LightGBM + SMOTE, accuracy=0.923
+        Key insight: oversampling before CV caused leakage — use SMOTE inside CV folds
+        Hypothesis: "Try LightGBM with scale_pos_weight instead of SMOTE"
+     
+     2. ~/projects/churn-prediction/ (similarity: 0.72)
+        Task: binary classification, tabular, moderate imbalance (3:1)
+        Winner: XGBoost + feature selection, accuracy=0.891
+        Key insight: removing correlated features improved generalization by 2%
+        Hypothesis: "Run feature selection before training"
+     ```
+   - Auto-queues hypotheses from transfer recommendations with `source: "transfer"`
+3. Project index: maintains a lightweight index at `~/.turing/project_index.yaml` (cross-project, not per-project)
+4. Privacy-aware: only indexes projects on the local machine, never uploads
+5. Integration with `/turing:init` — suggest starting hypotheses from similar projects during scaffolding
+6. Add tests
+
+**Depends on:** Phase 9.1 (semantic index for similarity matching)
+
+**Acceptance:** `/turing:transfer` finds a similar prior project and suggests a hypothesis that the researcher wouldn't have tried otherwise. The hypothesis proves useful.
+
+### 19.2 Pre-Submission Methodology Audit — `/turing:audit`
+
+**What:** Check for common ML paper methodology mistakes before submission: data leakage, wrong CV strategy, missing baselines, unreported hyperparameter tuning cost, cherry-picked seeds, train/test overlap. A reviewer checklist you run *before* submitting.
+
+**Why:** The top reasons for ML paper desk rejections are methodological, not novelty: leakage, unfair comparisons, missing ablations, unreproducible results. These are all checkable from experiment logs. `/turing:audit` is a pre-flight check that catches these before a reviewer does.
+
+**Implementation:**
+1. Create `commands/audit.md` — `/turing:audit [--strict] [--checklist venue-name]`
+2. Add `templates/scripts/methodology_audit.py`:
+   - Reads the full experiment history and project configuration
+   - Checks against a methodology checklist:
+     ```yaml
+     checks:
+       data_leakage:
+         description: "Test data not used during training or feature engineering"
+         check: "Verify prepare.py splits before any feature computation"
+         severity: critical
+       
+       cv_strategy:
+         description: "CV strategy appropriate for data type"
+         check: "Temporal data uses time-series split, grouped data uses group k-fold"
+         severity: critical
+       
+       seed_sensitivity:
+         description: "Results reported with error bars from multiple seeds"
+         check: "Seed study exists for best experiment (Phase 10.1)"
+         severity: high
+       
+       ablation_completeness:
+         description: "All major components ablated"
+         check: "Ablation study exists (Phase 11.2) covering all non-trivial components"
+         severity: high
+       
+       baseline_comparison:
+         description: "Compared against reasonable baselines"
+         check: "At least one simple baseline (majority class, mean prediction) in experiment log"
+         severity: high
+       
+       hyperparameter_budget:
+         description: "Total hyperparameter tuning budget reported"
+         check: "Experiment count and compute hours documented"
+         severity: medium
+       
+       reproducibility:
+         description: "Best result successfully reproduced"
+         check: "Reproduction report exists (Phase 10.2)"
+         severity: high
+       
+       train_test_overlap:
+         description: "No overlap between train and test samples"
+         check: "Hash-based deduplication check on prepare.py output"
+         severity: critical
+     ```
+   - Produces an audit report:
+     ```
+     Methodology Audit Report
+     ========================
+     ✓ PASS  Data leakage: prepare.py splits before feature computation
+     ✓ PASS  Seed sensitivity: 5-seed study, CV=0.82%
+     ✗ FAIL  Baseline comparison: no simple baseline found in experiment log
+     ⚠ WARN  Ablation: 3 of 5 components ablated, missing: augmentation, postprocessing
+     ✓ PASS  Reproducibility: exp-042 reproduced within tolerance
+     ⚠ WARN  Hyperparameter budget: 47 experiments run, not documented in paper sections
+     
+     Score: 4/7 pass, 2 warnings, 1 failure
+     Action required: Add a simple baseline experiment before submission
+     ```
+   - Venue-specific checklists: `--checklist neurips` adds NeurIPS-specific checks (reproducibility checklist, broader impact statement)
+3. Integration with `/turing:paper` (Phase 14.2) — audit failures generate TODO items in paper sections
+4. Auto-fix suggestions: for each failure, suggest the `/turing:` command that would fix it
+5. Add tests
+
+**Depends on:** Phases 10.1 (seed), 11.2 (ablation), 10.2 (reproduce), 14.2 (paper)
+
+**Acceptance:** `/turing:audit` catches a missing baseline comparison and a partial ablation study. The researcher fixes both before submission, avoiding a desk rejection.
+
+---
+
 ## Updated Full Implementation Order
 
 | # | Feature | Phase | Version | Priority | Status | Depends On |
@@ -1532,31 +2106,54 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | **DONE** | Phase 10.1 (seed study for model card) |
 | 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | **DONE** | Phase 7.1 (scholarly API infra) |
 | 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | **DONE** | Phases 10.1, 11.2, 14.1, 6.3 |
+| 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | Planned | — (standalone) |
+| 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
+| 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | Planned | Phase 1.3 (dependency graph) |
+| 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | Planned | Phase 11.3 (frontier metrics) |
+| 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | Planned | Phase 12.1 (profiling infra) |
+| 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | Planned | Phase 10.2 (reproduce) |
+| 43 | Automated ensemble construction `/turing:ensemble` | 17.1 | v2.4.0 | **High** | Planned | Phase 11.3 (Pareto for model selection) |
+| 44 | Pipeline composition `/turing:stitch` | 17.2 | v2.4.0 | **High** | Planned | Phase 11.2 (ablation for stage testing) |
+| 45 | Warm-start from prior model `/turing:warm` | 17.3 | v2.4.0 | **Medium** | Planned | Phase 12.2 (checkpoint manager) |
+| 46 | Scaling law estimator `/turing:scale` | 18.1 | v2.5.0 | **High** | Planned | Phase 10.1 (seed for statistical fit) |
+| 47 | Compute budget manager `/turing:budget` | 18.2 | v2.5.0 | **High** | Planned | Phase 15.1 (queue integration) |
+| 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | Planned | Phase 13.1 (export for size comparison) |
+| 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | Planned | Phase 9.1 (semantic index) |
+| 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | Planned | Phases 10.1, 11.2, 14.2 |
 
 ### Dependency Graph
 
 ```
-Phase 10 (Statistical Rigor)          Phase 12 (Performance)
-  10.1 seed ─────────┐                  12.1 profile (standalone)
-  10.2 reproduce     │                  12.2 checkpoint ← 11.3 Pareto
-                     ▼
-Phase 11 (Experiment Intelligence)
-  11.1 diagnose ← 3.1 decomposition
-  11.2 ablate ← 10.1 seed
-  11.3 frontier (standalone)
-                     │
-                     ▼
-Phase 13 (Deployment)                Phase 14 (Research Workflow)
-  13.1 export ← 10.1 seed             14.1 lit ← 7.1 scholarly APIs
-                                       14.2 paper ← 10.1, 11.2, 14.1, 6.3
+Phases 1–14 (v1.0–v2.1) ─── ALL DONE ───────────────────────────────────
+
+Phase 15 (Orchestration)              Phase 16 (Deep Analysis)
+  15.1 queue (standalone)               16.1 diff ← 11.3 frontier
+  15.2 retry ← 11.1 diagnose           16.2 watch ← 12.1 profile
+  15.3 fork ← 1.3 dep graph            16.3 regress ← 10.2 reproduce
+           │                                     │
+           ▼                                     ▼
+Phase 17 (Model Composition)          Phase 18 (Scaling & Efficiency)
+  17.1 ensemble ← 11.3 Pareto          18.1 scale ← 10.1 seed
+  17.2 stitch ← 11.2 ablation          18.2 budget ← 15.1 queue
+  17.3 warm ← 12.2 checkpoint          18.3 distill ← 13.1 export
+                                                 │
+                                                 ▼
+                                      Phase 19 (Meta-Intelligence) ← v3.0
+                                        19.1 transfer ← 9.1 semantic index
+                                        19.2 audit ← 10.1, 11.2, 14.2
 ```
 
 ### Version Release Criteria
 
 | Version | Phase | Release Gate |
 |---------|-------|-------------|
-| v1.3.0 | 10 (Statistical Rigor) | `/turing:seed` and `/turing:reproduce` pass on 3 different ML tasks |
-| v1.4.0 | 11 (Experiment Intelligence) | `/turing:diagnose`, `/turing:ablate`, `/turing:frontier` produce correct output on existing experiment logs |
-| v1.5.0 | 12 (Performance) | `/turing:profile` identifies known bottlenecks; `/turing:checkpoint prune` reclaims >50% disk on a 50-experiment project |
-| **v2.0.0** | **13 (Deployment Bridge)** | **`/turing:export` produces bit-equivalent ONNX/joblib output verified by equivalence tests — Turing crosses from experiment engine to production pipeline** |
-| v2.1.0 | 14 (Research Workflow) | `/turing:paper` generates a results table where every number matches `log.jsonl` (zero transcription errors) |
+| v1.3.0 | 10 (Statistical Rigor) | **RELEASED** |
+| v1.4.0 | 11 (Experiment Intelligence) | **RELEASED** |
+| v1.5.0 | 12 (Performance) | **RELEASED** |
+| **v2.0.0** | **13 (Deployment Bridge)** | **RELEASED** |
+| v2.1.0 | 14 (Research Workflow) | **RELEASED** |
+| v2.2.0 | 15 (Orchestration) | `/turing:queue` runs 10 experiments overnight with priority ordering; `/turing:retry` auto-recovers from OOM by reducing batch size |
+| v2.3.0 | 16 (Deep Analysis) | `/turing:diff` identifies the divergence point between two experiments; `/turing:watch` catches a loss spike mid-training |
+| v2.4.0 | 17 (Model Composition) | `/turing:ensemble` beats the best single model on 3 tasks; `/turing:stitch` swaps a pipeline stage without rewriting train.py |
+| v2.5.0 | 18 (Scaling & Efficiency) | `/turing:scale` predicts full-dataset accuracy within 2% from 10% data runs; `/turing:budget` halts exploration when budget exhausted |
+| **v3.0.0** | **19 (Meta-Intelligence)** | **`/turing:transfer` surfaces a winning hypothesis from a prior project; `/turing:audit` catches a real methodological error — Turing becomes project-aware, not just experiment-aware** |
