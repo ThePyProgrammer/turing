@@ -1,6 +1,6 @@
 {
   "name": "claude-turing",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "type": "module",
   "description": "Autonomous ML research harness for Claude Code. The autoresearch loop as a formal protocol — iteratively trains, evaluates, and improves ML models with structured experiment tracking, convergence detection, immutable evaluation infrastructure, and safety guardrails.",
   "bin": {
