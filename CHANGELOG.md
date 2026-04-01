@@ -2,6 +2,18 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.3.0] — 2026-04-01 — Feature & Training Intelligence
+
+### Added
+- `/turing:feature` — automated feature selection: mutual information, L1, tree-based importance with consensus ranking, redundancy detection, interaction feature generation
+- `/turing:curriculum` — training curriculum optimization: difficulty scoring (loss, margin, disagreement), strategy comparison (easy-to-hard, hard-to-easy, self-paced, random), impossible sample detection
+
+### Phase
+- **22.1** Automated Feature Selection
+- **22.2** Training Curriculum Optimization
+
+**1440 tests | 49 commands | 68 scripts | 11 commits**
+
 ## [3.2.0] — 2026-04-01 — Model Debugging
 
 ### Added
@@ -260,6 +272,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.3.0
 [3.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.2.0
 [3.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.1.0
 [3.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.0.0
