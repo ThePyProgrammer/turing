@@ -2,6 +2,26 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.3.0] — 2026-04-01 — Deep Analysis
+
+### Added
+- `/turing:diff` — deep experiment comparison: config diffs with magnitude, metric deltas with statistical significance, per-class regression detection, training curve divergence points, feature importance shifts, optional code diff
+- `/turing:watch` — live training monitor with configurable alert rules (loss spikes, NaN detection, overfitting onset, metric plateaus), compact dashboard, post-hoc analysis mode
+- `/turing:regress` — performance regression gate: re-run best experiment after changes, verify metrics haven't degraded, capture environment diffs, pass/warning/fail verdicts
+- `config/watch_alerts.yaml` — configurable alert rules for training monitor
+- Stability section in `/turing:brief` with regression check history
+- `/implement` skill for systematic roadmap phase implementation
+
+### Fixed
+- Filter NaN values from rolling statistics in training monitor
+
+### Phase
+- **16.1** Deep Experiment Comparison
+- **16.2** Live Training Monitor
+- **16.3** Performance Regression Gate
+
+**931 tests | 33 commands | 52 scripts | 23 commits**
+
 ## [2.2.1] — 2026-04-01
 
 ### Fixed
@@ -160,6 +180,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[2.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.3.0
 [2.2.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.1
 [2.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.0
 [2.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.1.0
