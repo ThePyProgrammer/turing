@@ -56,7 +56,33 @@ From the commit history and changed files, determine:
 
 To count commands: `ls commands/*.md | grep -v turing.md | wc -l`
 To count scripts: `ls templates/scripts/*.py | grep -v __init__.py | wc -l`
-To count tests (approximate): run `python -m pytest tests/ --co -q 2>/dev/null | tail -1` or count test functions with grep.
+To count tests: run `uv run pytest tests/ --co -q 2>/dev/null | tail -1`
+
+## Step 1b: Update CHANGELOG.md
+
+Read `CHANGELOG.md` and prepend a new entry at the top (after the header). Follow the existing format exactly:
+
+```markdown
+## [<NEW_VERSION>] — <YYYY-MM-DD> — <Headline>
+
+### Added
+- bullet per new command or feature
+
+### Fixed (if applicable)
+- bullet per bug fix
+
+### Phase (if applicable)
+- **N.M** Phase Name
+
+**<test_count> tests | <command_count> commands | <script_count> scripts | <commit_count> commits**
+```
+
+Also add the release link at the bottom of the file:
+```markdown
+[<NEW_VERSION>]: https://github.com/ThePyProgrammer/turing/releases/tag/v<NEW_VERSION>
+```
+
+For patch releases (x.y.Z), keep it minimal — just the fix description and stats.
 
 ## Step 2: Update Version in Manifests
 
@@ -80,7 +106,7 @@ The README uses a specific philosophical, essay-like style with extended metapho
 ## Step 4: Commit and Push
 
 ```bash
-git add pyproject.toml package.json .claude-plugin/plugin.json README.md
+git add pyproject.toml package.json .claude-plugin/plugin.json README.md CHANGELOG.md
 git commit -m "chore: bump version to v<NEW_VERSION> across all manifests
 
 Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>"

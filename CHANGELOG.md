@@ -1,0 +1,173 @@
+# Changelog
+
+All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+## [2.2.1] — 2026-04-01
+
+### Fixed
+- Add missing runtime dependencies (`pandas>=2.0`, `scipy>=1.12`, `joblib>=1.3`) to `pyproject.toml`
+- Add `uv.lock` for reproducible installs
+- Fix 14 test failures caused by missing packages in clean virtual environments
+
+**778 tests passing (0 failures) | 30 commands | 49 scripts | 2 commits**
+
+## [2.2.0] — 2026-04-01 — Orchestration
+
+### Added
+- `/turing:queue` — batch experiment scheduler with priority ordering and dependency chains
+- `/turing:retry` — smart failure recovery: auto-diagnose crash type (OOM, NaN, timeout, import, convergence, data) and retry with targeted fix
+- `/turing:fork` — experiment branching: run parallel tracks from common parent, report winner
+- `config/failure_modes.yaml` — configurable failure taxonomy for retry
+- Queue Report section in `/turing:brief`
+
+### Phase
+- **15.1** Experiment Scheduler
+- **15.2** Smart Failure Recovery
+- **15.3** Experiment Branching
+
+**727 tests | 30 commands | 49 scripts | 17 commits**
+
+## [2.1.0] — 2026-04-01 — Research Workflow
+
+### Added
+- `/turing:lit` — literature search via Semantic Scholar API (free query, baseline SOTA comparison, related papers)
+- `/turing:paper` — draft paper sections from experiment logs (setup, results, ablation, hyperparameters) in LaTeX and markdown
+- Auto-hypothesis generation from literature findings with `source: "literature"`
+
+### Phase
+- **14.1** Literature Integration
+- **14.2** Paper Section Drafting
+- All 14 original roadmap phases complete
+
+**664 tests | 27 commands | 46 scripts | 12 commits**
+
+## [2.0.0] — 2026-04-01 — Deployment Bridge
+
+### Added
+- `/turing:export` — export model to production formats (joblib, xgboost_json, lightgbm_text, onnx, torchscript, tflite)
+- `equivalence_checker.py` — inference equivalence verification (exact, approximate, divergent)
+- `latency_benchmark.py` — p50/p95/p99 inference latency with warm-up and speedup comparison
+- `export_card.py` — deployment model card with metrics, seed study, equivalence, latency, dependencies
+- Format registry with auto-detection based on model type
+
+### Phase
+- **13.1** Model Export — Turing crosses from experiment engine to production pipeline
+
+**611 tests | 25 commands | 44 scripts | 14 commits**
+
+## [1.5.0] — 2026-03-31 — Performance & Resources
+
+### Added
+- `/turing:profile` — computational profiling: timing breakdown, memory (RSS + Python + GPU), throughput, bottleneck detection with 5 pattern types and actionable recommendations
+- `/turing:checkpoint` — smart checkpoint management: list, prune (Pareto-based), average top-K, resume, disk usage stats
+- Performance Profile section in `/turing:brief`
+
+### Phase
+- **12.1** Computational Profiling
+- **12.2** Smart Checkpoint Manager
+
+**542 tests | 24 commands | 39 scripts | 13 commits**
+
+## [1.4.0] — 2026-03-31 — Experiment Intelligence
+
+### Added
+- `/turing:diagnose` — error analysis: confusion matrix, per-class P/R/F1, most-confused pairs, regression residual analysis, feature-range bias, failure mode clustering, auto-hypothesis generation
+- `/turing:ablate` — systematic ablation studies: auto-detect components, per-component runs, delta table, dead-weight flagging, LaTeX output
+- `/turing:frontier` — N-dimensional Pareto frontier: multi-objective dominance, closest-neighbor for dominated points, ASCII scatter plots
+- Error Analysis section in `/turing:brief`
+
+### Phase
+- **11.1** Error Analysis
+- **11.2** Ablation Studies
+- **11.3** Pareto Frontier Visualization
+
+**487 tests | 22 commands | 37 scripts | 18 commits**
+
+## [1.3.0] — 2026-03-31 — Statistical Rigor
+
+### Added
+- `/turing:seed` — multi-seed study: mean/std/95% CI, coefficient of variation, seed-sensitivity flagging
+- `/turing:reproduce` — reproducibility verification: re-run from logged config, tolerance checking, environment drift detection (pip freeze diff)
+- Seed study sections in `/turing:brief` and `/turing:card`
+- Seed study step in convergence protocol (`program.md`)
+- `load_seed_study()` and `load_reproduction()` in `turing_io.py`
+
+### Phase
+- **10.1** Multi-Seed Runner
+- **10.2** Reproducibility Verification
+
+**407 tests | 19 commands | 34 scripts | 28 commits**
+
+## [1.2.0] — 2026-03-31 — Tree-Search Hypothesis Exploration
+
+### Added
+- `/turing:explore` — AB-MCTS tree search over hypothesis space via TreeQuest integration
+- `treequest_suggest.py` — seed generation, deterministic child expansion (18 strategies), critique-based scoring
+- `treequest` as hypothesis source with priority ordering: human > literature > treequest > taxonomy > agent
+- `[treequest]` markers in `/turing:brief`
+- Greedy best-first fallback when TreeQuest not installed
+
+### Phase
+- **9.1** TreeQuest Integration
+
+**379 tests | 17 commands | 31 scripts | 11 commits**
+
+## [1.1.0] — 2026-03-31 — Cost-Performance Frontier and Model Cards
+
+### Added
+- `cost_frontier.py` — Pareto-optimal cost-performance analysis with efficiency scoring
+- `/turing:card` — standardized model card generation (performance, limitations, intended use, artifact contract)
+- `leaderboard.py` — ranked experiment table with delta-vs-leader
+- `diff_configs.py`, `export_results.py`, `plot_trajectory.py`
+- Cost-Performance Analysis section in `/turing:brief`
+
+### Phase
+- **8.1** Cost-Performance Frontier
+- **8.2** Model Cards
+
+**345 tests | 16 commands | 30 scripts | 19 commits**
+
+## [1.0.1] — 2026-03-31 — Multi-Project, Model Contracts, Model Registry
+
+### Added
+- Multi-project support: scaffold multiple ML projects in one repo with independent state
+- `model_contract.md` — formal schema for trained model bundles
+- `model_registry.yaml` — catalog of model architectures with default hyperparameters
+- Multi-project detection in router and brief commands
+
+**311 tests | 15 commands | 25 scripts | 11 commits**
+
+## [1.0.0] — 2026-03-31 — The Research Assistant That Can't Fool Itself
+
+### Added
+- Core autoresearch loop: `/turing:init`, `/turing:train`, `/turing:status`, `/turing:compare`
+- Hypothesis database: `/turing:try` with priority queue, status transitions, detail files
+- Research briefing: `/turing:brief` with campaign summary, trajectory, failure patterns
+- Immutable evaluation infrastructure: hidden `evaluate.py`, behavioral probes
+- Anti-cheating guardrails: 6 defense layers
+- Novelty guard with configurable alias tables
+- Statistical comparison (Mann-Whitney U test, multi-run evaluation)
+- Experiment families with exhaustion detection
+- Decision packets (promote, branch_followup, abandon, fix_and_retry)
+- Hyperparameter sweep: `/turing:sweep`
+- Literature-grounded model suggestions: `/turing:suggest`
+- Experiment design scaffolding: `/turing:design`
+- Research mode switching: `/turing:mode`
+- Pre-flight resource check: `/turing:preflight`
+- Logbook, poster, report generation
+- 2 specialized agents: `@ml-researcher` (read/write), `@ml-evaluator` (read-only)
+- 16 Architecture Decision Records
+
+**257 tests | 14 commands | 23 scripts | 193 commits**
+
+[2.2.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.1
+[2.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.0
+[2.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.1.0
+[2.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.0.0
+[1.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.5.0
+[1.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.4.0
+[1.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.3.0
+[1.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.2.0
+[1.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.1.0
+[1.0.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.0.1
+[1.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v1.0.0
