@@ -355,6 +355,22 @@ def load_scaling_results(scaling_dir: str = "experiments/scaling") -> list[dict]
     return reports
 
 
+def load_audit_report(audit_dir: str = "experiments/audits") -> dict | None:
+    """Load the most recent audit report."""
+    path = Path(audit_dir)
+    if not path.exists():
+        return None
+    files = sorted(path.glob("audit-*.yaml"))
+    if not files:
+        return None
+    try:
+        with open(files[-1]) as f:
+            report = yaml.safe_load(f)
+            return report if isinstance(report, dict) else None
+    except (yaml.YAMLError, OSError):
+        return None
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -376,6 +392,7 @@ def format_brief(
     ensemble_results: list[dict] | None = None,
     budget_status: dict | None = None,
     scaling_results: list[dict] | None = None,
+    audit_report: dict | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -635,6 +652,28 @@ def format_brief(
             reason = verdict.get("reason", "")
             lines.append(f"- **{v.upper()}**: {reason}")
 
+    # Methodology audit
+    if audit_report and audit_report.get("score"):
+        score = audit_report["score"]
+        verdict = audit_report.get("verdict", "?")
+        verdict_labels = {
+            "pass": "PASS",
+            "pass_with_warnings": "PASS (warnings)",
+            "needs_work": "NEEDS WORK",
+            "fail": "FAIL",
+        }
+        lines.extend(["", "## Methodology Audit", ""])
+        lines.append(
+            f"**{verdict_labels.get(verdict, verdict.upper())}** — "
+            f"{score.get('pass', 0)}/{score.get('checkable', 0)} checks passed, "
+            f"{score.get('fail', 0)} failure(s)"
+        )
+        actions = audit_report.get("actions", [])
+        if actions:
+            lines.append("")
+            for a in actions[:3]:
+                lines.append(f"- Fix: `{a['fix']}` ({a['check']})")
+
     # Regression check history (stability)
     if regression_checks:
         lines.extend(["", "## Stability", ""])
@@ -728,6 +767,7 @@ def generate_brief(
     ensemble_results = load_ensemble_results()
     budget_status = load_budget_status(log_path=log_path)
     scaling_results = load_scaling_results()
+    audit_report = load_audit_report()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -743,6 +783,7 @@ def generate_brief(
         ensemble_results=ensemble_results if ensemble_results else None,
         budget_status=budget_status,
         scaling_results=scaling_results if scaling_results else None,
+        audit_report=audit_report,
     )
 
 
