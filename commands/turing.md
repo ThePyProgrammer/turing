@@ -53,6 +53,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "sanity", "sanity check", "pre-training", "is it broken", "before training", "quick check" | `/turing:sanity` | Check |
 | "baseline", "baselines", "trivial baseline", "majority class", "is it better than random" | `/turing:baseline` | Analyze |
 | "leak", "leakage", "data leakage scan", "suspicious feature", "train test overlap" | `/turing:leak` | Validate |
+| "xray", "model internals", "dead neurons", "gradient flow", "weight distribution", "inside the model" | `/turing:xray` | Analyze |
+| "sensitivity", "which params matter", "hyperparameter importance", "parameter ranking" | `/turing:sensitivity` | Analyze |
+| "calibrate", "calibration", "ECE", "reliability diagram", "overconfident", "probability calibration" | `/turing:calibrate` | Analyze |
 
 ## Sub-commands
 
@@ -102,6 +105,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:sanity [--quick]` | Pre-training sanity checks: initial loss, overfit test, gradient flow, output validation | (inline) |
 | `/turing:baseline [--methods]` | Automatic baseline generation: random, majority/mean, linear, k-NN | (inline) |
 | `/turing:leak [--deep]` | Targeted leakage detection: single-feature tests, correlation, train/test overlap | (inline) |
+| `/turing:xray [exp-id]` | Internal model diagnostics: gradient flow, dead neurons, weight distributions, tree analysis | (inline) |
+| `/turing:sensitivity [exp-id]` | Hyperparameter sensitivity analysis: rank parameters by impact, detect non-monotonic responses | (inline) |
+| `/turing:calibrate [exp-id]` | Probability calibration: ECE/MCE, reliability diagrams, Platt/isotonic/temperature scaling | (inline) |
 
 ## Proactive Detection
 
