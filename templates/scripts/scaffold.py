@@ -124,6 +124,8 @@ TEMPLATE_DIRS = {
         "model_xray.py",
         "sensitivity_analysis.py",
         "calibration.py",
+        "feature_intelligence.py",
+        "curriculum_optimizer.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -160,6 +162,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/xrays",
     "experiments/sensitivity",
     "experiments/calibration",
+    "experiments/features",
+    "experiments/curriculum",
     "experiments/logs",
     "models/best",
     "models/archive",

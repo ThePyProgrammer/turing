@@ -61,6 +61,8 @@ const EXPECTED_COMMANDS = [
   "xray/SKILL.md",
   "sensitivity/SKILL.md",
   "calibrate/SKILL.md",
+  "feature/SKILL.md",
+  "curriculum/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
