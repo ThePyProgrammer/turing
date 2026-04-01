@@ -39,6 +39,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "fork", "branch", "try both", "parallel experiments", "A or B" | `/turing:fork` | Orchestrate |
 | "profile", "profiling", "bottleneck", "slow training", "why is it slow", "timing" | `/turing:profile` | Check |
 | "checkpoint", "checkpoints", "prune checkpoints", "disk space", "resume training" | `/turing:checkpoint` | Check |
+| "diff", "deep compare", "what changed", "why did it diverge", "experiment diff" | `/turing:diff` | Analyze |
+| "watch", "monitor", "live training", "loss spike", "is it overfitting", "training progress" | `/turing:watch` | Monitor |
+| "regress", "regression", "did metrics degrade", "check for regression", "CI gate", "stability check" | `/turing:regress` | Validate |
 
 ## Sub-commands
 
@@ -74,6 +77,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:fork <exp-id> --branches` | Experiment branching: run parallel tracks, report winner | (inline) |
 | `/turing:profile [exp-id]` | Computational profiling: timing, memory, throughput, bottleneck detection | (inline) |
 | `/turing:checkpoint <action>` | Smart checkpoint management: list, prune (Pareto), average, resume, stats | (inline) |
+| `/turing:diff <exp-a> <exp-b>` | Deep experiment comparison: config diff, metric significance, per-class regressions, curve divergence | (inline) |
+| `/turing:watch [--analyze]` | Live training monitor with early-warning alerts (loss spike, NaN, overfitting, plateau) | (inline) |
+| `/turing:regress [--tolerance]` | Performance regression gate: re-run best experiment, verify metrics haven't degraded | (inline) |
 
 ## Proactive Detection
 
