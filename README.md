@@ -377,6 +377,9 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:onboard [--audience]` | Project onboarding — walkthrough for new collaborators |
 | `/turing:share <exp-ids...>` | Experiment packaging — portable archive with manifest |
 | `/turing:review [--venue]` | Peer review simulation — weaknesses, fix commands, score |
+| `/turing:whatif "<question>"` | What-if analysis — answer hypotheticals from existing experiment data |
+| `/turing:counterfactual <exp-id>` | Counterfactual explanations — minimum input change to flip a prediction |
+| `/turing:simulate [--configs]` | Experiment outcome prediction — pre-filter configs, save budget |
 
 And for fully hands-off operation:
 
@@ -561,11 +564,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-66 commands, 2 agents, 10 config files, 85 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), model composition (ensemble + stitch + warm), scaling & efficiency (scale + budget + distill), meta-intelligence (transfer + audit), pre-training intelligence (sanity + baseline + leak), model debugging (xray + sensitivity + calibrate), feature & training intelligence (feature + curriculum), model surgery (prune + quantize + merge + surgery), experiment archaeology (trend + flashback + archive + annotate + search + template + replay), research communication (cite + present + changelog), collaboration (onboard + share + review), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+69 commands, 2 agents, 10 config files, 88 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), deep analysis (diff + watch + regress), model composition (ensemble + stitch + warm), scaling & efficiency (scale + budget + distill), meta-intelligence (transfer + audit), pre-training intelligence (sanity + baseline + leak), model debugging (xray + sensitivity + calibrate), feature & training intelligence (feature + curriculum), model surgery (prune + quantize + merge + surgery), experiment archaeology (trend + flashback + archive + annotate + search + template + replay), research communication (cite + present + changelog), collaboration (onboard + share + review), what-if analysis (whatif + counterfactual + simulate), 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              62 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis + model composition + scaling & efficiency + meta-intelligence + pre-training intelligence + model debugging + feature & training intelligence + model surgery + experiment archaeology + research communication)
+├── commands/              65 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration + deep analysis + model composition + scaling & efficiency + meta-intelligence + pre-training intelligence + model debugging + feature & training intelligence + model surgery + experiment archaeology + research communication + what-if analysis)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
