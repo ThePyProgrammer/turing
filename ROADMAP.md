@@ -2981,6 +2981,592 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 
 ---
 
+## Phase 26: Collaboration (v4.1.0)
+
+*Research is a team sport. Make results shareable and reviewable.*
+
+### 26.1 Project Onboarding — `/turing:onboard`
+
+**What:** Generate a project walkthrough for a new collaborator. Summarizes the task, what's been tried, what works, what's dead, and where the project is heading. A 5-minute read that replaces a 1-hour onboarding meeting.
+
+**Why:** ML projects accumulate context that lives in one researcher's head. When a collaborator joins — or when *you* return after a month — reconstructing the full picture from experiment logs is painful. `/turing:flashback` (Phase 24.2) restores recent context. `/turing:onboard` goes deeper: the full project narrative from inception to current state, pitched at someone who has never seen the project.
+
+**Implementation:**
+1. Create `commands/onboard.md` — `/turing:onboard [--depth brief|full] [--audience researcher|engineer|stakeholder]`
+2. Add `templates/scripts/generate_onboarding.py`:
+   - Reads all available project artifacts: `config.yaml`, `RESEARCH_PLAN.md`, experiment log, trend analysis, briefs, annotations, changelog, decision packets, failure clusters
+   - Generates a structured walkthrough:
+     ```
+     Project Onboarding: fraud-detection
+     =====================================
+     
+     ## The Task
+     Binary classification on transaction data (23 features, 50K samples).
+     Primary metric: F1-score (imbalanced classes, 5:1 ratio).
+     
+     ## What We've Tried (89 experiments, 3 weeks)
+     
+     ### Architecture Search (40 experiments → exhausted)
+     Started with logistic regression (F1=0.71), moved to random forest (0.78),
+     then XGBoost (0.84), then LightGBM (0.87). Neural nets failed — dataset
+     too small. Architecture search hit diminishing returns at experiment 40.
+     
+     ### Feature Engineering (30 experiments → still productive)
+     Polynomial features (+0.02), feature selection (+0.01), time-based
+     features (+0.03). This is where the gains are coming from now.
+     
+     ### Ensemble & Calibration (19 experiments)
+     Stacking ensemble of top 3 models (0.89). Platt calibration applied.
+     Current best: exp-089, F1=0.891 ± 0.005.
+     
+     ## Key Decisions
+     - Don't try neural nets (too little data — see annotation on exp-090)
+     - SMOTE must be inside CV folds (leakage discovered in exp-044)
+     - LightGBM dart boosting > default gbdt for this dataset
+     
+     ## Where We're Heading
+     - Pending: CatBoost with native categoricals (human-injected hypothesis)
+     - Budget: 11 experiments remaining
+     - Mode: exploit (refining current best)
+     
+     ## How to Get Started
+     1. Read exp-089's config for the current best setup
+     2. Run `/turing:flashback` for recent context
+     3. Run `/turing:brief` for actionable next steps
+     ```
+   - **Audience adaptation:**
+     - `researcher`: full technical detail, experiment IDs, hyperparameters
+     - `engineer`: focus on the deployment path, model card, export format
+     - `stakeholder`: high-level narrative, business metrics, timeline
+   - Writes to `ONBOARDING.md`
+3. Integration with `/turing:changelog` (Phase 25.3) — onboarding includes the evolution narrative
+4. Integration with `/turing:trend` (Phase 24.1) — includes strategic assessment
+5. Add tests
+
+**Acceptance:** A new collaborator reads `/turing:onboard` output and can start contributing within 30 minutes without a walkthrough meeting.
+
+### 26.2 Experiment Packaging — `/turing:share`
+
+**What:** Package an experiment or set of experiments into a self-contained, portable archive. Includes config, results, seed study, model card, annotations, and reproduction instructions. The recipient can `/turing:replay` it without access to the full project.
+
+**Why:** Sharing ML results currently means sending a Slack message with a screenshot of metrics and a "check exp-042 on my branch." `/turing:share` produces a professional, reproducible package — useful for collaborator handoffs, paper supplementary material, or archiving milestones.
+
+**Implementation:**
+1. Create `commands/share.md` — `/turing:share <exp-ids...> [--include model,data-hash,figures] [--format zip|tar.gz]`
+2. Add `templates/scripts/package_experiments.py`:
+   - Collects for each experiment:
+     - Config and hyperparameters
+     - Metrics (aggregate + per-class if available)
+     - Seed study results (if available)
+     - Model card (generated or from `/turing:card` Phase 28.3)
+     - Annotations (Phase 24.4)
+     - Decision packet (Phase 6.2)
+     - Relevant figures (training curve, confusion matrix)
+   - Optionally includes:
+     - `--include model`: the trained model artifact
+     - `--include data-hash`: dataset hash for verification (not the data itself)
+     - `--include figures`: pre-generated visualizations
+     - `--include code`: `train.py` and `prepare.py` snapshots from that experiment's git commit
+   - Generates a `README.md` inside the package:
+     ```
+     Experiment Package: exp-089 (fraud-detection)
+     ==============================================
+     Metric: F1=0.891 ± 0.005 (5-seed study)
+     Model: LightGBM (dart, max_depth=6, 500 estimators)
+     
+     To reproduce: `/turing:replay` with included config
+     To verify: compare against data hash in manifest.yaml
+     ```
+   - Outputs to `exports/packages/exp-089-package.tar.gz`
+3. Integration with `/turing:export` (Phase 13.1) — packages can include the exported model
+4. Add `--email` or `--upload` hooks for sharing (extensible via user config)
+5. Add tests
+
+**Depends on:** Phase 13.1 (export), Phase 24.4 (annotations), Phase 10.1 (seed study)
+
+**Acceptance:** `/turing:share exp-089` produces a self-contained archive that a collaborator can unpack and reproduce without access to the original project.
+
+### 26.3 Peer Review Simulation — `/turing:review`
+
+**What:** Simulate a conference peer review of your experiment setup, results, and paper sections. Generates likely reviewer objections, methodological concerns, and missing comparisons — before you submit.
+
+**Why:** The most common review feedback is predictable: "missing baseline X," "no error bars," "unfair comparison," "overclaimed in abstract." These are all checkable from experiment logs. `/turing:audit` (Phase 19.2) checks methodology. `/turing:review` goes further — it role-plays a skeptical reviewer and generates specific objections with severity ratings.
+
+**Implementation:**
+1. Create `commands/review.md` — `/turing:review [--venue neurips|icml|aaai|general] [--harsh]`
+2. Add `templates/scripts/simulate_review.py`:
+   - Reads: paper sections (Phase 14.2), experiment log, audit report (Phase 19.2), seed study, ablation, baseline comparison
+   - Generates structured review:
+     ```
+     Simulated Peer Review
+     =====================
+     
+     Overall: Weak Accept (5/10)
+     
+     Strengths:
+     + Thorough ablation study covering all components
+     + Multi-seed evaluation with proper confidence intervals
+     + Clear improvement over baselines
+     
+     Weaknesses:
+     ✗ [MAJOR] No comparison to CatBoost — a strong baseline for this task type
+       Fix: `/turing:try "CatBoost with default params"` then add to results table
+     
+     ✗ [MAJOR] Claim "state-of-the-art" in abstract but no comparison to published
+       SOTA (0.91 on Papers With Code)
+       Fix: `/turing:lit --baseline` to get SOTA numbers, soften claim or improve
+     
+     ⚠ [MINOR] Feature importance analysis missing — which features drive predictions?
+       Fix: `/turing:feature` or `/turing:xray`
+     
+     ⚠ [MINOR] No discussion of computational cost vs accuracy tradeoff
+       Fix: Include `/turing:frontier` results in paper
+     
+     Questions a reviewer would ask:
+     - "How does performance vary with dataset size?" → Run `/turing:scale`
+     - "Is the model calibrated?" → Run `/turing:calibrate`
+     
+     Estimated time to address: 2-3 days
+     ```
+   - **Venue-specific calibration:** NeurIPS reviewers care about novelty and theoretical grounding; ICML about rigor; AAAI about breadth of evaluation
+   - `--harsh` flag: simulate Reviewer 2 (overly critical, finds fault with everything)
+   - Each objection links to the `/turing:` command that would fix it
+3. Integration with `/turing:audit` (Phase 19.2) — review incorporates audit results
+4. Integration with `/turing:paper` (Phase 14.2) — review references specific paper sections
+5. Add tests
+
+**Depends on:** Phase 19.2 (audit), Phase 14.2 (paper), Phase 20.2 (baseline)
+
+**Acceptance:** `/turing:review` identifies 2+ real weaknesses that would appear in an actual review. The researcher addresses them before submission.
+
+---
+
+## Phase 27: What-If Analysis (v4.2.0)
+
+*Answer hypotheticals without running experiments.*
+
+### 27.1 Counterfactual Experiment Simulation — `/turing:whatif`
+
+**What:** Answer "what if?" questions using existing experiment data and models: "What if I had 2x more data?" "What if I removed class 3?" "What if I combined features from exp-031 with the model from exp-042?" Synthesizes predictions from prior phases without running new experiments.
+
+**Why:** Every new experiment costs compute time. Many hypotheticals can be answered (or at least estimated) from existing data: scaling laws predict data size impact, per-class metrics predict class removal impact, stitch can simulate pipeline combinations. `/turing:whatif` routes the question to the right existing tool and returns an estimate.
+
+**Implementation:**
+1. Create `commands/whatif.md` — `/turing:whatif "<question>"`
+2. Add `templates/scripts/whatif_engine.py`:
+   - Parses the question and routes to the appropriate estimator:
+     - **"more/less data"** → `/turing:scale` extrapolation (Phase 18.1)
+     - **"remove class/feature"** → `/turing:ablate` with per-class metrics (Phase 11.2, 3.1)
+     - **"combine X from exp-A with Y from exp-B"** → `/turing:stitch` estimation (Phase 17.2)
+     - **"different hyperparameter"** → `/turing:sensitivity` interpolation (Phase 21.2)
+     - **"ensemble these models"** → `/turing:ensemble` prediction correlation analysis (Phase 17.1)
+     - **"prune to X% sparsity"** → `/turing:prune` sweep interpolation (Phase 23.1)
+   - Returns an estimate with confidence:
+     ```
+     What if: "I had 2x more data"
+     
+     Estimate: accuracy 0.882 → 0.891 (+0.009)
+     Confidence: HIGH (R²=0.997 on scaling curve from 4 data points)
+     Source: scaling law fit from `/turing:scale` (Phase 18.1)
+     
+     Recommendation: Marginal gain. Invest in feature engineering instead.
+     To verify: run `/turing:scale --extrapolate 2x`
+     ```
+   - When no existing data supports the estimate, says so honestly: "Cannot estimate — no scaling data available. Run `/turing:scale` first."
+3. Integration with `/turing:budget` (Phase 18.2) — "what if I spent my remaining budget on X vs Y?"
+4. Add tests for question parsing, estimator routing, confidence calibration
+
+**Depends on:** Phases 18.1, 11.2, 17.2, 21.2, 17.1, 23.1 (uses their data, doesn't re-run them)
+
+**Acceptance:** `/turing:whatif "I had 2x more data"` returns an accuracy estimate within 1% of the actual result when later verified.
+
+### 27.2 Input-Level Counterfactual Explanations — `/turing:counterfactual`
+
+**What:** For a given prediction, find the smallest input change that would flip the outcome. "This transaction was flagged as fraud — what's the minimum change to make it non-fraud?" Useful for debugging individual predictions and for regulatory explanations.
+
+**Why:** Aggregate model explanations (SHAP, feature importance) show general patterns. Counterfactuals explain *individual decisions* — required by GDPR's "right to explanation" and increasingly expected in high-stakes ML applications (credit, insurance, medical). `/turing:counterfactual` finds the nearest contrastive example.
+
+**Implementation:**
+1. Create `commands/counterfactual.md` — `/turing:counterfactual <exp-id> --sample <index> [--target <class>]`
+2. Add `templates/scripts/counterfactual_explanation.py`:
+   - Loads the model and the target sample
+   - Finds the nearest counterfactual using:
+     - **Feature perturbation:** greedy search — change one feature at a time, find the minimum change that flips the prediction
+     - **Prototype-based:** find the nearest training sample from the target class and interpolate
+     - **Optimization-based:** gradient-based search for differentiable models (neural nets)
+   - Reports:
+     ```
+     Counterfactual for sample #1247 (predicted: fraud, confidence: 0.89)
+     
+     Current prediction: FRAUD (0.89)
+     Nearest non-fraud counterfactual:
+     
+     | Feature         | Original | Counterfactual | Change     |
+     |-----------------|----------|----------------|------------|
+     | amount          | $4,230   | $1,850         | −$2,380    |
+     | hour_of_day     | 3        | 14             | +11 hours  |
+     | merchant_country | foreign  | domestic       | category   |
+     
+     Counterfactual prediction: NOT FRAUD (0.34)
+     Distance: 0.42 (normalized feature space)
+     
+     Interpretation: This transaction is flagged primarily because of
+     the high amount ($4,230) at an unusual hour (3 AM) from a foreign
+     merchant. Reducing the amount to $1,850 alone is insufficient —
+     the combination of all three factors drives the prediction.
+     ```
+   - Supports batch mode: generate counterfactuals for all misclassified samples
+3. Integration with `/turing:diagnose` (Phase 11.1) — counterfactuals for systematic failure modes
+4. Integration with `/turing:card` (Phase 28.3) — counterfactual examples in model card
+5. Add tests
+
+**Depends on:** Phase 11.1 (diagnose)
+
+**Acceptance:** `/turing:counterfactual` produces a human-readable explanation of what would need to change to flip a prediction, with the minimum number of feature changes.
+
+### 27.3 Experiment Outcome Prediction — `/turing:simulate`
+
+**What:** Before running a sweep of N experiments, predict the likely outcome distribution from prior data. "Based on your history, 80% of experiments in this hyperparameter region will underperform the current best." Pre-filters experiments to save budget.
+
+**Why:** `/turing:budget` caps total experiments. `/turing:simulate` makes each experiment count by predicting which ones are likely to succeed. Uses the Bayesian surrogate from Phase 2.2 and the sensitivity analysis from Phase 21.2 to estimate outcomes without running them.
+
+**Implementation:**
+1. Create `commands/simulate.md` — `/turing:simulate [--configs configs.yaml] [--top-k 5]`
+2. Add `templates/scripts/experiment_simulator.py`:
+   - Takes a list of proposed experiment configs (or generates them from a sweep definition)
+   - For each config, predicts the likely metric using:
+     - **Surrogate model:** Random Forest trained on experiment history (Phase 2.2's `suggest_next.py`)
+     - **Sensitivity bounds:** clamp predictions using sensitivity ranges (Phase 21.2)
+     - **Novelty penalty:** discount predicted performance for configs far from training distribution
+   - Ranks by predicted metric with uncertainty:
+     ```
+     Experiment Simulation (20 proposed configs):
+     
+     | Rank | Config Summary              | Predicted Acc | Uncertainty | Verdict      |
+     |------|-----------------------------|---------------|-------------|--------------|
+     | 1    | LightGBM lr=0.05 depth=8    | 0.886 ± 0.004 | LOW         | RUN ✓        |
+     | 2    | XGBoost lr=0.03 depth=10    | 0.881 ± 0.006 | LOW         | RUN ✓        |
+     | 3    | LightGBM lr=0.2 depth=4     | 0.877 ± 0.008 | MED         | RUN ✓        |
+     | ...                                                                             |
+     | 15   | RF n_est=50 depth=3         | 0.842 ± 0.015 | HIGH        | SKIP ✗       |
+     | 16   | NN hidden=32 lr=0.1         | 0.838 ± 0.022 | HIGH        | SKIP ✗       |
+     
+     Recommendation: Run top 5, skip bottom 15. Estimated budget savings: 75%.
+     ```
+   - Auto-filters: only queue experiments predicted to beat the current best (configurable threshold)
+   - Integration with `/turing:queue` — auto-queue the "RUN" experiments
+3. Integration with `/turing:budget` (Phase 18.2) — simulation informs budget allocation
+4. Add tests for prediction accuracy, ranking quality
+
+**Depends on:** Phase 2.2 (Bayesian surrogate), Phase 21.2 (sensitivity), Phase 18.2 (budget)
+
+**Acceptance:** `/turing:simulate` predicts the top 5 configs, and when actually run, 3+ of them outperform the current best. Budget savings > 50% vs. running all configs.
+
+---
+
+## Phase 28: Model Lifecycle (v4.3.0)
+
+*From "best experiment" to governed, versioned, production-tracked model.*
+
+### 28.1 Incremental Model Update — `/turing:update`
+
+**What:** Update the existing best model with new data without retraining from scratch. For tree models: add new boosting rounds. For neural nets: fine-tune on new samples with a replay buffer to prevent catastrophic forgetting. Tracks accuracy on both old and new data.
+
+**Why:** In production ML, data arrives continuously. Full retraining is expensive and wasteful when 95% of the data hasn't changed. `/turing:update` adds the new 5% incrementally, verifies no regression on old data, and produces an updated model in a fraction of the time.
+
+**Implementation:**
+1. Create `commands/update.md` — `/turing:update <exp-id> --new-data <path> [--replay-ratio 0.1]`
+2. Add `templates/scripts/incremental_update.py`:
+   - Loads the trained model from the specified experiment
+   - Model-specific update strategy:
+     - **XGBoost/LightGBM:** `xgb_model` parameter for continued boosting with new data, add N new rounds
+     - **Neural networks:** fine-tune on new data + 10% replay from old data (configurable ratio). Reduced learning rate.
+     - **scikit-learn:** `partial_fit()` where supported, otherwise `warm_start=True` with combined data
+   - Catastrophic forgetting check:
+     - Evaluate updated model on old validation set
+     - If accuracy drops > threshold on old data: WARN and offer rollback
+     ```
+     Incremental update: exp-089 + 5,000 new samples
+     
+     | Metric    | Before  | After   | Δ        |
+     |-----------|---------|---------|----------|
+     | Old data  | 0.891   | 0.889   | -0.002 ✓ |
+     | New data  | —       | 0.873   | (first)  |
+     | Combined  | 0.891   | 0.885   | -0.006 ⚠ |
+     
+     Update time: 45 seconds (vs 12 minutes for full retrain)
+     Forgetting check: PASS (old data accuracy within tolerance)
+     ```
+   - Logs as new experiment with parent link and `family: "update"`
+3. Integration with `/turing:regress` (Phase 16.3) — auto-run regression check after update
+4. Integration with `/turing:registry` (Phase 28.2) — updated model enters the registry pipeline
+5. Add tests for incremental update, forgetting detection, rollback
+
+**Depends on:** Phase 16.3 (regression gate), Phase 12.2 (checkpoint manager)
+
+**Acceptance:** `/turing:update` adds new data in 45 seconds (vs 12 minutes full retrain) with <0.5% accuracy loss on old data.
+
+### 28.2 Model Registry — `/turing:registry`
+
+**What:** Track which model version is "production," "staging," "candidate," or "archived." Promotion workflow with automated gates: candidate → staging (pass regression) → production (pass audit). Prevents the "which pickle file is deployed?" problem.
+
+**Why:** ML teams lose track of which model is where. The researcher's "best model" isn't always what's deployed. `/turing:registry` creates a formal lifecycle so everyone agrees on which model is live, which is being tested, and which is next in line.
+
+**Implementation:**
+1. Create `commands/registry.md` — `/turing:registry [list|promote|demote|history]`
+2. Add `templates/scripts/model_registry.py`:
+   - **list:** show all registered models with their stage:
+     ```
+     Model Registry:
+     | Stage      | Exp ID  | Version | Metric | Registered   |
+     |------------|---------|---------|--------|--------------|
+     | production | exp-078 | v3      | 0.872  | 2026-03-20   |
+     | staging    | exp-089 | v4      | 0.891  | 2026-03-28   |
+     | candidate  | exp-095 | v4.1    | 0.893  | 2026-04-01   |
+     | archived   | exp-042 | v2      | 0.864  | 2026-03-10   |
+     ```
+   - **promote:** move a model to the next stage with automated gates:
+     - candidate → staging: requires `/turing:regress` PASS + `/turing:seed` study
+     - staging → production: requires `/turing:audit` PASS + `/turing:calibrate` check
+     - Promotion fails if gates don't pass — researcher must fix issues first
+   - **demote:** move a model back (e.g., production issue discovered)
+   - **history:** full promotion/demotion log with timestamps and gate results
+   - Registry stored in `experiments/registry.yaml`
+3. Integration with `/turing:export` (Phase 13.1) — promote auto-exports the model
+4. Integration with `/turing:card` (Phase 28.3) — promote requires an up-to-date model card
+5. Integration with `/turing:changelog` (Phase 25.3) — promotion generates a changelog entry
+6. Add tests
+
+**Depends on:** Phase 16.3 (regress), Phase 19.2 (audit), Phase 10.1 (seed), Phase 21.3 (calibrate)
+
+**Acceptance:** `/turing:registry promote exp-089 staging` runs regression + seed study gates automatically. Promotion succeeds only if both pass.
+
+### 28.3 Model Card Generation — `/turing:card`
+
+**What:** Generate a standardized model card (Mitchell et al., 2019) combining: task description, training data summary, performance metrics with error bars, known failure modes, calibration status, intended use, and limitations. Required by many deployment contexts and increasingly by conferences.
+
+**Why:** Model cards are becoming mandatory — the EU AI Act requires model documentation, NeurIPS requires broader impact statements, and companies need compliance records. The information already exists across Turing's artifacts — `/turing:card` assembles it into the standard format automatically.
+
+**Implementation:**
+1. Create `commands/card.md` — `/turing:card <exp-id> [--format markdown|html|json] [--include fairness]`
+2. Add `templates/scripts/generate_model_card.py`:
+   - Assembles information from existing artifacts:
+     - **Model details:** from `config.yaml` and experiment log
+     - **Training data:** from `prepare.py` analysis and data hash
+     - **Performance:** from experiment metrics, seed study (Phase 10.1), per-class metrics (Phase 3.1)
+     - **Failure modes:** from `/turing:diagnose` report (Phase 11.1)
+     - **Calibration:** from `/turing:calibrate` report (Phase 21.3)
+     - **Limitations:** from annotations (Phase 24.4), review simulation (Phase 26.3)
+     - **Ethical considerations:** prompted if not already documented
+   - Generates structured card:
+     ```
+     # Model Card: fraud-detection-v4
+     
+     ## Model Details
+     - Type: LightGBM (dart boosting)
+     - Version: v4 (exp-089)
+     - Training date: 2026-03-28
+     - Framework: LightGBM 4.1.0
+     
+     ## Intended Use
+     - Binary fraud detection on payment transactions
+     - NOT intended for: credit scoring, identity verification
+     
+     ## Performance
+     - F1: 0.891 ± 0.005 (5-seed study)
+     - Precision: 0.912, Recall: 0.871
+     - Calibration: ECE 0.021 (Platt-calibrated)
+     
+     ## Known Failure Modes
+     - Confuses legitimate high-value international transactions with fraud (fm-001)
+     - Performance degrades on transactions from new merchant categories
+     
+     ## Training Data
+     - 50,000 transactions, 5:1 class imbalance
+     - Data hash: sha256:a3b2c1d4...
+     - Temporal range: 2025-01 to 2026-03
+     
+     ## Limitations
+     - Not validated on data after 2026-03
+     - Requires recalibration if fraud rate changes significantly
+     ```
+   - Writes to `exports/model-cards/exp-NNN-card.md`
+3. Integration with `/turing:registry` (Phase 28.2) — promotion requires current card
+4. Integration with `/turing:export` (Phase 13.1) — card bundled with exported model
+5. Add `--include fairness` flag: add demographic parity analysis if protected attributes available
+6. Add tests
+
+**Depends on:** Phases 10.1, 3.1, 11.1, 21.3, 24.4
+
+**Acceptance:** `/turing:card` produces a complete model card from existing artifacts with zero manual data entry. All numbers verified against experiment logs.
+
+---
+
+## Phase 29: Operational Intelligence (v4.4.0)
+
+*Make Turing itself smarter and easier to use.*
+
+### 29.1 Automated Failure Postmortem — `/turing:postmortem`
+
+**What:** When 5+ consecutive experiments fail or show no improvement, auto-trigger a postmortem: what do they share? Is the search space exhausted? Is there a systematic issue (data bug, config error, wrong metric)? Produces actionable next steps.
+
+**Why:** Failure streaks are demoralizing and expensive. The researcher keeps tweaking hoping the next run works, but the underlying issue is systematic. `/turing:postmortem` breaks the cycle by diagnosing *why* a streak is happening rather than letting the researcher (or agent) blindly continue.
+
+**Implementation:**
+1. Create `commands/postmortem.md` — `/turing:postmortem [--window 10] [--auto-trigger 5]`
+2. Add `templates/scripts/failure_postmortem.py`:
+   - Analyzes the last N experiments (default: last 10, or all experiments since last improvement)
+   - Diagnosis categories:
+     - **Search space exhaustion:** all recent experiments cluster in a small config region with diminishing returns
+       → Recommendation: switch families, try a fundamentally different approach
+     - **Systematic config error:** all experiments share a common bad config (e.g., learning rate too high)
+       → Recommendation: check sensitivity analysis, fix the common factor
+     - **Data issue:** all experiments show similar failure patterns regardless of model
+       → Recommendation: run `/turing:leak`, `/turing:sanity`, check data pipeline
+     - **Metric ceiling:** improvements plateau near a theoretical limit
+       → Recommendation: run `/turing:scale` to confirm ceiling, shift to different metrics or data
+     - **Noise floor:** improvements are within seed variance
+       → Recommendation: run `/turing:seed` to measure noise, increase `n_runs`
+   - Report:
+     ```
+     Failure Postmortem (last 8 experiments, 0 improvements)
+     ========================================================
+     
+     Diagnosis: SEARCH SPACE EXHAUSTION
+     
+     Evidence:
+     - Config variance across last 8 experiments: LOW (all within ±10% of exp-082)
+     - Best metric in streak: 0.873 (vs current best 0.878)
+     - Family: all in "hyperparameter-tuning"
+     - Sensitivity: learning_rate and max_depth already at optimal per sensitivity analysis
+     
+     Root cause: You're micro-tuning hyperparameters that don't matter.
+     The last 8 experiments varied max_depth by ±2 and n_estimators by ±100,
+     but sensitivity analysis shows these have <0.5% impact.
+     
+     Recommended actions:
+     1. Stop tuning hyperparameters — switch to `/turing:feature` for feature engineering
+     2. Try `/turing:ensemble` — combine existing models instead of building new ones
+     3. Run `/turing:scale --axis data` — check if more data would help
+     
+     Auto-queued: "Switch from hyperparameter tuning to feature engineering" (priority: high)
+     ```
+3. **Auto-trigger:** optionally enable in `config.yaml` — postmortem fires automatically after N consecutive non-improvements
+4. Integration with `/turing:budget` (Phase 18.2) — postmortem results inform remaining budget strategy
+5. Integration with `/turing:brief` — postmortem summary appears when a streak is detected
+6. Add tests
+
+**Depends on:** Phases 21.2 (sensitivity), 18.1 (scale), 6.4 (failure clustering)
+
+**Acceptance:** `/turing:postmortem` correctly diagnoses a search space exhaustion after 8 failed hyperparameter tuning experiments and redirects to feature engineering.
+
+### 29.2 Harness Self-Diagnosis — `/turing:doctor`
+
+**What:** Self-diagnostic for the Turing harness itself. Checks: venv health, script importability, experiment log validity, orphaned checkpoints, disk space, git state, config consistency. Fixes common issues automatically.
+
+**Why:** When Turing breaks, the error messages come from deep in the pipeline and are hard to diagnose. "ImportError in log_experiment.py" could mean the venv is broken, a dependency was removed, or the template was corrupted. `/turing:doctor` checks everything and either fixes it or tells the researcher exactly what's wrong.
+
+**Implementation:**
+1. Create `commands/doctor.md` — `/turing:doctor [--fix] [--verbose]`
+2. Add `templates/scripts/harness_doctor.py`:
+   - **Environment checks:**
+     - venv exists and is activatable
+     - All required packages installed and importable
+     - Python version compatible
+     - CUDA available (if expected)
+   - **Project health checks:**
+     - `config.yaml` valid and contains required fields
+     - `experiments/log.jsonl` valid JSONL (no corrupted lines)
+     - `experiment_state.yaml` parseable and consistent with log
+     - `hypotheses.yaml` parseable, no orphaned references
+     - `train.py`, `prepare.py`, `evaluate.py` exist and are syntactically valid (AST parse)
+   - **Resource checks:**
+     - Disk space available (warn if <1GB)
+     - Orphaned checkpoints (checkpoints with no log entry)
+     - Stale lock files
+   - **Git checks:**
+     - Working tree clean (warn if uncommitted changes to `evaluate.py` or `prepare.py`)
+     - Experiment branches consistent with log
+   - Report:
+     ```
+     Turing Doctor Report
+     ====================
+     ✓ PASS  Python environment (3.11.5, venv active)
+     ✓ PASS  Dependencies (all 12 packages importable)
+     ✓ PASS  Config (config.yaml valid, all required fields present)
+     ⚠ WARN  Experiment log (3 entries have missing 'seed' field — old format?)
+     ✓ PASS  Scripts (train.py, prepare.py, evaluate.py all parse)
+     ✗ FAIL  Disk space (423 MB remaining — below 1 GB threshold)
+              Fix: run `/turing:archive` to reclaim space
+     ✓ PASS  Git state (working tree clean)
+     
+     Score: 5/7 pass, 1 warning, 1 failure
+     Run with --fix to auto-repair: archive old experiments, update log format
+     ```
+   - `--fix` flag: auto-repair issues that have safe fixes (archive, reformat log entries, remove orphaned files)
+3. Integration with `/turing:init` — run doctor after scaffolding to verify setup
+4. Add tests
+
+**Acceptance:** `/turing:doctor` identifies a corrupted log entry and low disk space, and `--fix` repairs both automatically.
+
+### 29.3 Research Planning Assistant — `/turing:plan`
+
+**What:** Given the current project state, generate a structured research plan for the next N experiments. Allocates experiments across strategies (feature engineering, model search, ensemble, calibration) based on trend analysis, sensitivity data, and budget constraints.
+
+**Why:** Individual hypothesis generation happens at the OBSERVE step of each experiment. `/turing:plan` operates one level higher: it designs a *campaign* of experiments with a strategic allocation. "Spend 5 experiments on feature engineering (highest ROI family), 3 on ensemble building (diminishing returns on single models), 2 on calibration (required for deployment)."
+
+**Implementation:**
+1. Create `commands/plan.md` — `/turing:plan [--budget 20] [--goal "maximize F1 for production deployment"]`
+2. Add `templates/scripts/research_planner.py`:
+   - Reads current state from:
+     - `/turing:trend` data — which families are productive vs exhausted
+     - `/turing:sensitivity` data — which hyperparameters still have room
+     - `/turing:budget` status — remaining experiment budget
+     - `/turing:frontier` data — current Pareto frontier gaps
+     - `/turing:audit` results — what's needed for submission/deployment
+   - Generates a phased plan:
+     ```
+     Research Plan (20 experiments, goal: maximize F1 for production)
+     ================================================================
+     
+     Phase A: Feature Engineering (8 experiments, 40% of budget)
+     Rationale: highest ROI family (0.004/experiment vs 0.001 for architecture)
+       1. Automated feature selection (top consensus features)
+       2-4. Interaction feature generation (3 rounds)
+       5-7. Time-based feature engineering (3 variants)
+       8. Feature ablation to prune dead weight
+     
+     Phase B: Ensemble & Composition (5 experiments, 25%)
+     Rationale: stacking typically adds 1-2% at this stage
+       9-10. Build stacking ensemble from top 3 diverse models
+       11. Model soup from top 5 checkpoints
+       12-13. Stitch: swap preprocessing from best feature experiment into ensemble
+     
+     Phase C: Production Readiness (4 experiments, 20%)
+       14. Calibration (Platt scaling)
+       15. Quantization (INT8, measure accuracy loss)
+       16. Pruning (find 75% sparsity knee point)
+       17. Full seed study on final model
+     
+     Phase D: Verification (3 experiments, 15%)
+       18. Reproduce final model
+       19. Run methodology audit
+       20. Generate model card
+     
+     Expected outcome: F1 0.891 → 0.905 ± 0.004 (estimated)
+     ```
+   - Plan is advisory — auto-queues hypotheses into `/turing:queue` but researcher can modify
+   - Plan adapts: after Phase A completes, re-evaluate whether Phase B allocation still makes sense
+3. Integration with `/turing:queue` (Phase 15.1) — plan auto-populates the queue
+4. Integration with `/turing:budget` (Phase 18.2) — plan respects budget constraints
+5. Add tests
+
+**Depends on:** Phases 24.1 (trend), 21.2 (sensitivity), 18.2 (budget), 11.3 (frontier), 19.2 (audit)
+
+**Acceptance:** `/turing:plan --budget 20` produces a strategic campaign that allocates experiments by expected ROI. After execution, actual improvement exceeds random allocation baseline.
+
+---
+
 ## Updated Full Implementation Order
 
 | # | Feature | Phase | Version | Priority | Status | Depends On |
@@ -3010,28 +3596,40 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | Planned | Phase 13.1 (export for size comparison) |
 | 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | Planned | Phase 9.1 (semantic index) |
 | 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | Planned | Phases 10.1, 11.2, 14.2 |
-| 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | **DONE** | — (standalone) |
-| 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
-| 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | **DONE** | Phase 19.2 (audit integration) |
-| 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | **DONE** | Phase 11.1 (diagnose) |
-| 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | **DONE** | Phase 10.1 (seed runner) |
-| 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | **DONE** | Phase 13.1 (export) |
-| 57 | Automated feature selection `/turing:feature` | 22.1 | v3.3.0 | **High** | **DONE** | Phase 11.2 (ablation) |
-| 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | **DONE** | Phase 10.1 (seed runner) |
-| 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | **DONE** | Phase 11.3 (Pareto), Phase 13.1 (export) |
-| 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | **DONE** | Phase 13.1 (export) |
-| 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | **DONE** | Phase 12.2 (checkpoint), Phase 13.1 (export) |
-| 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | **DONE** | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
-| 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | **DONE** | Phase 18.2 (budget) |
-| 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | **DONE** | Phases 6.2, 6.5, 24.7 |
-| 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | **DONE** | Phase 12.2 (checkpoint pruning) |
-| 66 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | **DONE** | — (standalone) |
-| 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | **DONE** | Phase 9.1 (semantic index), Phase 24.4 |
-| 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | **DONE** | Phase 19.1 (transfer) |
-| 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | **DONE** | Experiment logging (Phase 1) |
-| 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | **DONE** | Phases 14.1, 7.1, 14.2 |
-| 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | **DONE** | Phases 11.2, 11.3, 21.2 |
-| 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | **DONE** | Phase 24.4 (annotations) |
+| 51 | Pre-training sanity checks `/turing:sanity` | 20.1 | v3.1.0 | **High** | Planned | — (standalone) |
+| 52 | Automatic baseline generation `/turing:baseline` | 20.2 | v3.1.0 | **High** | Planned | Phase 10.1 (seed runner) |
+| 53 | Targeted leakage detection `/turing:leak` | 20.3 | v3.1.0 | **Critical** | Planned | Phase 19.2 (audit integration) |
+| 54 | Internal model diagnostics `/turing:xray` | 21.1 | v3.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
+| 55 | Hyperparameter sensitivity `/turing:sensitivity` | 21.2 | v3.2.0 | **High** | Planned | Phase 10.1 (seed runner) |
+| 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | Planned | Phase 13.1 (export) |
+| 57 | Automated feature selection `/turing:feature` | 22.1 | v3.3.0 | **High** | Planned | Phase 11.2 (ablation) |
+| 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | Planned | Phase 10.1 (seed runner) |
+| 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | Planned | Phase 11.3 (Pareto), Phase 13.1 (export) |
+| 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | Planned | Phase 13.1 (export) |
+| 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | Planned | Phase 12.2 (checkpoint), Phase 13.1 (export) |
+| 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | Planned | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
+| 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
+| 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.7 |
+| 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
+| 66 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | Planned | — (standalone) |
+| 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | Planned | Phase 9.1 (semantic index), Phase 24.4 |
+| 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | Planned | Phase 19.1 (transfer) |
+| 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | Planned | Experiment logging (Phase 1) |
+| 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
+| 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
+| 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
+| 73 | Project onboarding `/turing:onboard` | 26.1 | v4.1.0 | **High** | Planned | Phases 24.1, 25.3 |
+| 74 | Experiment packaging `/turing:share` | 26.2 | v4.1.0 | **High** | Planned | Phase 13.1 (export), Phase 24.4 |
+| 75 | Peer review simulation `/turing:review` | 26.3 | v4.1.0 | **High** | Planned | Phases 19.2 (audit), 14.2 (paper) |
+| 76 | Counterfactual experiment simulation `/turing:whatif` | 27.1 | v4.2.0 | **High** | Planned | Phases 18.1, 11.2, 17.2, 21.2 |
+| 77 | Input-level counterfactuals `/turing:counterfactual` | 27.2 | v4.2.0 | **Medium** | Planned | Phase 11.1 (diagnose) |
+| 78 | Experiment outcome prediction `/turing:simulate` | 27.3 | v4.2.0 | **High** | Planned | Phases 2.2, 21.2, 18.2 |
+| 79 | Incremental model update `/turing:update` | 28.1 | v4.3.0 | **High** | Planned | Phase 16.3 (regress), Phase 12.2 |
+| 80 | Model registry `/turing:registry` | 28.2 | v4.3.0 | **Critical** | Planned | Phases 16.3, 19.2, 10.1, 21.3 |
+| 81 | Model card generation `/turing:card` | 28.3 | v4.3.0 | **High** | Planned | Phases 10.1, 3.1, 11.1, 21.3, 24.4 |
+| 82 | Automated failure postmortem `/turing:postmortem` | 29.1 | v4.4.0 | **High** | Planned | Phases 21.2, 18.1, 6.4 |
+| 83 | Harness self-diagnosis `/turing:doctor` | 29.2 | v4.4.0 | **High** | Planned | — (standalone) |
+| 84 | Research planning assistant `/turing:plan` | 29.3 | v4.4.0 | **High** | Planned | Phases 24.1, 21.2, 18.2, 11.3, 19.2 |
 
 ### Dependency Graph
 
@@ -3084,6 +3682,18 @@ Phase 25 (Research Communication) ← v4.0
   25.1 cite ← 14.1, 7.1, 14.2
   25.2 present ← 11.2, 11.3, 21.2
   25.3 changelog ← 24.4 annotate
+           │
+           ▼
+Phase 26 (Collaboration)              Phase 27 (What-If Analysis)
+  26.1 onboard ← 24.1, 25.3            27.1 whatif ← 18.1, 11.2, 17.2, 21.2
+  26.2 share ← 13.1, 24.4              27.2 counterfactual ← 11.1
+  26.3 review ← 19.2, 14.2             27.3 simulate ← 2.2, 21.2, 18.2
+           │                                     │
+           ▼                                     ▼
+Phase 28 (Model Lifecycle)            Phase 29 (Operational Intelligence)
+  28.1 update ← 16.3, 12.2             29.1 postmortem ← 21.2, 18.1, 6.4
+  28.2 registry ← 16.3, 19.2, 21.3     29.2 doctor (standalone)
+  28.3 card ← 10.1, 11.1, 21.3, 24.4   29.3 plan ← 24.1, 21.2, 18.2, 11.3
 ```
 
 ### Version Release Criteria
@@ -3106,3 +3716,7 @@ Phase 25 (Research Communication) ← v4.0
 | v3.4.0 | 23 (Model Surgery) | `/turing:prune` achieves 1.8x speedup at <1% accuracy loss; `/turing:merge` beats best individual model with zero latency overhead; `/turing:surgery` produces runnable modified architecture in <10s |
 | v3.5.0 | 24 (Experiment Archaeology) | `/turing:flashback` restores context in <10s after days away; `/turing:search` finds relevant experiments via natural language; `/turing:template` transfers a winning recipe to a new project |
 | **v4.0.0** | **25 (Research Communication)** | **`/turing:cite` catches missing attributions; `/turing:present` generates publication-quality figures; `/turing:changelog` produces stakeholder-readable progress narrative — Turing becomes a research-to-communication pipeline** |
+| v4.1.0 | 26 (Collaboration) | `/turing:onboard` gets a new collaborator productive in 30 minutes; `/turing:review` catches 2+ real weaknesses before submission |
+| v4.2.0 | 27 (What-If Analysis) | `/turing:whatif` predicts data scaling impact within 1%; `/turing:simulate` pre-filters experiments saving >50% budget |
+| v4.3.0 | 28 (Model Lifecycle) | `/turing:registry` enforces promotion gates; `/turing:card` generates a complete model card with zero manual entry |
+| v4.4.0 | 29 (Operational Intelligence) | `/turing:postmortem` diagnoses failure streaks; `/turing:plan` allocates experiments by ROI; `/turing:doctor` auto-repairs common harness issues |
