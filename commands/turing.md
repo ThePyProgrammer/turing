@@ -78,6 +78,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "what if", "what-if", "hypothetical", "estimate impact", "would it help" | `/turing:whatif` | Analyze |
 | "counterfactual", "flip prediction", "why this prediction", "minimum change", "explanation" | `/turing:counterfactual` | Explain |
 | "simulate", "predict outcome", "pre-filter", "which configs will work", "forecast" | `/turing:simulate` | Predict |
+| "update", "incremental", "new data", "add data", "fine-tune existing", "partial update" | `/turing:update` | Update |
+| "registry", "promote", "demote", "staging", "production", "which model is deployed", "model lifecycle" | `/turing:registry` | Govern |
 
 ## Sub-commands
 
@@ -152,6 +154,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:whatif "<question>"` | What-if analysis: route hypotheticals to existing estimators (scaling, ablation, sensitivity, ensemble, pruning) | (inline) |
 | `/turing:counterfactual <exp-id> --sample <index>` | Input-level counterfactual explanations: minimum input change to flip a prediction | (inline) |
 | `/turing:simulate [--configs] [--top-k]` | Experiment outcome prediction: pre-filter configs using surrogate model, save budget | (inline) |
+| `/turing:update <exp-id> --new-data <path>` | Incremental model update: add new data without full retraining, forgetting detection | (inline) |
+| `/turing:registry [list\|register\|promote\|demote\|history]` | Model registry: stage lifecycle (candidate → staging → production) with promotion gates | (inline) |
 
 ## Proactive Detection
 
