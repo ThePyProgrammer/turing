@@ -146,6 +146,8 @@ TEMPLATE_DIRS = {
         "whatif_engine.py",
         "counterfactual_explanation.py",
         "experiment_simulator.py",
+        "incremental_update.py",
+        "model_lifecycle.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -200,6 +202,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/whatif",
     "experiments/counterfactuals",
     "experiments/simulations",
+    "experiments/updates",
+    "exports/model-cards",
     "experiments/logs",
     "models/best",
     "models/archive",

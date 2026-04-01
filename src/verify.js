@@ -83,6 +83,8 @@ const EXPECTED_COMMANDS = [
   "whatif/SKILL.md",
   "counterfactual/SKILL.md",
   "simulate/SKILL.md",
+  "update/SKILL.md",
+  "registry/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
