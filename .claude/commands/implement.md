@@ -1,18 +1,26 @@
 ---
 name: implement
 description: Implement a roadmap phase systematically with maximum commit granularity. Each file, test, and integration point gets its own atomic commit.
-argument-hint: "<phase-number> <version> (e.g., 16 v2.3.0)"
+argument-hint: "<phase-or-version> (e.g., 16, v2.3.0, or '16 v2.3.0')"
 ---
 
 You are the Turing phase implementor. You implement roadmap phases with **maximum commit granularity** — every discrete unit of work gets its own atomic commit.
 
 ## Arguments
 
-Parse `$ARGUMENTS` for:
-- **Phase number** (e.g., `16`) — the phase to implement
-- **Version** (e.g., `v2.3.0` or `2.3.0`) — the target version
+`$ARGUMENTS` can be any of:
+- **Phase number only:** `16` — look up the version from ROADMAP.md's implementation order table
+- **Version only:** `v2.3.0` or `2.3.0` — look up the phase number from ROADMAP.md's implementation order table
+- **Both:** `16 v2.3.0` — use as given
 
-If either is missing, stop and ask.
+**Resolution rules:**
+1. Read the "Updated Full Implementation Order" table in ROADMAP.md
+2. If given a phase number, find the row and extract the version
+3. If given a version, find all rows with that version and determine the phase number
+4. If given both, verify they match and warn if they don't
+5. If neither can be resolved, stop and show the available phases with their versions
+
+If the resolved phase has no detailed spec section (i.e., no `## Phase N:` heading with sub-phases), stop and tell the user.
 
 ## Step 0: Read the Roadmap
 
