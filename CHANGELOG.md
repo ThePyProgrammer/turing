@@ -3,6 +3,22 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.3.0] — 2026-04-01 — Model Lifecycle
+
+### Added
+- `/turing:update` — incremental model update: add new data without full retraining, model-specific strategies (continued boosting for trees, fine-tune with replay buffer for neural nets, partial_fit/warm_start for sklearn), catastrophic forgetting detection
+- `/turing:registry` — model registry with 4-stage lifecycle (candidate → staging → production → archived), automated promotion gates (regression + seed study for staging, audit + calibration for production), demotion, archiving, full history log
+- Enhanced `/turing:card` — added `--include fairness` flag with demographic parity and equal opportunity metrics, registry status integration
+- Registry status and update history integrated into `/turing:brief` research briefing
+
+### Phase
+- **28.1** Incremental Model Update
+- **28.2** Model Registry
+- **28.3** Model Card Enhancement (fairness + registry)
+
+**1876 tests | 71 commands | 90 scripts | 16 commits**
+
+
 ## [4.2.0] — 2026-04-01 — What-If Analysis
 
 ### Added
@@ -361,6 +377,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 [4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
 [4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
+[4.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.3.0
 [4.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.2.0
 [4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
 [4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
