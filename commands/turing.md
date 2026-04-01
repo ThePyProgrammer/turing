@@ -48,6 +48,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "scale", "scaling law", "how much data", "is more data worth it", "power law", "data efficiency" | `/turing:scale` | Analyze |
 | "budget", "compute budget", "how many experiments", "spending limit", "stop after" | `/turing:budget` | Manage |
 | "distill", "compress", "smaller model", "student model", "knowledge distillation", "model compression" | `/turing:distill` | Deploy |
+| "transfer", "what worked before", "similar project", "cross-project", "institutional knowledge", "prior projects" | `/turing:transfer` | Research |
+| "audit", "methodology check", "pre-submission", "reviewer checklist", "data leakage", "missing baselines" | `/turing:audit` | Validate |
 
 ## Sub-commands
 
@@ -92,6 +94,8 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:scale [--axis]` | Scaling law estimator: fit power law, predict full-scale performance | (inline) |
 | `/turing:budget <action>` | Compute budget manager: set limits, track allocation, auto-shift modes | (inline) |
 | `/turing:distill <exp-id>` | Model compression: distill teacher into smaller student model | (inline) |
+| `/turing:transfer [--from]` | Cross-project knowledge transfer: find similar prior projects, surface what worked | (inline) |
+| `/turing:audit [--strict]` | Pre-submission methodology audit: data leakage, baselines, seeds, ablations, reproducibility | (inline) |
 
 ## Proactive Detection
 
