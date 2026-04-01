@@ -28,6 +28,7 @@ const SUB_COMMANDS = [
   "diff", "watch", "regress",
   "ensemble", "stitch", "warm",
   "scale", "budget", "distill",
+  "transfer", "audit",
 ];
 
 export async function install(opts = {}) {

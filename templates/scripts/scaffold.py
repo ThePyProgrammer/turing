@@ -116,6 +116,8 @@ TEMPLATE_DIRS = {
         "scaling_estimator.py",
         "budget_manager.py",
         "model_distiller.py",
+        "knowledge_transfer.py",
+        "methodology_audit.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -144,6 +146,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/warm_starts",
     "experiments/scaling",
     "experiments/distillations",
+    "experiments/transfers",
+    "experiments/audits",
     "experiments/logs",
     "models/best",
     "models/archive",
