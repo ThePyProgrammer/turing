@@ -3022,13 +3022,13 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | **DONE** | Phase 13.1 (export) |
 | 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | **DONE** | Phase 12.2 (checkpoint), Phase 13.1 (export) |
 | 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | **DONE** | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
-| 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
-| 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.7 |
-| 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
-| 66 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | Planned | — (standalone) |
-| 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | Planned | Phase 9.1 (semantic index), Phase 24.4 |
-| 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | Planned | Phase 19.1 (transfer) |
-| 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | Planned | Experiment logging (Phase 1) |
+| 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | **DONE** | Phase 18.2 (budget) |
+| 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | **DONE** | Phases 6.2, 6.5, 24.7 |
+| 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | **DONE** | Phase 12.2 (checkpoint pruning) |
+| 66 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | **DONE** | — (standalone) |
+| 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | **DONE** | Phase 9.1 (semantic index), Phase 24.4 |
+| 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | **DONE** | Phase 19.1 (transfer) |
+| 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | **DONE** | Experiment logging (Phase 1) |
 | 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
 | 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
 | 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
