@@ -42,6 +42,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "diff", "deep compare", "what changed", "why did it diverge", "experiment diff" | `/turing:diff` | Analyze |
 | "watch", "monitor", "live training", "loss spike", "is it overfitting", "training progress" | `/turing:watch` | Monitor |
 | "regress", "regression", "did metrics degrade", "check for regression", "CI gate", "stability check" | `/turing:regress` | Validate |
+| "ensemble", "combine models", "voting", "stacking", "blending", "merge models" | `/turing:ensemble` | Compose |
+| "stitch", "pipeline", "swap stage", "cache stage", "pipeline composition" | `/turing:stitch` | Compose |
+| "warm", "warm start", "fine-tune", "continue training", "transfer learning", "from checkpoint" | `/turing:warm` | Compose |
 
 ## Sub-commands
 
@@ -80,6 +83,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:diff <exp-a> <exp-b>` | Deep experiment comparison: config diff, metric significance, per-class regressions, curve divergence | (inline) |
 | `/turing:watch [--analyze]` | Live training monitor with early-warning alerts (loss spike, NaN, overfitting, plateau) | (inline) |
 | `/turing:regress [--tolerance]` | Performance regression gate: re-run best experiment, verify metrics haven't degraded | (inline) |
+| `/turing:ensemble [--top-k] [--methods]` | Automated ensemble: voting, weighted voting, stacking, blending from top-K models | (inline) |
+| `/turing:stitch <action> [stage]` | Pipeline composition: show/swap/cache/run stages independently | (inline) |
+| `/turing:warm <exp-id>` | Warm-start from prior model: load checkpoint, freeze layers, adjust LR | (inline) |
 
 ## Proactive Detection
 
