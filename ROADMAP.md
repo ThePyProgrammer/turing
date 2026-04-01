@@ -2106,9 +2106,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 34 | Model export `/turing:export` | 13.1 | **v2.0.0** | **High** | **DONE** | Phase 10.1 (seed study for model card) |
 | 35 | Literature integration `/turing:lit` | 14.1 | v2.1.0 | **Medium** | **DONE** | Phase 7.1 (scholarly API infra) |
 | 36 | Paper section drafting `/turing:paper` | 14.2 | v2.1.0 | **Medium** | **DONE** | Phases 10.1, 11.2, 14.1, 6.3 |
-| 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | Planned | — (standalone) |
-| 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | Planned | Phase 11.1 (diagnose) |
-| 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | Planned | Phase 1.3 (dependency graph) |
+| 37 | Experiment scheduler `/turing:queue` | 15.1 | v2.2.0 | **Critical** | **DONE** | — (standalone) |
+| 38 | Smart failure recovery `/turing:retry` | 15.2 | v2.2.0 | **High** | **DONE** | Phase 11.1 (diagnose) |
+| 39 | Experiment branching `/turing:fork` | 15.3 | v2.2.0 | **High** | **DONE** | Phase 1.3 (dependency graph) |
 | 40 | Deep experiment comparison `/turing:diff` | 16.1 | v2.3.0 | **High** | Planned | Phase 11.3 (frontier metrics) |
 | 41 | Live training monitor `/turing:watch` | 16.2 | v2.3.0 | **High** | Planned | Phase 12.1 (profiling infra) |
 | 42 | Performance regression gate `/turing:regress` | 16.3 | v2.3.0 | **Medium** | Planned | Phase 10.2 (reproduce) |
