@@ -3621,9 +3621,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 73 | Project onboarding `/turing:onboard` | 26.1 | v4.1.0 | **High** | **DONE** | Phases 24.1, 25.3 |
 | 74 | Experiment packaging `/turing:share` | 26.2 | v4.1.0 | **High** | **DONE** | Phase 13.1 (export), Phase 24.4 |
 | 75 | Peer review simulation `/turing:review` | 26.3 | v4.1.0 | **High** | **DONE** | Phases 19.2 (audit), 14.2 (paper) |
-| 76 | Counterfactual experiment simulation `/turing:whatif` | 27.1 | v4.2.0 | **High** | Planned | Phases 18.1, 11.2, 17.2, 21.2 |
-| 77 | Input-level counterfactuals `/turing:counterfactual` | 27.2 | v4.2.0 | **Medium** | Planned | Phase 11.1 (diagnose) |
-| 78 | Experiment outcome prediction `/turing:simulate` | 27.3 | v4.2.0 | **High** | Planned | Phases 2.2, 21.2, 18.2 |
+| 76 | Counterfactual experiment simulation `/turing:whatif` | 27.1 | v4.2.0 | **High** | **DONE** | Phases 18.1, 11.2, 17.2, 21.2 |
+| 77 | Input-level counterfactuals `/turing:counterfactual` | 27.2 | v4.2.0 | **Medium** | **DONE** | Phase 11.1 (diagnose) |
+| 78 | Experiment outcome prediction `/turing:simulate` | 27.3 | v4.2.0 | **High** | **DONE** | Phases 2.2, 21.2, 18.2 |
 | 79 | Incremental model update `/turing:update` | 28.1 | v4.3.0 | **High** | Planned | Phase 16.3 (regress), Phase 12.2 |
 | 80 | Model registry `/turing:registry` | 28.2 | v4.3.0 | **Critical** | Planned | Phases 16.3, 19.2, 10.1, 21.3 |
 | 81 | Model card generation `/turing:card` | 28.3 | v4.3.0 | **High** | Planned | Phases 10.1, 3.1, 11.1, 21.3, 24.4 |
@@ -3717,6 +3717,6 @@ Phase 28 (Model Lifecycle)            Phase 29 (Operational Intelligence)
 | v3.5.0 | 24 (Experiment Archaeology) | `/turing:flashback` restores context in <10s after days away; `/turing:search` finds relevant experiments via natural language; `/turing:template` transfers a winning recipe to a new project |
 | **v4.0.0** | **25 (Research Communication)** | **`/turing:cite` catches missing attributions; `/turing:present` generates publication-quality figures; `/turing:changelog` produces stakeholder-readable progress narrative — Turing becomes a research-to-communication pipeline** |
 | v4.1.0 | 26 (Collaboration) | `/turing:onboard` gets a new collaborator productive in 30 minutes; `/turing:review` catches 2+ real weaknesses before submission |
-| v4.2.0 | 27 (What-If Analysis) | `/turing:whatif` predicts data scaling impact within 1%; `/turing:simulate` pre-filters experiments saving >50% budget |
+| **v4.2.0** | **27 (What-If Analysis)** | **`/turing:whatif` predicts data scaling impact within 1%; `/turing:simulate` pre-filters experiments saving >50% budget** |
 | v4.3.0 | 28 (Model Lifecycle) | `/turing:registry` enforces promotion gates; `/turing:card` generates a complete model card with zero manual entry |
 | v4.4.0 | 29 (Operational Intelligence) | `/turing:postmortem` diagnoses failure streaks; `/turing:plan` allocates experiments by ROI; `/turing:doctor` auto-repairs common harness issues |
