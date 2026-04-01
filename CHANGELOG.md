@@ -3,6 +3,22 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.2.0] — 2026-04-01 — What-If Analysis
+
+### Added
+- `/turing:whatif` — answer hypothetical questions from existing experiment data: routes to scaling, ablation, sensitivity, ensemble, pruning, stitch, and budget estimators with confidence levels
+- `/turing:counterfactual` — input-level counterfactual explanations: greedy perturbation + prototype-based search for minimum-change prediction flips, batch mode for misclassified samples
+- `/turing:simulate` — experiment outcome prediction: weighted k-NN surrogate model with novelty penalty, pre-filters configs to save compute budget
+- What-if and simulation sections integrated into `/turing:brief` research briefing
+
+### Phase
+- **27.1** Counterfactual Experiment Simulation
+- **27.2** Input-Level Counterfactual Explanations
+- **27.3** Experiment Outcome Prediction
+
+**1740 tests | 69 commands | 88 scripts | 18 commits**
+
+
 ## [4.1.0] — 2026-04-01 — Collaboration
 
 ### Added
@@ -343,6 +359,9 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
+[4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
+[4.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.2.0
 [4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
 [4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
 [3.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.5.0
