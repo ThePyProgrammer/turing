@@ -62,6 +62,13 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "quantize", "quantization", "int8", "fp16", "reduce precision", "faster inference" | `/turing:quantize` | Optimize |
 | "merge", "model soup", "merge weights", "average models", "TIES", "DARE" | `/turing:merge` | Compose |
 | "surgery", "architecture", "add layer", "widen", "modify model", "swap activation" | `/turing:surgery` | Modify |
+| "trend", "trends", "research direction", "improvement rate", "diminishing returns", "what's working" | `/turing:trend` | Analyze |
+| "flashback", "where was I", "context", "resume", "catch up", "what happened" | `/turing:flashback` | Recall |
+| "archive", "cleanup", "compress old", "disk space", "archive experiments" | `/turing:archive` | Manage |
+| "annotate", "note", "tag experiment", "add note", "experiment note" | `/turing:annotate` | Record |
+| "search", "find experiment", "query experiments", "which experiments" | `/turing:search` | Query |
+| "template", "recipe", "save config", "reusable config", "starting point" | `/turing:template` | Manage |
+| "replay", "re-run", "revisit", "retry old", "would it work now" | `/turing:replay` | Validate |
 
 ## Sub-commands
 
@@ -120,6 +127,13 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:quantize <exp-id>` | Post-training quantization: FP16/INT8, accuracy-latency comparison, QAT suggestion | (inline) |
 | `/turing:merge <exp-ids...>` | Model merging: uniform/greedy soup, TIES, DARE — free accuracy, zero latency cost | (inline) |
 | `/turing:surgery <exp-id>` | Architecture modification: add/remove layer, widen/narrow, swap activation, skip connections | (inline) |
+| `/turing:trend` | Long-term trend analysis: improvement velocity, family ROI, diminishing returns detection | (inline) |
+| `/turing:flashback` | Session context restoration: "where was I?" after days away from the project | (inline) |
+| `/turing:archive` | Experiment lifecycle cleanup: compress old artifacts, prune checkpoints, summary index | (inline) |
+| `/turing:annotate <exp-id>` | Retrospective annotations: add human notes, tags, search by content | (inline) |
+| `/turing:search <query>` | Natural language experiment search with structured filters | (inline) |
+| `/turing:template <action>` | Experiment template library: save/list/apply reusable configs across projects | (inline) |
+| `/turing:replay <exp-id>` | Experiment replay: re-run old experiment with current infrastructure | (inline) |
 
 ## Proactive Detection
 
