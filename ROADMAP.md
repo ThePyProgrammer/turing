@@ -3618,9 +3618,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
 | 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
 | 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
-| 73 | Project onboarding `/turing:onboard` | 26.1 | v4.1.0 | **High** | Planned | Phases 24.1, 25.3 |
-| 74 | Experiment packaging `/turing:share` | 26.2 | v4.1.0 | **High** | Planned | Phase 13.1 (export), Phase 24.4 |
-| 75 | Peer review simulation `/turing:review` | 26.3 | v4.1.0 | **High** | Planned | Phases 19.2 (audit), 14.2 (paper) |
+| 73 | Project onboarding `/turing:onboard` | 26.1 | v4.1.0 | **High** | **DONE** | Phases 24.1, 25.3 |
+| 74 | Experiment packaging `/turing:share` | 26.2 | v4.1.0 | **High** | **DONE** | Phase 13.1 (export), Phase 24.4 |
+| 75 | Peer review simulation `/turing:review` | 26.3 | v4.1.0 | **High** | **DONE** | Phases 19.2 (audit), 14.2 (paper) |
 | 76 | Counterfactual experiment simulation `/turing:whatif` | 27.1 | v4.2.0 | **High** | Planned | Phases 18.1, 11.2, 17.2, 21.2 |
 | 77 | Input-level counterfactuals `/turing:counterfactual` | 27.2 | v4.2.0 | **Medium** | Planned | Phase 11.1 (diagnose) |
 | 78 | Experiment outcome prediction `/turing:simulate` | 27.3 | v4.2.0 | **High** | Planned | Phases 2.2, 21.2, 18.2 |
