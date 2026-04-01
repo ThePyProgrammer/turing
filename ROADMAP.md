@@ -3018,10 +3018,10 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 56 | Probability calibration `/turing:calibrate` | 21.3 | v3.2.0 | **Medium** | **DONE** | Phase 13.1 (export) |
 | 57 | Automated feature selection `/turing:feature` | 22.1 | v3.3.0 | **High** | **DONE** | Phase 11.2 (ablation) |
 | 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | **DONE** | Phase 10.1 (seed runner) |
-| 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | Planned | Phase 11.3 (Pareto), Phase 13.1 (export) |
-| 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | Planned | Phase 13.1 (export) |
-| 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | Planned | Phase 12.2 (checkpoint), Phase 13.1 (export) |
-| 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | Planned | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
+| 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | **DONE** | Phase 11.3 (Pareto), Phase 13.1 (export) |
+| 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | **DONE** | Phase 13.1 (export) |
+| 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | **DONE** | Phase 12.2 (checkpoint), Phase 13.1 (export) |
+| 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | **DONE** | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
 | 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
 | 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.7 |
 | 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
