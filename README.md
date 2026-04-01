@@ -332,6 +332,9 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:checkpoint <action>` | Smart checkpoint management — list, prune (Pareto), average, resume, stats |
 | `/turing:lit <query>` | Literature search — papers, SOTA baselines, related work |
 | `/turing:paper [--sections] [--format]` | Draft paper sections from experiment logs (setup, results, ablation, hyperparams) |
+| `/turing:queue <action>` | Batch experiment scheduler — add, list, run, pause, clear |
+| `/turing:retry <exp-id>` | Smart failure recovery — auto-diagnose crash, apply fix, re-run |
+| `/turing:fork <exp-id>` | Experiment branching — run parallel tracks, report winner |
 | `/turing:export [--format]` | Export model to production format with equivalence check + latency benchmark |
 | `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
@@ -522,11 +525,11 @@ Each project gets independent config, data, experiments, models, and agent memor
 
 ## Architecture of Turing Itself
 
-27 commands, 2 agents, 8 config files, 46 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, 664 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
+30 commands, 2 agents, 9 config files, 49 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration (queue + retry + fork), 727 tests, 16 ADRs. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ```
 turing/
-├── commands/              26 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow)
+├── commands/              29 skill files (core + taste-leverage + reporting + exploration + statistical rigor + experiment intelligence + performance + deployment + research workflow + orchestration)
 ├── agents/                2 agents (researcher: read/write, evaluator: read-only)
 ├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
 ├── templates/             Scaffolded into user projects by /turing:init
