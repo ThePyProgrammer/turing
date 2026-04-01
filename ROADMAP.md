@@ -2500,6 +2500,87 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 
 **Acceptance:** `/turing:quantize` achieves 2.6x speedup with INT8 dynamic quantization at 0.2% accuracy loss.
 
+### 23.3 Model Merging — `/turing:merge`
+
+**What:** Average or merge weights from multiple fine-tuned checkpoints into a single model (model soups, TIES merging, DARE). Often beats any individual model with zero additional training cost.
+
+**Why:** Different from ensembling (Phase 17.1) — ensembles combine *predictions* at inference time (2-5x latency cost), merging combines *weights* into a single model (zero latency cost). Model soups (Wortsman et al., 2022) showed that averaging weights from models fine-tuned with different hyperparameters consistently outperforms individual models. It's free accuracy with no deployment complexity.
+
+**Implementation:**
+1. Create `commands/merge.md` — `/turing:merge <exp-ids...> [--method uniform|ties|dare|greedy]`
+2. Add `templates/scripts/model_merger.py`:
+   - **Uniform soup:** simple average of all model weights. Works when models share architecture and were fine-tuned from the same initialization.
+   - **Greedy soup:** iteratively add models to the soup only if they improve the merged result. Filters out models that hurt the average.
+   - **TIES merging:** Trim redundant parameters, Elect sign consensus, disjoint Merge. Better than uniform for models with conflicting parameter updates.
+   - **DARE:** randomly Drop parameters And REscale survivors. Reduces interference between merged models.
+   - For tree models: merge by averaging prediction probabilities at the leaf level, or combine tree sets with weight adjustment
+   - Compatibility check: verify all models share the same architecture (weight shapes match)
+   - Report:
+     ```
+     Model merge (3 models, uniform soup):
+     | Model    | Individual Acc | Contribution |
+     |----------|---------------|--------------|
+     | exp-042  | 0.872         | included     |
+     | exp-053  | 0.878         | included     |
+     | exp-067  | 0.869         | included     |
+     
+     | Method       | Merged Acc | Δ vs Best Single |
+     |--------------|-----------|------------------|
+     | Uniform soup | 0.881     | +0.003           |
+     | Greedy soup  | 0.883     | +0.005 ← BEST   |
+     | TIES         | 0.880     | +0.002           |
+     
+     Greedy soup excluded 0 models. All 3 contribute positively.
+     ```
+   - Logs as new experiment with `family: "merge"` and parent links to all source models
+3. Integration with `/turing:export` (Phase 13.1) — merged model is a single artifact, no ensemble overhead
+4. Integration with `/turing:frontier` (Phase 11.3) — merged model has same latency as individual models but better accuracy
+5. Add tests
+
+**Depends on:** Phase 12.2 (checkpoint manager for loading), Phase 13.1 (export)
+
+**Acceptance:** `/turing:merge` produces a single model that outperforms the best individual model, with identical inference latency.
+
+### 23.4 Architecture Modification — `/turing:surgery`
+
+**What:** Programmatic architecture changes: add/remove layers, widen/narrow, swap activation functions, inject skip connections, change normalization — then fine-tune briefly. Automates the "what if I tweaked the architecture?" experiments.
+
+**Why:** Architecture modifications are the most error-prone manual edits in ML research. Adding a layer requires matching dimensions, updating optimizer parameter groups, and adjusting learning rate schedules. `/turing:surgery` handles the plumbing and produces a runnable modified `train.py`, so the researcher specifies *what* to change and the system handles *how*.
+
+**Implementation:**
+1. Create `commands/surgery.md` — `/turing:surgery <exp-id> [--op add-layer|remove-layer|widen|swap-activation|add-skip|add-norm]`
+2. Add `templates/scripts/architecture_surgery.py`:
+   - **Operations** (each produces a modified config and/or `train.py`):
+     - `add-layer`: insert a layer at a specified position with auto-matched dimensions
+     - `remove-layer`: remove a layer and reconnect surrounding layers
+     - `widen <factor>`: multiply hidden dimensions by factor (e.g., 2x wider)
+     - `narrow <factor>`: reduce hidden dimensions (e.g., 0.5x narrower)
+     - `swap-activation <from> <to>`: replace ReLU→GELU, Sigmoid→SiLU, etc.
+     - `add-skip`: inject residual connections between specified layers
+     - `add-norm <type>`: insert BatchNorm/LayerNorm/GroupNorm at specified positions
+   - For tree models:
+     - `deepen`: increase max_depth
+     - `widen`: increase n_estimators
+     - `swap-objective`: change loss function (logloss→focal, mse→huber)
+   - Auto warm-start: loads weights from source experiment where dimensions match, initializes new parameters (Phase 17.3 integration)
+   - Parameter count comparison: report new vs old parameter count
+   - Report:
+     ```
+     Surgery: add-layer (exp-042)
+     Operation: Insert Linear(256→256) + ReLU after layer 2
+     Parameters: 1.2M → 1.3M (+8.3%)
+     Warm-started: 4/5 layers from exp-042, 1 layer initialized fresh
+     Ready to train: experiments/surgery/exp-042-add-layer/train.py
+     ```
+   - Logs the modified experiment as a child of the source
+3. Integration with `/turing:warm` (Phase 17.3) — surgery auto-warm-starts from source weights
+4. Integration with `/turing:sensitivity` (Phase 21.2) — test which architectural changes matter
+5. Add tests
+
+**Depends on:** Phase 17.3 (warm-start), Phase 21.2 (sensitivity for testing changes)
+
+**Acceptance:** `/turing:surgery exp-042 --op widen 2` doubles the hidden dimensions, warm-starts from existing weights, and produces a runnable experiment in under 10 seconds.
+
 ---
 
 ## Phase 24: Experiment Archaeology (v3.5.0)
@@ -2659,6 +2740,115 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 5. Add tests
 
 **Acceptance:** `/turing:annotate exp-042 "fragile result"` attaches a note that appears in all subsequent briefs and comparisons involving exp-042.
+
+### 24.5 Natural Language Experiment Search — `/turing:search`
+
+**What:** Query experiment history with natural language: "experiments that used dropout and got accuracy above 0.86" or "all failed LightGBM runs from last week." Combines semantic search (Phase 9.1) with structured filters over config fields and metrics.
+
+**Why:** After 200+ experiments, finding specific runs is painful. `/turing:tag` requires pre-tagging. The semantic index (Phase 9.1) finds similar experiments but doesn't support structured constraints. `/turing:search` merges both: natural language for intent, structured filters for precision.
+
+**Implementation:**
+1. Create `commands/search.md` — `/turing:search <query> [--filter "metric>0.85"] [--limit 10]`
+2. Add `templates/scripts/experiment_search.py`:
+   - Parses the query into two components:
+     - **Semantic:** embed the text portion and query the FAISS index (Phase 9.1)
+     - **Structured:** extract filter predicates (metric comparisons, date ranges, status, family, tags)
+   - Combines results: semantic similarity score × filter pass/fail
+   - Output:
+     ```
+     Search: "LightGBM experiments with high accuracy"
+     Filters: accuracy > 0.85, model_type = lightgbm
+     
+     Results (7 matches):
+     | Exp ID  | Description                    | Accuracy | Family           | Status |
+     |---------|--------------------------------|----------|------------------|--------|
+     | exp-089 | LightGBM + dart + feat select  | 0.883    | model-comparison | kept   |
+     | exp-056 | LightGBM baseline              | 0.865    | model-comparison | kept   |
+     | exp-071 | LightGBM + deeper trees        | 0.861    | architecture     | kept   |
+     ...
+     ```
+   - Supports date filters: `--filter "date>2026-03-20"`, status: `--filter "status=discarded"`, family: `--filter "family=ensemble"`
+   - Searches annotations (Phase 24.4) as well as experiment descriptions
+3. Integration with `/turing:flashback` — flashback uses search internally for context reconstruction
+4. Add tests
+
+**Depends on:** Phase 9.1 (semantic index), Phase 24.4 (annotations)
+
+**Acceptance:** `/turing:search "neural net experiments that failed" --filter "date>2026-03-15"` returns all matching experiments with relevance ranking.
+
+### 24.6 Experiment Template Library — `/turing:template`
+
+**What:** Save an experiment configuration as a reusable template. "This XGBoost config with this preprocessing is my go-to for tabular classification." Templates persist across projects and feed into `/turing:transfer` (Phase 19.1).
+
+**Why:** Researchers develop personal "recipes" — starting configurations they reach for based on task type. These recipes live in the researcher's head and are reconstructed from memory each time. `/turing:template` makes them explicit, versioned, and shareable.
+
+**Implementation:**
+1. Create `commands/template.md` — `/turing:template [save|list|apply|share]`
+2. Add `templates/scripts/experiment_templates.py`:
+   - **save:** `/turing:template save exp-042 --name "tabular-xgboost-v2" --description "XGBoost with feature selection, good for tabular classification with <50 features"`
+     - Extracts: model config, preprocessing pipeline, feature engineering steps, evaluation protocol
+     - Strips project-specific details (dataset paths, column names)
+     - Saves to `~/.turing/templates/tabular-xgboost-v2.yaml` (global, cross-project)
+   - **list:** show all saved templates with descriptions and source project:
+     ```
+     Templates (5 saved):
+     | Name                | Description                              | Source Project   | Accuracy |
+     |---------------------|------------------------------------------|------------------|----------|
+     | tabular-xgboost-v2  | XGBoost + feat selection, <50 features   | fraud-detection  | 0.923    |
+     | lightgbm-imbalanced | LightGBM for imbalanced classification   | churn-prediction | 0.891    |
+     | nn-small-tabular    | 3-layer MLP for small tabular datasets   | credit-scoring   | 0.847    |
+     ```
+   - **apply:** `/turing:template apply tabular-xgboost-v2` — generates a `train.py` and `config.yaml` from the template, adapted to the current project's dataset
+   - **share:** export template as a standalone YAML file for sharing with collaborators
+3. Integration with `/turing:transfer` (Phase 19.1) — templates are the mechanism for transferring knowledge
+4. Integration with `/turing:init` — suggest templates during project scaffolding based on task description
+5. Templates stored at `~/.turing/templates/` (cross-project persistence)
+6. Add tests
+
+**Depends on:** Phase 19.1 (transfer for cross-project use)
+
+**Acceptance:** `/turing:template save` captures a winning config. `/turing:template apply` in a new project produces a runnable starting point that beats a default configuration.
+
+### 24.7 Experiment Replay — `/turing:replay`
+
+**What:** Re-run a historical experiment with the current infrastructure — current code, current data, current libraries. Different from `/turing:reproduce` (which verifies the *same* result) — replay tests whether an *old approach* would do better *now*.
+
+**Why:** ML projects evolve: data pipelines improve, bugs get fixed, preprocessing gets refined. An approach that failed 3 weeks ago might succeed today because the underlying data quality improved. `/turing:replay` answers "should I revisit old ideas?" without the researcher manually reconstructing configs.
+
+**Implementation:**
+1. Create `commands/replay.md` — `/turing:replay <exp-id> [--with-current-data] [--with-current-preprocessing]`
+2. Add `templates/scripts/experiment_replay.py`:
+   - Reads the experiment's config from `log.jsonl`
+   - **Default replay:** applies the old config to the *current* `train.py` and data:
+     - Uses current preprocessing (from current `prepare.py`)
+     - Uses the old model config and hyperparameters
+     - Runs with current library versions
+   - **Selective replay:**
+     - `--with-original-code`: checkout `train.py` from the experiment's git commit (like reproduce but with current data)
+     - `--with-current-data`: use current data with old code (test if data improvements help old approaches)
+     - `--with-current-preprocessing`: use current `prepare.py` with old model config
+   - Comparison report:
+     ```
+     Replay: exp-023 (XGBoost baseline, originally accuracy=0.834)
+     
+     | Condition            | Accuracy | Δ from Original |
+     |----------------------|----------|-----------------|
+     | Original (3 weeks ago) | 0.834  | —               |
+     | Current code + data  | 0.856    | +0.022          |
+     | Current data only    | 0.851    | +0.017          |
+     | Current code only    | 0.839    | +0.005          |
+     
+     Verdict: Data improvements account for 77% of the gain.
+     This approach is worth revisiting with current infrastructure.
+     ```
+   - Optionally auto-queues a hypothesis if replay shows significant improvement: "Revisit exp-023 approach with current infrastructure"
+   - Logs as new experiment with parent link and `family: "replay"`
+3. Integration with `/turing:trend` (Phase 24.1) — identify old experiments worth replaying based on infrastructure changes
+4. Add tests
+
+**Depends on:** Experiment logging (Phase 1), git-based experiment tracking
+
+**Acceptance:** `/turing:replay exp-023` shows that an old approach gains +2.2% from infrastructure improvements, prompting the researcher to revisit it.
 
 ---
 
@@ -2830,13 +3020,18 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 58 | Training curriculum optimization `/turing:curriculum` | 22.2 | v3.3.0 | **Medium** | **DONE** | Phase 10.1 (seed runner) |
 | 59 | Weight pruning `/turing:prune` | 23.1 | v3.4.0 | **High** | Planned | Phase 11.3 (Pareto), Phase 13.1 (export) |
 | 60 | Post-training quantization `/turing:quantize` | 23.2 | v3.4.0 | **High** | Planned | Phase 13.1 (export) |
-| 61 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
-| 62 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.4 |
-| 63 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
-| 64 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | Planned | — (standalone) |
-| 65 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
-| 66 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
-| 67 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
+| 61 | Model merging `/turing:merge` | 23.3 | v3.4.0 | **High** | Planned | Phase 12.2 (checkpoint), Phase 13.1 (export) |
+| 62 | Architecture modification `/turing:surgery` | 23.4 | v3.4.0 | **Medium** | Planned | Phase 17.3 (warm), Phase 21.2 (sensitivity) |
+| 63 | Long-term trend analysis `/turing:trend` | 24.1 | v3.5.0 | **High** | Planned | Phase 18.2 (budget) |
+| 64 | Session context restoration `/turing:flashback` | 24.2 | v3.5.0 | **Critical** | Planned | Phases 6.2, 6.5, 24.7 |
+| 65 | Experiment lifecycle cleanup `/turing:archive` | 24.3 | v3.5.0 | **Medium** | Planned | Phase 12.2 (checkpoint pruning) |
+| 66 | Retrospective annotations `/turing:annotate` | 24.4 | v3.5.0 | **Medium** | Planned | — (standalone) |
+| 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | Planned | Phase 9.1 (semantic index), Phase 24.4 |
+| 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | Planned | Phase 19.1 (transfer) |
+| 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | Planned | Experiment logging (Phase 1) |
+| 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
+| 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
+| 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
 
 ### Dependency Graph
 
@@ -2870,14 +3065,19 @@ Phase 20 (Pre-Training Intel)         Phase 21 (Model Debugging)
 Phase 22 (Feature & Training)         Phase 23 (Model Surgery)
   22.1 feature ← 11.2 ablation         23.1 prune ← 11.3 Pareto, 13.1 export
   22.2 curriculum ← 10.1 seed          23.2 quantize ← 13.1 export
+                                        23.3 merge ← 12.2 checkpoint, 13.1 export
+                                        23.4 surgery ← 17.3 warm, 21.2 sensitivity
                                                  │
            ┌─────────────────────────────────────┘
            ▼
 Phase 24 (Experiment Archaeology)
   24.1 trend ← 18.2 budget
-  24.2 flashback ← 6.2, 6.5, 24.4
+  24.2 flashback ← 6.2, 6.5, 24.7
   24.3 archive ← 12.2 checkpoint
   24.4 annotate (standalone)
+  24.5 search ← 9.1 semantic index, 24.4
+  24.6 template ← 19.1 transfer
+  24.7 replay ← experiment logging
            │
            ▼
 Phase 25 (Research Communication) ← v4.0
@@ -2903,6 +3103,6 @@ Phase 25 (Research Communication) ← v4.0
 | v3.1.0 | 20 (Pre-Training Intelligence) | `/turing:sanity` catches a broken data loader in <30s; `/turing:leak` detects a leaked feature before training |
 | v3.2.0 | 21 (Model Debugging) | `/turing:xray` identifies dead neurons; `/turing:sensitivity` redirects tuning effort to high-impact hyperparameters |
 | v3.3.0 | 22 (Feature & Training Intelligence) | `/turing:feature` identifies redundant features that hurt generalization; `/turing:curriculum` demonstrates faster convergence |
-| v3.4.0 | 23 (Model Surgery) | `/turing:prune` achieves 1.8x speedup at <1% accuracy loss; `/turing:quantize` produces INT8 model with <0.5% degradation |
-| v3.5.0 | 24 (Experiment Archaeology) | `/turing:flashback` restores context in <10s after days away; `/turing:archive` reclaims >50% disk on a 200-experiment project |
+| v3.4.0 | 23 (Model Surgery) | `/turing:prune` achieves 1.8x speedup at <1% accuracy loss; `/turing:merge` beats best individual model with zero latency overhead; `/turing:surgery` produces runnable modified architecture in <10s |
+| v3.5.0 | 24 (Experiment Archaeology) | `/turing:flashback` restores context in <10s after days away; `/turing:search` finds relevant experiments via natural language; `/turing:template` transfers a winning recipe to a new project |
 | **v4.0.0** | **25 (Research Communication)** | **`/turing:cite` catches missing attributions; `/turing:present` generates publication-quality figures; `/turing:changelog` produces stakeholder-readable progress narrative — Turing becomes a research-to-communication pipeline** |
