@@ -102,6 +102,8 @@ TEMPLATE_DIRS = {
         "equivalence_checker.py",
         "latency_benchmark.py",
         "export_card.py",
+        "literature_search.py",
+        "draft_paper_sections.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -118,6 +120,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/profiles",
     "experiments/checkpoints",
     "exports",
+    "experiments/literature",
+    "paper/sections",
     "models/best",
     "models/archive",
 ]
