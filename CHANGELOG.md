@@ -2,6 +2,23 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [3.2.0] — 2026-04-01 — Model Debugging
+
+### Added
+- `/turing:xray` — internal model diagnostics: gradient flow, dead neurons, activation stats, weight distributions (neural), depth utilization and feature dominance (tree), coefficient magnitudes (sklearn)
+- `/turing:sensitivity` — hyperparameter sensitivity analysis: sweep generation, normalized sensitivity scoring (HIGH/MED/LOW/NONE), monotonicity detection, tuning recommendations
+- `/turing:calibrate` — probability calibration: ECE/MCE computation, reliability diagrams, Platt scaling, isotonic regression, temperature scaling, auto-method selection
+
+### Fixed
+- Skip tunable param check when sweep data is pre-computed in sensitivity analysis
+
+### Phase
+- **21.1** Internal Model Diagnostics
+- **21.2** Hyperparameter Sensitivity Analysis
+- **21.3** Probability Calibration
+
+**1398 tests | 47 commands | 66 scripts | 15 commits**
+
 ## [3.1.0] — 2026-04-01 — Pre-Training Intelligence
 
 ### Added
@@ -243,6 +260,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[3.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.2.0
 [3.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.1.0
 [3.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v3.0.0
 [2.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.5.0
