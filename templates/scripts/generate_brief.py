@@ -326,6 +326,35 @@ def load_ensemble_results(ensemble_dir: str = "experiments/ensembles") -> list[d
     return reports
 
 
+def load_budget_status(state_path: str = "experiment_state.yaml", log_path: str = "experiments/log.jsonl") -> dict | None:
+    """Load budget status if active."""
+    try:
+        from scripts.budget_manager import get_budget_status
+        result = get_budget_status(state_path, log_path)
+        if "error" not in result:
+            return result
+    except (ImportError, Exception):
+        pass
+    return None
+
+
+def load_scaling_results(scaling_dir: str = "experiments/scaling") -> list[dict]:
+    """Load scaling study results from YAML files."""
+    path = Path(scaling_dir)
+    if not path.exists():
+        return []
+    reports = []
+    for f in sorted(path.glob("scale-*.yaml")):
+        try:
+            with open(f) as fh:
+                report = yaml.safe_load(fh)
+                if report and isinstance(report, dict) and "verdict" in report:
+                    reports.append(report)
+        except (yaml.YAMLError, OSError):
+            continue
+    return reports
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -345,6 +374,8 @@ def format_brief(
     queue_summary: dict | None = None,
     regression_checks: list[dict] | None = None,
     ensemble_results: list[dict] | None = None,
+    budget_status: dict | None = None,
+    scaling_results: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -579,6 +610,31 @@ def format_brief(
             else:
                 lines.append(f"- {n_models}-model ensemble: no improvement over best single")
 
+    # Budget status
+    if budget_status and budget_status.get("usage"):
+        usage = budget_status["usage"]
+        phase = budget_status.get("phase", "?")
+        lines.extend(["", "## Budget", ""])
+        if usage.get("experiments_max"):
+            lines.append(
+                f"- **Experiments:** {usage['experiments_used']}/{usage['experiments_max']} "
+                f"({usage['budget_fraction']:.0%} used)"
+            )
+        if usage.get("hours_max"):
+            lines.append(f"- **Time:** {usage['hours_used']:.1f}/{usage['hours_max']:.1f}h")
+        lines.append(f"- **Phase:** {phase}")
+        if budget_status.get("exhausted"):
+            lines.append("- **STATUS: EXHAUSTED** — no more experiments will run")
+
+    # Scaling predictions
+    if scaling_results:
+        lines.extend(["", "## Scaling Predictions", ""])
+        for study in scaling_results:
+            verdict = study.get("verdict", {})
+            v = verdict.get("verdict", "?")
+            reason = verdict.get("reason", "")
+            lines.append(f"- **{v.upper()}**: {reason}")
+
     # Regression check history (stability)
     if regression_checks:
         lines.extend(["", "## Stability", ""])
@@ -670,6 +726,8 @@ def generate_brief(
     queue_summary = load_queue_summary()
     regression_checks = load_regression_checks()
     ensemble_results = load_ensemble_results()
+    budget_status = load_budget_status(log_path=log_path)
+    scaling_results = load_scaling_results()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -683,6 +741,8 @@ def generate_brief(
         queue_summary=queue_summary,
         regression_checks=regression_checks if regression_checks else None,
         ensemble_results=ensemble_results if ensemble_results else None,
+        budget_status=budget_status,
+        scaling_results=scaling_results if scaling_results else None,
     )
 
 
