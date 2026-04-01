@@ -52,8 +52,11 @@ def load_registry(registry_path: str = DEFAULT_REGISTRY_PATH) -> dict:
     path = Path(registry_path)
     if not path.exists():
         return {"models": [], "history": []}
-    with open(path) as f:
-        data = yaml.safe_load(f)
+    try:
+        with open(path) as f:
+            data = yaml.safe_load(f)
+    except (yaml.YAMLError, OSError):
+        return {"models": [], "history": []}
     if not isinstance(data, dict):
         return {"models": [], "history": []}
     if "models" not in data:
