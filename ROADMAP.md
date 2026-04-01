@@ -3029,9 +3029,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 67 | Natural language experiment search `/turing:search` | 24.5 | v3.5.0 | **High** | **DONE** | Phase 9.1 (semantic index), Phase 24.4 |
 | 68 | Experiment template library `/turing:template` | 24.6 | v3.5.0 | **Medium** | **DONE** | Phase 19.1 (transfer) |
 | 69 | Experiment replay `/turing:replay` | 24.7 | v3.5.0 | **Medium** | **DONE** | Experiment logging (Phase 1) |
-| 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | Planned | Phases 14.1, 7.1, 14.2 |
-| 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | Planned | Phases 11.2, 11.3, 21.2 |
-| 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | Planned | Phase 24.4 (annotations) |
+| 70 | Citation & attribution manager `/turing:cite` | 25.1 | **v4.0.0** | **High** | **DONE** | Phases 14.1, 7.1, 14.2 |
+| 71 | Presentation figure generation `/turing:present` | 25.2 | **v4.0.0** | **High** | **DONE** | Phases 11.2, 11.3, 21.2 |
+| 72 | Model changelog generation `/turing:changelog` | 25.3 | **v4.0.0** | **Medium** | **DONE** | Phase 24.4 (annotations) |
 
 ### Dependency Graph
 
