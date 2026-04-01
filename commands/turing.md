@@ -62,6 +62,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "quantize", "quantization", "int8", "fp16", "reduce precision", "faster inference" | `/turing:quantize` | Optimize |
 | "merge", "model soup", "merge weights", "average models", "TIES", "DARE" | `/turing:merge` | Compose |
 | "surgery", "architecture", "add layer", "widen", "modify model", "swap activation" | `/turing:surgery` | Modify |
+| "cite", "citation", "bibliography", "bibtex", "attribution", "references" | `/turing:cite` | Record |
+| "present", "figures", "slides", "presentation", "charts", "plots" | `/turing:present` | Document |
+| "changelog", "model changelog", "progress summary", "what improved" | `/turing:changelog` | Document |
 | "trend", "trends", "research direction", "improvement rate", "diminishing returns", "what's working" | `/turing:trend` | Analyze |
 | "flashback", "where was I", "context", "resume", "catch up", "what happened" | `/turing:flashback` | Recall |
 | "archive", "cleanup", "compress old", "disk space", "archive experiments" | `/turing:archive` | Manage |
@@ -134,6 +137,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:search <query>` | Natural language experiment search with structured filters | (inline) |
 | `/turing:template <action>` | Experiment template library: save/list/apply reusable configs across projects | (inline) |
 | `/turing:replay <exp-id>` | Experiment replay: re-run old experiment with current infrastructure | (inline) |
+| `/turing:cite <action>` | Citation manager: add/list/check/bib for papers, datasets, methods | (inline) |
+| `/turing:present [--figures]` | Presentation figures: training curves, comparisons, ablation, Pareto, sensitivity | (inline) |
+| `/turing:changelog [--audience]` | Model changelog: version-grouped improvements for technical or stakeholder audiences | (inline) |
 
 ## Proactive Detection
 
