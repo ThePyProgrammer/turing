@@ -34,6 +34,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "lit", "literature", "papers", "SOTA", "baseline", "related work", "citations" | `/turing:lit` | Research |
 | "paper", "draft paper", "write paper", "results table", "latex", "experimental setup" | `/turing:paper` | Document |
 | "export", "deploy", "production", "onnx", "torchscript", "tflite", "ship model" | `/turing:export` | Deploy |
+| "queue", "batch", "overnight", "schedule experiments", "run queue" | `/turing:queue` | Orchestrate |
+| "retry", "retry experiment", "crashed", "OOM", "fix and rerun" | `/turing:retry` | Orchestrate |
+| "fork", "branch", "try both", "parallel experiments", "A or B" | `/turing:fork` | Orchestrate |
 | "profile", "profiling", "bottleneck", "slow training", "why is it slow", "timing" | `/turing:profile` | Check |
 | "checkpoint", "checkpoints", "prune checkpoints", "disk space", "resume training" | `/turing:checkpoint` | Check |
 
@@ -66,6 +69,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:lit <query>` | Literature search: papers, SOTA baselines, related work | (inline, uses WebSearch) |
 | `/turing:paper [--sections] [--format]` | Draft paper sections from experiment logs (setup, results, ablation, hyperparams) | (inline) |
 | `/turing:export [exp-id] [--format]` | Export model to production format with equivalence check + latency benchmark | (inline) |
+| `/turing:queue <action>` | Batch experiment scheduler: add, list, run, pause, clear | (inline) |
+| `/turing:retry <exp-id>` | Smart failure recovery: auto-diagnose crash, apply fix, re-run | (inline) |
+| `/turing:fork <exp-id> --branches` | Experiment branching: run parallel tracks, report winner | (inline) |
 | `/turing:profile [exp-id]` | Computational profiling: timing, memory, throughput, bottleneck detection | (inline) |
 | `/turing:checkpoint <action>` | Smart checkpoint management: list, prune (Pareto), average, resume, stats | (inline) |
 
