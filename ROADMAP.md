@@ -2115,9 +2115,9 @@ Phase 2.1 added optional multi-run significance testing. This phase makes statis
 | 43 | Automated ensemble construction `/turing:ensemble` | 17.1 | v2.4.0 | **High** | **DONE** | Phase 11.3 (Pareto for model selection) |
 | 44 | Pipeline composition `/turing:stitch` | 17.2 | v2.4.0 | **High** | **DONE** | Phase 11.2 (ablation for stage testing) |
 | 45 | Warm-start from prior model `/turing:warm` | 17.3 | v2.4.0 | **Medium** | **DONE** | Phase 12.2 (checkpoint manager) |
-| 46 | Scaling law estimator `/turing:scale` | 18.1 | v2.5.0 | **High** | Planned | Phase 10.1 (seed for statistical fit) |
-| 47 | Compute budget manager `/turing:budget` | 18.2 | v2.5.0 | **High** | Planned | Phase 15.1 (queue integration) |
-| 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | Planned | Phase 13.1 (export for size comparison) |
+| 46 | Scaling law estimator `/turing:scale` | 18.1 | v2.5.0 | **High** | **DONE** | Phase 10.1 (seed for statistical fit) |
+| 47 | Compute budget manager `/turing:budget` | 18.2 | v2.5.0 | **High** | **DONE** | Phase 15.1 (queue integration) |
+| 48 | Model compression `/turing:distill` | 18.3 | v2.5.0 | **Medium** | **DONE** | Phase 13.1 (export for size comparison) |
 | 49 | Cross-project knowledge transfer `/turing:transfer` | 19.1 | **v3.0.0** | **High** | Planned | Phase 9.1 (semantic index) |
 | 50 | Pre-submission methodology audit `/turing:audit` | 19.2 | **v3.0.0** | **High** | Planned | Phases 10.1, 11.2, 14.2 |
 
