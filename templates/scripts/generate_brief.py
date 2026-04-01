@@ -212,6 +212,18 @@ def detect_environment_drift(experiments: list[dict]) -> list[str]:
     return warnings
 
 
+def load_queue_summary(queue_path: str = "experiments/queue-summary.yaml") -> dict | None:
+    """Load the most recent queue execution summary."""
+    path = Path(queue_path)
+    if not path.exists():
+        return None
+    try:
+        with open(path) as f:
+            return yaml.safe_load(f)
+    except (yaml.YAMLError, OSError):
+        return None
+
+
 def load_profiles(profile_dir: str = "experiments/profiles") -> list[dict]:
     """Load all profiling results from YAML files."""
     path = Path(profile_dir)
@@ -296,6 +308,7 @@ def format_brief(
     reproductions: list[dict] | None = None,
     diagnoses: list[dict] | None = None,
     profiles: list[dict] | None = None,
+    queue_summary: dict | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -472,6 +485,16 @@ def format_brief(
         if failed:
             lines.extend(["", f"*{len(failed)} experiment(s) failed reproducibility checks.*"])
 
+    # Queue report
+    if queue_summary and queue_summary.get("total"):
+        qs = queue_summary
+        lines.extend(["", "## Queue Report", ""])
+        lines.append(
+            f"**{qs.get('status', '?')}** — {qs.get('completed', 0)} completed, "
+            f"{qs.get('failed', 0)} failed, {qs.get('skipped', 0)} skipped "
+            f"of {qs.get('total', 0)} queued"
+        )
+
     # Profiles
     if profiles:
         lines.extend(["", "## Performance Profile", ""])
@@ -569,6 +592,7 @@ def generate_brief(
     reproductions = load_reproductions()
     diagnoses = load_diagnoses()
     profiles = load_profiles()
+    queue_summary = load_queue_summary()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -579,6 +603,7 @@ def generate_brief(
         reproductions=reproductions if reproductions else None,
         diagnoses=diagnoses if diagnoses else None,
         profiles=profiles if profiles else None,
+        queue_summary=queue_summary,
     )
 
 
