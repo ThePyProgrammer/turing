@@ -1,0 +1,74 @@
+# Configurable failure taxonomy for /turing:retry
+# Add project-specific patterns to extend the built-in taxonomy.
+# Each failure mode has:
+#   patterns: list of strings to match in stdout/stderr (case-insensitive)
+#   fix: human-readable description of the fix
+#   config_changes: dict of hyperparameter changes (//N = divide, *N = multiply)
+#   severity: recoverable | requires_intervention
+
+oom:
+  patterns:
+    - "CUDA out of memory"
+    - "MemoryError"
+    - "RuntimeError: out of memory"
+    - "std::bad_alloc"
+    - "OutOfMemoryError"
+  fix: "Reduce batch_size by 50%"
+  config_changes:
+    batch_size: "//2"
+  severity: recoverable
+
+nan_loss:
+  patterns:
+    - "loss is NaN"
+    - "loss is nan"
+    - "RuntimeWarning: invalid value"
+    - "loss: nan"
+    - "NaN loss"
+  fix: "Add gradient clipping at 1.0, reduce learning_rate by 10x"
+  config_changes:
+    gradient_clip: 1.0
+    learning_rate: "//10"
+  severity: recoverable
+
+timeout:
+  patterns:
+    - "TimeoutError"
+    - "exceeded time limit"
+    - "timed out"
+    - "TimeoutExpired"
+  fix: "Double max_epochs or training timeout"
+  config_changes:
+    max_epochs: "*2"
+  severity: recoverable
+
+import_error:
+  patterns:
+    - "ModuleNotFoundError"
+    - "ImportError"
+    - "No module named"
+  fix: "Install missing dependency"
+  config_changes: {}
+  severity: requires_intervention
+
+convergence_failure:
+  patterns:
+    - "loss did not decrease"
+    - "no improvement"
+    - "early stopping"
+    - "convergence warning"
+  fix: "Increase learning_rate by 3x for warm-up"
+  config_changes:
+    learning_rate: "*3"
+  severity: recoverable
+
+data_error:
+  patterns:
+    - "FileNotFoundError"
+    - "No such file"
+    - "empty dataset"
+    - "zero samples"
+    - "KeyError"
+  fix: "Check data path and preprocessing"
+  config_changes: {}
+  severity: requires_intervention
