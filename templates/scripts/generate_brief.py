@@ -292,6 +292,23 @@ def load_reproductions(repro_dir: str = "experiments/reproductions") -> list[dic
     return reports
 
 
+def load_regression_checks(regress_dir: str = "experiments/regressions") -> list[dict]:
+    """Load all regression check reports from YAML files."""
+    path = Path(regress_dir)
+    if not path.exists():
+        return []
+    reports = []
+    for f in sorted(path.glob("check-*.yaml")):
+        try:
+            with open(f) as fh:
+                report = yaml.safe_load(fh)
+                if report and isinstance(report, dict):
+                    reports.append(report)
+        except (yaml.YAMLError, OSError):
+            continue
+    return reports
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -309,6 +326,7 @@ def format_brief(
     diagnoses: list[dict] | None = None,
     profiles: list[dict] | None = None,
     queue_summary: dict | None = None,
+    regression_checks: list[dict] | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -528,6 +546,30 @@ def format_brief(
         if auto_hyps:
             lines.append(f"\n*{auto_hyps} auto-generated hypotheses from failure analysis.*")
 
+    # Regression check history (stability)
+    if regression_checks:
+        lines.extend(["", "## Stability", ""])
+        verdict_markers = {
+            "pass": "PASS",
+            "warning": "WARNING",
+            "fail": "FAIL",
+        }
+        for check in regression_checks:
+            baseline = check.get("baseline_id", "?")
+            verdict = check.get("verdict", "unknown")
+            marker = verdict_markers.get(verdict, verdict)
+            date = check.get("checked_at", "")[:10]
+            mode = check.get("mode", "?")
+            lines.append(f"- **{date}** [{marker}] against {baseline} ({mode} mode)")
+            if verdict == "fail":
+                per_metric = check.get("per_metric", {})
+                failed = [k for k, v in per_metric.items() if v.get("verdict") == "fail"]
+                if failed:
+                    lines.append(f"  - Failed metrics: {', '.join(failed)}")
+        passed = sum(1 for c in regression_checks if c.get("verdict") == "pass")
+        total = len(regression_checks)
+        lines.append(f"\n*{passed}/{total} regression checks passed.*")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -593,6 +635,7 @@ def generate_brief(
     diagnoses = load_diagnoses()
     profiles = load_profiles()
     queue_summary = load_queue_summary()
+    regression_checks = load_regression_checks()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -604,6 +647,7 @@ def generate_brief(
         diagnoses=diagnoses if diagnoses else None,
         profiles=profiles if profiles else None,
         queue_summary=queue_summary,
+        regression_checks=regression_checks if regression_checks else None,
     )
 
 
