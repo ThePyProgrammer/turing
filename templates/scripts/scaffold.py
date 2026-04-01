@@ -113,6 +113,9 @@ TEMPLATE_DIRS = {
         "build_ensemble.py",
         "pipeline_manager.py",
         "warm_start.py",
+        "scaling_estimator.py",
+        "budget_manager.py",
+        "model_distiller.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -139,6 +142,8 @@ DIRECTORIES_TO_CREATE = [
     "experiments/ensembles",
     "experiments/cache",
     "experiments/warm_starts",
+    "experiments/scaling",
+    "experiments/distillations",
     "experiments/logs",
     "models/best",
     "models/archive",

@@ -27,6 +27,7 @@ const SUB_COMMANDS = [
   "lit", "paper", "queue", "retry", "fork",
   "diff", "watch", "regress",
   "ensemble", "stitch", "warm",
+  "scale", "budget", "distill",
 ];
 
 export async function install(opts = {}) {

@@ -50,6 +50,9 @@ const EXPECTED_COMMANDS = [
   "ensemble/SKILL.md",
   "stitch/SKILL.md",
   "warm/SKILL.md",
+  "scale/SKILL.md",
+  "budget/SKILL.md",
+  "distill/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];
