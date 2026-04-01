@@ -50,6 +50,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "distill", "compress", "smaller model", "student model", "knowledge distillation", "model compression" | `/turing:distill` | Deploy |
 | "transfer", "what worked before", "similar project", "cross-project", "institutional knowledge", "prior projects" | `/turing:transfer` | Research |
 | "audit", "methodology check", "pre-submission", "reviewer checklist", "data leakage", "missing baselines" | `/turing:audit` | Validate |
+| "sanity", "sanity check", "pre-training", "is it broken", "before training", "quick check" | `/turing:sanity` | Check |
+| "baseline", "baselines", "trivial baseline", "majority class", "is it better than random" | `/turing:baseline` | Analyze |
+| "leak", "leakage", "data leakage scan", "suspicious feature", "train test overlap" | `/turing:leak` | Validate |
 
 ## Sub-commands
 
@@ -96,6 +99,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:distill <exp-id>` | Model compression: distill teacher into smaller student model | (inline) |
 | `/turing:transfer [--from]` | Cross-project knowledge transfer: find similar prior projects, surface what worked | (inline) |
 | `/turing:audit [--strict]` | Pre-submission methodology audit: data leakage, baselines, seeds, ablations, reproducibility | (inline) |
+| `/turing:sanity [--quick]` | Pre-training sanity checks: initial loss, overfit test, gradient flow, output validation | (inline) |
+| `/turing:baseline [--methods]` | Automatic baseline generation: random, majority/mean, linear, k-NN | (inline) |
+| `/turing:leak [--deep]` | Targeted leakage detection: single-feature tests, correlation, train/test overlap | (inline) |
 
 ## Proactive Detection
 
