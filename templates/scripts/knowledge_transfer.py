@@ -170,14 +170,19 @@ def compute_similarity(sig_a: dict, sig_b: dict) -> float:
     # Task type (exact match)
     ds_a = sig_a.get("dataset", {})
     ds_b = sig_b.get("dataset", {})
-    task_match = 1.0 if ds_a.get("task_type") == ds_b.get("task_type") else 0.0
+    task_a = ds_a.get("task_type")
+    task_b = ds_b.get("task_type")
+    task_match = 1.0 if (task_a and task_b and task_a == task_b) else 0.0
     scores.append(task_match)
     weights.append(3.0)  # High weight
 
     # Feature types
-    ft_a = ds_a.get("feature_types", "")
-    ft_b = ds_b.get("feature_types", "")
-    ft_match = 1.0 if ft_a == ft_b else 0.3
+    ft_a = ds_a.get("feature_types")
+    ft_b = ds_b.get("feature_types")
+    if ft_a and ft_b:
+        ft_match = 1.0 if ft_a == ft_b else 0.3
+    else:
+        ft_match = 0.0
     scores.append(ft_match)
     weights.append(1.0)
 
