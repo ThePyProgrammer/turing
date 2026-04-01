@@ -24,7 +24,7 @@ const SUB_COMMANDS = [
   "try", "brief", "suggest", "explore", "design", "logbook", "poster",
   "report", "mode", "preflight", "card", "seed", "reproduce",
   "diagnose", "ablate", "frontier", "profile", "checkpoint", "export",
-  "lit", "paper",
+  "lit", "paper", "queue", "retry", "fork",
 ];
 
 export async function install(opts = {}) {

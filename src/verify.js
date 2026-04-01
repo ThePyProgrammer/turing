@@ -41,6 +41,9 @@ const EXPECTED_COMMANDS = [
   "export/SKILL.md",
   "lit/SKILL.md",
   "paper/SKILL.md",
+  "queue/SKILL.md",
+  "retry/SKILL.md",
+  "fork/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];

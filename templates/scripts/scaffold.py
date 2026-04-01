@@ -104,6 +104,9 @@ TEMPLATE_DIRS = {
         "export_card.py",
         "literature_search.py",
         "draft_paper_sections.py",
+        "experiment_queue.py",
+        "smart_retry.py",
+        "fork_experiment.py",
     ],
     "tests": ["__init__.py", "conftest.py"],
 }
@@ -122,6 +125,9 @@ DIRECTORIES_TO_CREATE = [
     "exports",
     "experiments/literature",
     "paper/sections",
+    "experiments/retries",
+    "experiments/forks",
+    "experiments/logs",
     "models/best",
     "models/archive",
 ]
