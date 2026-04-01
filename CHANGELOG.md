@@ -2,6 +2,21 @@
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.5.0] — 2026-04-01 — Scaling & Efficiency
+
+### Added
+- `/turing:scale` — scaling law estimator: run experiments at different data/compute/model sizes, fit power law, predict full-scale performance, ASCII plots, diminishing-returns verdicts
+- `/turing:budget` — compute budget manager: set experiment/time limits, auto-shift explore→mixed→exploit phases, burn rate projections, hard stop at 100%
+- `/turing:distill` — model compression via distillation: auto-select student architecture, soft labels/feature matching/dataset distillation, accuracy/size/latency tradeoff verdicts
+- Budget and Scaling Predictions sections in `/turing:brief`
+
+### Phase
+- **18.1** Scaling Law Estimator
+- **18.2** Compute Budget Manager
+- **18.3** Model Compression
+
+**1195 tests | 39 commands | 58 scripts | 18 commits**
+
 ## [2.4.0] — 2026-04-01 — Model Composition
 
 ### Added
@@ -195,6 +210,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[2.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.5.0
 [2.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.4.0
 [2.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.3.0
 [2.2.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v2.2.1
