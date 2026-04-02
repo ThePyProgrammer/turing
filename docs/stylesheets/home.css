@@ -37,9 +37,9 @@
 }
 
 .tx-hero__title {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0 0 1.25rem;
   color: #fff;
@@ -47,7 +47,7 @@
 
 @media (max-width: 600px) {
   .tx-hero__title {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
 }
 
