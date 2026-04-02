@@ -164,8 +164,9 @@ turing/
 ├── package.json               npm package definition.
 ├── CONTRIBUTING.md            Command/script/config authoring conventions.
 ├── README.md                  Philosophical README.
-├── ROADMAP.md                 Feature roadmap (phases 1-9 complete).
-├── V1_RELEASE_BLOCKERS.md     Release readiness tracker.
+├── .planning/
+│   ├── ROADMAP.md             Feature roadmap (84 commands, 29 phases).
+│   └── V1_RELEASE_BLOCKERS.md Release readiness tracker (resolved).
 ├── LICENSE                    MIT.
 └── .gitignore
 ```

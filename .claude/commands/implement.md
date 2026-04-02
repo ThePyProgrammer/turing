@@ -9,12 +9,12 @@ You are the Turing phase implementor. You implement roadmap phases with **maximu
 ## Arguments
 
 `$ARGUMENTS` can be any of:
-- **Phase number only:** `16` — look up the version from ROADMAP.md's implementation order table
-- **Version only:** `v2.3.0` or `2.3.0` — look up the phase number from ROADMAP.md's implementation order table
+- **Phase number only:** `16` — look up the version from .planning/ROADMAP.md's implementation order table
+- **Version only:** `v2.3.0` or `2.3.0` — look up the phase number from .planning/ROADMAP.md's implementation order table
 - **Both:** `16 v2.3.0` — use as given
 
 **Resolution rules:**
-1. Read the "Updated Full Implementation Order" table in ROADMAP.md
+1. Read the "Updated Full Implementation Order" table in .planning/ROADMAP.md
 2. If given a phase number, find the row and extract the version
 3. If given a version, find all rows with that version and determine the phase number
 4. If given both, verify they match and warn if they don't
@@ -24,7 +24,7 @@ If the resolved phase has no detailed spec section (i.e., no `## Phase N:` headi
 
 ## Step 0: Read the Roadmap
 
-Read `ROADMAP.md` and find the section for the requested phase. Extract:
+Read `.planning/ROADMAP.md` and find the section for the requested phase. Extract:
 - Phase title and tagline
 - All sub-phases (e.g., 16.1, 16.2, 16.3)
 - Per sub-phase: command name, script name, implementation details, dependencies, acceptance criteria
@@ -87,7 +87,7 @@ Then for shared infrastructure:
    → commit JUST the config file
 
 9. docs: mark Phase N as DONE in roadmap
-   → commit JUST ROADMAP.md
+   → commit JUST .planning/ROADMAP.md
 
 10. docs: add Phase N commands and update stats in README
     → commit JUST README.md
