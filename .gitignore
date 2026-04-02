@@ -32,6 +32,9 @@ models/
 # Superpowers artifacts
 docs/superpowers/
 
+# Zensical build output
+site/
+
 # Test artifacts
 .pytest_cache/
 .coverage
