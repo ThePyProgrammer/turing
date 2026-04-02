@@ -1,0 +1,48 @@
+# Everything is excluded by default.
+# The "files" field in package.json is the allowlist:
+#   bin/, src/, .claude-plugin/, commands/, agents/, templates/, config/
+#
+# This file exists as a safety net and to document intent.
+
+# Development
+tests/
+docs/
+site/
+overrides/
+.github/
+.cache/
+
+# Internal
+.claude/
+.planning/
+outputs/
+
+# Build artifacts
+.venv/
+node_modules/
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+*.whl
+*.tar.gz
+
+# Lock files
+uv.lock
+package-lock.json
+
+# Config
+.gitignore
+.editorconfig
+pyproject.toml
+mkdocs.yml
+
+# Documentation
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE
