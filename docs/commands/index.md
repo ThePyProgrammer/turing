@@ -21,22 +21,26 @@ If you read nothing else, learn these three:
 
 | Category | Commands | Page |
 |----------|----------|------|
-| **Core Loop** | init, train, sweep, status, compare | [core.md](core.md) |
-| **Taste-Leverage Interface** | try, brief, suggest, explore, design, mode | [taste-leverage.md](taste-leverage.md) |
-| **Statistical Rigor** | validate, seed, reproduce | [statistical-rigor.md](statistical-rigor.md) |
-| **Experiment Intelligence** | diagnose, ablate, frontier, card, logbook, report, poster | [experiment-intelligence.md](experiment-intelligence.md) |
-| **Performance & Resources** | profile, checkpoint | [performance.md](performance.md) |
-| **Research Workflow** | lit, paper, export | [research-workflow.md](research-workflow.md) |
-| **Pre-flight & Diagnostics** | preflight, doctor, sanity | -- |
-| **Data Pipeline** | feature, leak, calibrate, sensitivity | -- |
-| **Model Operations** | ensemble, distill, prune, quantize, transfer, warm, stitch, surgery | -- |
-| **Experiment Management** | fork, merge, diff, flashback, replay, retry, queue, archive, registry | -- |
-| **Monitoring & Trends** | watch, trend, regress, xray | -- |
-| **Collaboration** | share, review, annotate, onboard, present, changelog | -- |
-| **Planning & Strategy** | plan, baseline, budget, scale, curriculum, counterfactual, whatif, simulate | -- |
-| **Search & Discovery** | search, template | -- |
-| **Maintenance** | update, postmortem, cite | -- |
-| **Router** | turing | -- |
+| **Core Loop** | init, train, sweep, status, compare | [Core Loop](core.md) |
+| **Taste-Leverage Interface** | try, brief, suggest, explore, design, mode | [Taste-Leverage](taste-leverage.md) |
+| **Statistical Rigor** | validate, seed, reproduce | [Statistical Rigor](statistical-rigor.md) |
+| **Experiment Intelligence** | diagnose, ablate, frontier, card, logbook, report, poster | [Experiment Intelligence](experiment-intelligence.md) |
+| **Performance & Resources** | profile, checkpoint | [Performance](performance.md) |
+| **Research Workflow** | lit, paper, export | [Research Workflow](research-workflow.md) |
+| **Experiment Orchestration** | queue, retry, fork | [Orchestration](orchestration.md) |
+| **Deep Analysis** | diff, watch, regress | [Deep Analysis](deep-analysis.md) |
+| **Model Composition** | ensemble, stitch, warm | [Composition](composition.md) |
+| **Scaling & Efficiency** | scale, budget, distill | [Scaling & Efficiency](scaling-efficiency.md) |
+| **Meta-Intelligence** | transfer, audit | [Meta-Intelligence](meta-intelligence.md) |
+| **Pre-Training Intelligence** | sanity, baseline, leak | [Pre-Training](pre-training.md) |
+| **Model Debugging** | xray, sensitivity, calibrate, feature, curriculum | [Model Debugging](model-debugging.md) |
+| **Model Surgery** | prune, quantize, merge, surgery | [Model Surgery](model-surgery.md) |
+| **Experiment Archaeology** | trend, flashback, archive, annotate, search, template, replay | [Archaeology](archaeology.md) |
+| **Research Communication** | cite, present, changelog | [Communication](communication.md) |
+| **Collaboration** | onboard, share, review | [Collaboration](collaboration.md) |
+| **What-If Analysis** | whatif, counterfactual, simulate | [What-If Analysis](whatif-analysis.md) |
+| **Model Lifecycle** | update, registry | [Model Lifecycle](model-lifecycle.md) |
+| **Operational Intelligence** | postmortem, doctor, plan, preflight | [Operational](operational.md) |
 
 ## Command Anatomy
 
