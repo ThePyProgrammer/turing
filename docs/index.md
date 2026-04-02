@@ -100,4 +100,3 @@ claude plugin add /path/to/turing
 - [The Taste-Leverage Loop](philosophy/taste-leverage.md): The bidirectional interface between human judgment and agent execution
 - [Separating Hypothesis from Measurement](philosophy/separation.md): The epistemological foundation
 - [Experiment Tracking as Institutional Memory](philosophy/memory.md): Why agents need structured memory
-- [Intellectual Heritage](philosophy/heritage.md): The ideas Turing builds on

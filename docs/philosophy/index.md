@@ -107,4 +107,3 @@ The interface between the two columns is Turing's reason for existing. `/turing:
 - [The Taste-Leverage Loop](taste-leverage.md): The bidirectional interface between taste and discipline
 - [Separating Hypothesis from Measurement](separation.md): Why the entity that generates hypotheses must not evaluate them
 - [Experiment Tracking as Institutional Memory](memory.md): Why agents need structured memory
-- [Intellectual Heritage](heritage.md): The full lineage of ideas Turing builds on

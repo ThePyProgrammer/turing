@@ -12,7 +12,6 @@ nav = [
     "philosophy/taste-leverage.md",
     "philosophy/separation.md",
     "philosophy/memory.md",
-    "philosophy/heritage.md",
   ]},
   {"Getting Started" = [
     "getting-started/index.md",
