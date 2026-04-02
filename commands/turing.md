@@ -80,6 +80,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | "simulate", "predict outcome", "pre-filter", "which configs will work", "forecast" | `/turing:simulate` | Predict |
 | "update", "incremental", "new data", "add data", "fine-tune existing", "partial update" | `/turing:update` | Update |
 | "registry", "promote", "demote", "staging", "production", "which model is deployed", "model lifecycle" | `/turing:registry` | Govern |
+| "postmortem", "why failing", "failure streak", "why no improvement", "what went wrong" | `/turing:postmortem` | Diagnose |
+| "doctor", "health check", "is it broken", "diagnose harness", "self-check" | `/turing:doctor` | Check |
+| "plan", "research plan", "campaign", "what next", "allocate budget", "strategic plan" | `/turing:plan` | Plan |
 
 ## Sub-commands
 
@@ -156,6 +159,9 @@ You are the Turing ML research router. Detect the user's intent and route to the
 | `/turing:simulate [--configs] [--top-k]` | Experiment outcome prediction: pre-filter configs using surrogate model, save budget | (inline) |
 | `/turing:update <exp-id> --new-data <path>` | Incremental model update: add new data without full retraining, forgetting detection | (inline) |
 | `/turing:registry [list\|register\|promote\|demote\|history]` | Model registry: stage lifecycle (candidate → staging → production) with promotion gates | (inline) |
+| `/turing:postmortem [--window N]` | Failure postmortem: diagnose why experiments stopped improving (exhaustion, config error, data issue, ceiling, noise) | (inline) |
+| `/turing:doctor [--fix]` | Harness self-diagnosis: environment, dependencies, config, log integrity, scripts, disk, git state | (inline) |
+| `/turing:plan [--budget N] [--goal]` | Research planning assistant: strategic campaign design with budget-aware ROI allocation | (inline) |
 
 ## Proactive Detection
 
