@@ -2,17 +2,27 @@
 
 *The research assistant that can't fool itself.*
 
+<p align="center">
+  <img src="https://img.shields.io/badge/version-4.4.0-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Version" />
+  <img src="https://img.shields.io/badge/license-MIT-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="License" />
+  <img src="https://img.shields.io/badge/Claude_Code-plugin-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
+</p>
+
 ---
 
-> Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) proved that ML experiment loops are mechanical enough to automate.
-> But the agent that runs experiments must not be the agent that evaluates them.
-> Turing is an autonomous ML research harness that enforces this separation structurally, not conversationally.
+> Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) proved that ML experiment loops are mechanical enough to automate, but the agent that generates hypotheses kept gaming the metrics.
+> We believe the entity that runs experiments must not be the entity that evaluates them.
+> Turing is an autonomous ML research harness that treats **separation of hypothesis from measurement** as a first class citizen.
 
 ---
 
 <p align="center">
-  <sub>Built with :heart: by <a href="https://github.com/prannayag">@prannayag</a></sub>
+  <sub>Built with :heart: by <a href="https://github.com/ThePyProgrammer">@ThePyProgrammer</a></sub>
 </p>
+
+> [!NOTE]
+> Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
 
 **Turing is a Claude Code plugin that runs autonomous ML experiment loops with immutable evaluation, anti-cheating guardrails, and structured hypothesis tracking.**
 
@@ -136,7 +146,17 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
 
 ## Credits
 
-Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch) and [snoglobe/helios](https://github.com/snoglobe/helios). Anti-cheating stack informed by [autocrucible](https://github.com/suzuke/autocrucible). The name references Alan Turing, who first asked whether machines could think, then built the framework for answering the question.
+Huge thanks to the work done by the autonomous ML research community. Turing would not exist without these projects and ideas:
+
+- [karpathy/autoresearch](https://github.com/karpathy/autoresearch) — proved the experiment loop is mechanical enough to automate. Turing's core loop is a direct descendant.
+- [snoglobe/helios](https://github.com/snoglobe/helios) — early inspiration for structured ML experiment harnesses.
+- [suzuke/autocrucible](https://github.com/suzuke/autocrucible) — autoresearch with guardrails. Turing's six-layer anti-cheating stack is directly informed by autocrucible's documented failure modes.
+- [Amy Tam](https://x.com/amytam01/status/2031072399731675269) — the "When Code Is Free" thesis. The entire taste-leverage interface is built around her insight that when execution cost approaches zero, research taste is the differentiator.
+- [Sakana AI / TreeQuest](https://github.com/SakanaAI/treequest) — AB-MCTS for inference-time scaling, repurposed in `/turing:explore` for hypothesis-space tree search.
+- [Google's Model Cards](https://arxiv.org/abs/1810.03993) — inspiration for `/turing:card` and structured model documentation.
+- [This article](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents) by HumanLayer — a great starting point for thinking about harness engineering for AI agents.
+
+The name references Alan Turing, who first asked whether machines could think, then built the framework for answering the question.
 
 ## Documentation
 
