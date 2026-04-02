@@ -206,25 +206,20 @@ This expands the archetype into a sequence of hypotheses with the correct family
 
 ### When to Use Each Archetype
 
-```mermaid
-timeline
-    title Project Timeline
-    section Early
-        model_comparison : Establish which model family works best
-        data_quality_audit : Check data quality and leakage
-    section Mid
-        feature_sweep : Add/remove feature transforms
-        hyperparameter_sweep : Grid search parameter space
-        regularization_search : Optimal regularization strength
-        learning_rate_schedule : LR vs estimator tradeoff
-    section Late
-        ensemble_construction : Voting, stacking, blending
-        ablation_study : Measure feature contributions
-```
-
-- **Early:** Establish which model family works best. Check data quality.
-- **Mid:** Optimize the winning model's hyperparameters and features.
-- **Late:** Combine models, remove noise features, finalize.
+<div class="tier-stack">
+  <div class="tier-card tier-card--danger">
+    <h4>Early — Establish direction</h4>
+    <p><code>model_comparison</code> · <code>data_quality_audit</code><br/>Which model family works best? Is the data clean?</p>
+  </div>
+  <div class="tier-card tier-card--muted">
+    <h4>Mid — Optimize the winner</h4>
+    <p><code>feature_sweep</code> · <code>hyperparameter_sweep</code> · <code>regularization_search</code> · <code>learning_rate_schedule</code><br/>Tune parameters, add/remove features, find the sweet spot.</p>
+  </div>
+  <div class="tier-card tier-card--dark">
+    <h4>Late — Combine and finalize</h4>
+    <p><code>ensemble_construction</code> · <code>ablation_study</code><br/>Combine models, remove noise features, ship.</p>
+  </div>
+</div>
 
 ## Querying the Database
 
