@@ -17,7 +17,7 @@ A Claude Code plugin that runs autonomous ML experiment loops. [When code is fre
 - **Taste:** you inject ideas with `/turing:try`, read results with `/turing:brief`
 
 > [!NOTE]
-> Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
+> Turing is in active development. Some features are rough around the edges. [Issues and feedback welcome.](https://github.com/ThePyProgrammer/turing/issues)
 
 ## Install
 
