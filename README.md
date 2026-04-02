@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-[autoresearch](https://github.com/karpathy/autoresearch) proved the experiment loop is mechanical enough to automate. [helios](https://github.com/snoglobe/helios) and [autocrucible](https://github.com/suzuke/autocrucible) added structure and guardrails. But the agent that generates hypotheses still games the metrics, nothing remembers what was tried across sessions, and the human has no clean interface for injecting research taste. Turing closes all three gaps: immutable evaluation the agent cannot see, structured memory that survives context resets, and a two-verb interface ([when code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269)).
+An autonomous ML agent that can't cheat its own metrics, remembers every experiment across sessions, and gives you a two-verb interface for injecting research taste. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). Turing handles the code.
 
 > [!NOTE]
 > Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
