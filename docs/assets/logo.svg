@@ -5,9 +5,9 @@
     <ellipse cx="64" cy="64" rx="50" ry="50" fill="#ff4d4d"/>
     <!-- Inner rim -->
     <ellipse cx="64" cy="64" rx="42" ry="42" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.3"/>
-    <!-- T stamped into the coin -->
-    <rect x="40" y="38" width="48" height="8" rx="1.5" fill="#fff"/>
-    <rect x="56.5" y="38" width="15" height="48" rx="1.5" fill="#fff"/>
+    <!-- T stamped into the coin (centered) -->
+    <rect x="40" y="44" width="48" height="8" rx="1.5" fill="#fff"/>
+    <rect x="56.5" y="44" width="15" height="42" rx="1.5" fill="#fff"/>
   </g>
   <!-- Motion lines — it's been flipped -->
   <line x1="100" y1="18" x2="108" y2="10" stroke="#ff4d4d" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
