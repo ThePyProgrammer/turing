@@ -1,43 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Outer ring: the experiment loop -->
-  <circle cx="256" cy="256" r="220" stroke="#ff4d4d" stroke-width="18" stroke-dasharray="60 20" opacity="0.25"/>
-  <circle cx="256" cy="256" r="220" stroke="#ff4d4d" stroke-width="6" opacity="0.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Loop: circular arrow -->
+  <path d="M64 16 A48 48 0 1 1 20 80" stroke="#ff4d4d" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <polygon points="16,68 8,82 24,82" fill="#ff4d4d"/>
 
-  <!-- Inner ring: the measurement apparatus (immutable) -->
-  <circle cx="256" cy="256" r="155" stroke="#ffffff" stroke-width="3" opacity="0.15"/>
-
-  <!-- The Turing tape: a horizontal strip through the center -->
-  <rect x="56" y="232" width="400" height="48" rx="8" fill="#ff4d4d" opacity="0.12"/>
-
-  <!-- Tape cells -->
-  <rect x="80"  y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-  <rect x="130" y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-  <rect x="180" y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-  <rect x="230" y="236" width="40" height="40" rx="4" fill="#ff4d4d" stroke="#ff4d4d" stroke-width="2" opacity="0.9"/>
-  <rect x="280" y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-  <rect x="330" y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-  <rect x="380" y="236" width="40" height="40" rx="4" fill="none" stroke="#ff4d4d" stroke-width="2" opacity="0.4"/>
-
-  <!-- Tape cell symbols: 0s and 1s -->
-  <text x="100" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">0</text>
-  <text x="150" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">1</text>
-  <text x="200" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">1</text>
-  <text x="250" y="264" text-anchor="middle" font-family="monospace" font-size="24" font-weight="bold" fill="#ffffff">T</text>
-  <text x="300" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">0</text>
-  <text x="350" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">1</text>
-  <text x="400" y="264" text-anchor="middle" font-family="monospace" font-size="22" fill="#ff4d4d" opacity="0.5">0</text>
-
-  <!-- Read/write head: triangle pointing down at center cell -->
-  <polygon points="250,200 236,218 264,218" fill="#ff4d4d"/>
-  <rect x="246" y="180" width="8" height="22" rx="2" fill="#ff4d4d"/>
-
-  <!-- Orbit dots: experiments circling the loop -->
-  <circle cx="256" cy="36"  r="8" fill="#ff4d4d"/>
-  <circle cx="436" cy="136" r="6" fill="#ff4d4d" opacity="0.7"/>
-  <circle cx="476" cy="256" r="5" fill="#ff4d4d" opacity="0.5"/>
-  <circle cx="436" cy="376" r="4" fill="#ff4d4d" opacity="0.35"/>
-  <circle cx="256" cy="476" r="3" fill="#ff4d4d" opacity="0.2"/>
-  <circle cx="76"  cy="376" r="4" fill="#ff4d4d" opacity="0.35"/>
-  <circle cx="36"  cy="256" r="5" fill="#ff4d4d" opacity="0.5"/>
-  <circle cx="76"  cy="136" r="6" fill="#ff4d4d" opacity="0.7"/>
+  <!-- T -->
+  <text x="64" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-size="48" font-weight="700" fill="#ffffff">T</text>
 </svg>
