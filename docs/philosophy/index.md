@@ -1,110 +1,104 @@
 ---
-title: "The Discovery Machine That Cannot Be Built"
-description: "The philosophical foundations of Turing — why research taste resists automation, what six decades of philosophy of science predict about autonomous agents, and what contemporary AI leaders confirm."
+title: "The Taste-Leverage Thesis"
+description: "The philosophical foundations of Turing — Amy Tam's insight that taste is the differentiator, what philosophy of science says about why, and what contemporary AI leaders confirm."
 ---
 
-# The Discovery Machine That Cannot Be Built
-
-!!! quote "Hans Reichenbach, *Experience and Prediction* (1938)"
-
-    "The act of discovery escapes logical analysis; there are no logical rules in terms of which a 'discovery machine' could be constructed that would take over the creative function of the genius."
-
-Reichenbach wrote this in 1938 — six decades before the first neural network won an ImageNet competition, nine decades before an AI agent ran 126 experiments overnight. He was not making a prediction about compute. He was making a claim about the *logical structure of discovery itself*: there are no rules to follow. You cannot build a machine that generates the hypotheses worth testing, because generating hypotheses worth testing is not a rule-following activity.
-
-And yet, in March 2026, Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) did exactly what Reichenbach said was impossible — or did it? The agent ran 700 experiments over two days, discovering 20 optimizations that produced an 11% speedup. Tobias Lutke reported a 19% performance gain from a single overnight session. That is a lot of coins flipped.
-
-The resolution is that Reichenbach was right about discovery and Karpathy was right about execution. They are talking about different things. The agent did not *discover* anything — it *tested* hypotheses within a search space that a human defined. Karpathy himself is explicit about this:
-
-> "You're not touching any of the Python files like you normally would as a researcher. Instead, you are programming the program.md Markdown files that provide context to the AI agents and set up your autonomous research org."
-
-The human writes `program.md` — the research agenda, the definition of "better," the stopping criteria. The agent flips coins. The discovery is in the program, not in the flipping.
-
----
-
-## What Philosophy of Science Predicted
-
-The distinction between *choosing what to investigate* and *mechanically testing it* is not new. It is the central structural feature of the scientific method, identified independently by every major 20th-century philosopher of science — who agreed on almost nothing else.
-
-### The Context of Discovery vs. the Context of Justification
-
-Karl Popper drew the foundational line. Hypothesis generation requires "a leap of the imagination" — it is creative, non-logical, and not susceptible to formal analysis. Only hypothesis *testing* (falsification) is rule-based and mechanical. Popper approvingly cites Einstein:
-
-!!! quote "Albert Einstein, cited in Popper's *The Logic of Scientific Discovery*"
-
-    "There is no logical path leading to [the highly universal laws of science]. They can only be reached by intuition, based upon something like an intellectual love of the objects of experience."
-
-This maps directly onto what an autonomous ML training loop does. The loop *tests* hypotheses — runs experiments, evaluates metrics, keeps improvements, discards regressions. That is the context of justification. The context of discovery — *which* hypothesis to test, *why* it might matter, *when* to abandon the approach entirely — remains outside the loop.
-
-### Tacit Knowledge: What We Know But Cannot Tell
-
-Michael Polányi's concept of *tacit knowledge* provides the deeper explanation. In *The Tacit Dimension* (1966), he argues that scientific judgment depends on a form of knowing that cannot be articulated as explicit rules:
-
-> "We can know more than we can tell."
-
-A seasoned ML researcher *senses* that a learning rate is too high, that a loss curve looks wrong, that a model architecture is fighting the data distribution. This sensing is not expressible as a function — it is connoisseurship, transmitted by apprenticeship, not by precept. Polányi's claim is not that tacit knowledge is *currently* hard to formalize, but that it is *in principle* resistant to formalization.
-
-Amy Tam captured the same insight in the language of her generation:
+# The Taste-Leverage Thesis
 
 !!! quote "Amy Tam (2026)"
 
-    "What comes across as luck is really the refinement of taste: years of feeling faint differences in the weight of the metal, the subtle offsets of a mis-mint."
+    "You're in a room with a quadrillion biased coins, and you want to maximize the number of heads in the shortest amount of time. Almost all coins are 'duds.' The novice coin-flipper might start flipping one-by-one, but heads come few and far between. The learned coin-flipper weaves through the quadrillion-coin room with a preternatural air; they flip many coins at once. What comes across as luck is really the refinement of taste: years of feeling faint differences in the weight of the metal, the subtle offsets of a mis-mint."
 
-Tam's "taste" is Polányi's "tacit knowledge" is Popper's "context of discovery." Three formulations, one insight: the part of research that matters most is the part you cannot write down as a recipe.
+This passage is why Turing exists.
 
-### Normal Science and the Paradigm Trap
+Tam wrote it in the context of autonomous coding agents, but the metaphor cuts deeper than she intended. It describes ML research with eerie precision: a quadrillion-coin room where the researcher's value lies not in the mechanical act of flipping but in *choosing which coins to flip at all*. The novice hyperparameter-tunes one model at a time. The experienced researcher senses which model families are worth exploring, which data transformations will unlock signal, which loss functions are measuring the wrong thing — and they sense it before the evidence is conclusive, through what Tam calls the "refinement of taste."
 
-Thomas Kuhn's *Structure of Scientific Revolutions* (1962) adds the sharpest warning. Most science — what Kuhn calls "normal science" — is puzzle-solving within an established paradigm. The rules are given, the methods are known, the criteria for success are defined. This is exactly what an autonomous training loop does: it solves puzzles (hyperparameter optimization, architecture search) within a given framework.
+Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) proved the second half of the metaphor. His agent ran 700 experiments over two days, discovering 20 optimizations that produced an 11% speedup. That is more coins flipped than any human could manage. But Karpathy is explicit about what the human still provides:
 
-But *paradigm selection* — choosing the framework itself, recognizing when the current approach is exhausted, sensing that an anomaly is significant rather than noise — is explicitly non-algorithmic:
+> "Writing a good program.md requires having done the research yourself. You need to know which directions are worth trying, what 'better' means for your problem, and when incremental gains have run their course."
+
+The agent flips coins with superhuman speed. The human selects which coins are worth flipping. **Tam's thesis is that the selection — the taste — is the hard part, and it always was.** The agent just makes this visible by removing the false bottleneck of execution.
+
+---
+
+## Why Taste Resists Automation
+
+Tam's insight is original, but the question it raises is not: *why can't you automate the selection?* Six decades of philosophy of science asked the same question and arrived at converging answers.
+
+### "We Can Know More Than We Can Tell"
+
+Michael Polányi, in *The Tacit Dimension* (1966), argued that scientific judgment depends on knowledge that cannot be articulated as explicit rules:
+
+> "We can know more than we can tell."
+
+The researcher who *senses* that a learning rate is wrong is exercising what Polányi calls connoisseurship — knowledge transmitted by apprenticeship, not by precept. His claim is not that this knowledge is *currently* hard to formalize, but that it is *in principle* resistant to formalization. This is the philosophical validation of Tam's "feeling faint differences in the weight of the metal." Those faint differences are real, they matter, and they cannot be written as a loss function.
+
+### The Discovery Machine That Cannot Be Built
+
+Hans Reichenbach, writing in 1938, stated the point with the precision of formal philosophy:
+
+> "The act of discovery escapes logical analysis; there are no logical rules in terms of which a 'discovery machine' could be constructed that would take over the creative function of the genius."
+
+Reichenbach was distinguishing the *context of discovery* (where hypotheses come from — creative, non-logical) from the *context of justification* (how hypotheses are tested — mechanical, rule-based). Karl Popper built his entire philosophy of science on the same distinction: hypothesis generation requires "a leap of the imagination"; only testing admits of formal treatment.
+
+An autonomous ML training loop is, in Reichenbach's terms, a *justification machine*. It tests hypotheses with superhuman efficiency. But the discovery — which hypothesis is worth testing — is exactly the part that "escapes logical analysis." It is the part that requires taste.
+
+### The Paradigm Trap
+
+Thomas Kuhn's *Structure of Scientific Revolutions* (1962) adds the sharpest warning for autonomous systems. Most science — "normal science" — is puzzle-solving within an established paradigm. The rules are given, the methods are known. This is what an autonomous training loop does: it solves puzzles within a framework the human defined.
+
+But paradigm selection — choosing the framework, recognizing when it is exhausted — is not algorithmic:
 
 > "Perception of similarity cannot be reduced to rules of rationality."
 
-The deepest risk of autonomous research is not getting the wrong answer. It is **efficiently optimizing within a degenerating paradigm** — solving puzzles with great precision in a framework that should have been abandoned. The agent tunes hyperparameters with superhuman discipline while the human should have switched to a different model family three hours ago.
-
-Imre Lakatos formalized this as the distinction between *hard core* commitments (what to protect — human judgment) and *protective belt* adjustments (what to tweak — mechanical work). The agent adjusts the protective belt. The human evaluates whether the research programme is still progressive or has degenerated into post-hoc rationalization.
+The deepest risk is not that the agent gets the wrong answer. It is **efficiently optimizing within a degenerating paradigm** — tuning hyperparameters with superhuman discipline inside a research programme that should have been abandoned. In Tam's metaphor: flipping coins very fast in a corner of the room where all the coins are duds. The taste to *leave that corner* is exactly what the agent lacks.
 
 ---
 
 ## What Contemporary AI Leaders Confirm
 
-The philosophical predictions are not theoretical. Every major AI researcher who has spoken on the topic confirms the same structural insight — from opposite ends of the optimism spectrum.
+Every major AI researcher who has spoken on the topic arrives at a version of Tam's insight — often independently, sometimes in strikingly similar language.
 
 **Demis Hassabis** (Nobel Prize in Chemistry, 2024, for AlphaFold):
 
-> "The human ingenuity comes in first — asking the question, developing the hypothesis — and AI systems can't do any of that. It just sort of analyses data right now."
+> "The human ingenuity comes in first — asking the question, developing the hypothesis — and AI systems can't do any of that."
 
-**Yann LeCun** (Turing Award, left Meta to co-found AMI Labs):
+**Yann LeCun** (Turing Award, co-founded AMI Labs):
 
 > Current AI structurally lacks reasoning, planning, persistent memory, and world understanding. These are "not bugs to be fixed with more data but fundamental architectural limitations."
 
-**Yoshua Bengio** (launched LawZero, 2025, for non-agentic "Scientist AI"):
+**Yoshua Bengio** (launched LawZero, 2025):
 
-> "The Scientist AI is trained to understand, explain and predict, like a selfless idealized and platonic scientist."
+> "The Scientist AI is trained to understand, explain and predict, like a selfless idealized and platonic scientist." — drawing a sharp line between AI that explains and AI that has agency.
 
-Bengio draws the sharpest line: an AI that *understands* the world can accelerate science as a tool. An AI that *acts* in the world introduces agency risks. An autonomous training loop sits at this boundary — the agent acts (modifies code, runs experiments), but the human constrains the action space.
+**Alan Aspuru-Guzik** (self-driving laboratories, University of Toronto):
 
-**The cautionary example:** Sakana AI's "AI Scientist" (2024) attempted fully autonomous research — generating hypotheses, writing code, running experiments, producing manuscripts. An independent evaluation found a 42% experiment failure rate, hallucinated numerical results, placeholder text like "Conclusions Here," and manuscripts with a median of five citations, mostly outdated. The reviewers concluded it operated "at the level of an unmotivated undergraduate student rushing to meet a deadline."
+> Scientists must "give up the driver's seat" to a computer, which allows them to "work on more important things," such as deciding *what research projects to pursue*.
 
-This is autoresearch without taste. Volume without validity is worse than useless — it is actively misleading.
+**The cautionary example:** Sakana AI's "AI Scientist" (2024) attempted fully autonomous research without the taste layer — generating hypotheses, writing code, running experiments, producing manuscripts with no human in the loop. An independent evaluation found a 42% experiment failure rate, hallucinated results, and manuscripts that operated "at the level of an unmotivated undergraduate student rushing to meet a deadline." This is what Tam's thesis predicts: without taste, you get volume without validity.
+
+The meta-pattern across every voice: **autonomous AI research is a force multiplier for human judgment, not a replacement for it.** The hard part of research was never running the experiment.
 
 ---
 
 ## The Architecture of Taste
 
-The resolution is architectural, not aspirational.
+Turing's design is a direct encoding of Tam's thesis. You cannot make an agent that has taste. But you can build a system where taste and execution are cleanly separated, each doing what it does best:
 
-You cannot make an agent that has taste. But you can build a system where taste and execution are cleanly separated, each doing what it does best:
-
-| Domain | Human (Taste) | Agent (Execution) |
-|--------|---------------|-------------------|
-| **Popper** | Context of discovery — "a leap of the imagination" | Context of justification — deductive falsification |
+| | Human (Taste) | Agent (Execution) |
+|---|---|---|
+| **Tam** | "Feeling faint differences in the weight of the metal" | Flipping coins at superhuman speed |
 | **Polányi** | Tacit knowledge — connoisseurship | Explicit knowledge — formalizable procedures |
-| **Kuhn** | Paradigm selection — anomaly recognition | Normal science — puzzle-solving within a paradigm |
-| **Lakatos** | Hard core — programme evaluation | Protective belt — auxiliary hypothesis adjustment |
-| **Karpathy** | `program.md` — the research agenda | The training loop — 700 experiments in 2 days |
+| **Reichenbach** | Context of discovery — "the creative function" | Context of justification — logical analysis |
+| **Kuhn** | Paradigm selection — knowing when to leave the corner | Normal science — puzzle-solving within a paradigm |
+| **Karpathy** | Writing `program.md` — the research agenda | The training loop — 700 experiments in 2 days |
 | **Hassabis** | "Asking the question" | "Analysing data" |
 
-Turing encodes this division as code, not as a suggestion. The human injects hypotheses (`/turing:try`). The agent executes them. The briefing reports results (`/turing:brief`). The human decides what to try next. The loop is bidirectional by design — not because the agent needs help, but because the human provides the one thing the agent structurally cannot: judgment about what matters.
+The interface between the two columns is Turing's reason for existing. `/turing:try` is how taste reaches the agent. `/turing:brief` is how results reach the human. Everything else — the 72 other commands — is infrastructure to make that exchange richer, faster, and more informed.
+
+!!! info "Tam's Thesis, Formalized"
+
+    When execution cost approaches zero, the differentiator is research taste — the accumulated judgment about which problems are worth solving, which approaches are promising, and when a direction is exhausted. Turing handles the execution. You bring the taste.
 
 ---
 
