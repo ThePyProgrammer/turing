@@ -9,15 +9,10 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-A Claude Code plugin that runs autonomous ML experiment loops. The agent that writes code cannot see the agent that scores it, every hypothesis and result is tracked across sessions, and convergence detection stops the loop when gains run out. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste; Turing handles the rest.
+A Claude Code plugin that runs autonomous ML experiment loops. The agent that writes code cannot see the agent that scores it (`train.py` is mutable, `evaluate.py` is invisible), every hypothesis and result is tracked across sessions, and convergence detection stops the loop when gains run out. You inject ideas with `/turing:try`, read results with `/turing:brief`. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste; Turing handles the rest.
 
 > [!NOTE]
 > Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
-
-- **Separation:** the agent modifies `train.py`; it cannot see or touch `evaluate.py`
-- **Memory:** every hypothesis registered, every experiment logged, every variant preserved
-- **Convergence:** automatic detection of diminishing returns; the agent stops when it should
-- **Taste:** you inject ideas with `/turing:try`, read results with `/turing:brief`
 
 ## Install
 
