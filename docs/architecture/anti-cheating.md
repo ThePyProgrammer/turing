@@ -19,23 +19,38 @@ Turing's anti-cheating stack is built on this insight. The defenses are architec
 
 ## The Six Layers
 
-```mermaid
-block-beta
-    columns 1
-    L6["Layer 6: DIFF-BASED HISTORY\nGit diffs are ground truth, not the agent's own descriptions"]
-    L5["Layer 5: TOOL RESTRICTION\nBash access whitelisted to specific commands"]
-    L4["Layer 4: STATISTICAL VALIDATION\nMulti-run evaluation, CV checks, seed studies"]
-    L3["Layer 3: BEHAVIORAL PROBES\nTraining time, model size, prediction diversity"]
-    L2["Layer 2: HIDDEN FILE TIER\nevaluate.py is invisible to the agent"]
-    L1["Layer 1: ARCHITECTURAL SEPARATION\nHypothesis space vs measurement apparatus"]
-
-    style L6 fill:#1b3a4b,stroke:#2a6f97,color:#fff
-    style L5 fill:#1b3a4b,stroke:#2a6f97,color:#fff
-    style L4 fill:#1b3a4b,stroke:#2a6f97,color:#fff
-    style L3 fill:#1b3a4b,stroke:#2a6f97,color:#fff
-    style L2 fill:#3d1308,stroke:#9d0208,color:#fff
-    style L1 fill:#1a472a,stroke:#2d6a4f,color:#fff
-```
+<div class="layer-grid">
+  <div class="layer-card">
+    <span class="layer-card__number">1</span>
+    <h4>Architectural Separation</h4>
+    <p>Hypothesis space vs measurement apparatus. The agent modifies <code>train.py</code>; it cannot touch <code>evaluate.py</code>.</p>
+  </div>
+  <div class="layer-card">
+    <span class="layer-card__number">2</span>
+    <h4>Hidden File Tier</h4>
+    <p><code>evaluate.py</code> is invisible to the agent. Not read-only — invisible. No tool can return its contents.</p>
+  </div>
+  <div class="layer-card">
+    <span class="layer-card__number">3</span>
+    <h4>Behavioral Probes</h4>
+    <p>Training time, model size, and prediction diversity are checked. Suspiciously fast or trivial models are flagged.</p>
+  </div>
+  <div class="layer-card">
+    <span class="layer-card__number">4</span>
+    <h4>Statistical Validation</h4>
+    <p>Multi-run evaluation, coefficient of variation checks, and seed studies. No single lucky run counts.</p>
+  </div>
+  <div class="layer-card">
+    <span class="layer-card__number">5</span>
+    <h4>Tool Restriction</h4>
+    <p>Bash access is whitelisted to specific commands. No <code>curl</code>, no <code>pip install</code>, no arbitrary execution.</p>
+  </div>
+  <div class="layer-card">
+    <span class="layer-card__number">6</span>
+    <h4>Diff-Based History</h4>
+    <p>Git diffs are ground truth, not the agent's own descriptions of what it changed.</p>
+  </div>
+</div>
 
 ## Layer 1: Architectural Separation
 

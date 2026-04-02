@@ -1,0 +1,130 @@
+/* === CENTER ALL MERMAID DIAGRAMS === */
+
+.mermaid {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+pre.mermaid {
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+}
+
+/* === TIER CARDS (for architecture/structural diagrams) === */
+
+.tier-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 600px;
+  margin: 1.5rem auto;
+}
+
+.tier-card {
+  padding: 1.2rem 1.5rem;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.tier-card:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.tier-card:last-child {
+  border-radius: 0 0 10px 10px;
+}
+
+.tier-card h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tier-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.tier-card code {
+  font-size: 0.82em;
+}
+
+/* Tier variants */
+.tier-card--danger {
+  background: rgba(255, 55, 55, 0.08);
+  border-color: rgba(255, 55, 55, 0.25);
+}
+
+.tier-card--danger h4 {
+  color: #ff4d4d;
+}
+
+.tier-card--muted {
+  background: rgba(128, 128, 128, 0.05);
+  border-color: rgba(128, 128, 128, 0.15);
+}
+
+.tier-card--muted h4 {
+  color: rgba(160, 160, 160, 0.9);
+}
+
+.tier-card--dark {
+  background: rgba(0, 0, 0, 0.15);
+  border-color: rgba(80, 80, 80, 0.2);
+}
+
+.tier-card--dark h4 {
+  color: rgba(120, 120, 120, 0.9);
+}
+
+/* === DEFENSE LAYER CARDS === */
+
+.layer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 600px) {
+  .layer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.layer-card {
+  background: rgba(128, 128, 128, 0.04);
+  border: 1px solid rgba(128, 128, 128, 0.12);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+}
+
+.layer-card__number {
+  display: inline-block;
+  background: rgba(255, 55, 55, 0.12);
+  color: #ff4d4d;
+  font-weight: 700;
+  font-size: 0.75rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  text-align: center;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.layer-card h4 {
+  display: inline;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.layer-card p {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.65;
+}
