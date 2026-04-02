@@ -32,6 +32,11 @@ models/
 # Superpowers artifacts
 docs/superpowers/
 
+# Internal/private directories
+.claude/
+.planning/
+outputs/
+
 # Zensical build output
 site/
 
