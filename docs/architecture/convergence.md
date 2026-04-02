@@ -1,6 +1,6 @@
 ---
 title: "Convergence Detection"
-description: "How Turing decides when to stop experimenting -- patience-based convergence, improvement thresholds, metric stability validation, seed studies, and reproducibility verification."
+description: "How Turing decides when to stop experimenting. Covers patience-based convergence, improvement thresholds, metric stability validation, seed studies, and reproducibility verification."
 ---
 
 # Convergence Detection
@@ -23,7 +23,7 @@ Defaults (from `config/defaults.yaml`) are conservative: patience of 3 with a 0.
 
 The convergence rule is simple: **N consecutive non-improvements trigger a stop.**
 
-An "improvement" is defined as a relative gain in the primary metric that exceeds `improvement_threshold`. A 0.4% gain when the threshold is 0.5% counts as a non-improvement -- the change is within noise.
+An "improvement" is defined as a relative gain in the primary metric that exceeds `improvement_threshold`. A 0.4% gain when the threshold is 0.5% counts as a non-improvement; the change is within noise.
 
 ```
 Experiment  Metric   Delta    Improvement?   Streak
@@ -35,7 +35,7 @@ exp-005     0.834    -0.4%    No             3  <- STOP (patience=3)
 ```
 
 !!! info "Relative, not absolute"
-    The threshold is relative: `(new - old) / old >= threshold`. This means the bar scales with the current performance level. A 0.5% relative improvement at 0.50 accuracy is +0.0025. At 0.95 accuracy, it is +0.00475. The threshold gets harder to clear as the model improves, which is correct -- gains shrink near the optimum.
+    The threshold is relative: `(new - old) / old >= threshold`. This means the bar scales with the current performance level. A 0.5% relative improvement at 0.50 accuracy is +0.0025. At 0.95 accuracy, it is +0.00475. The threshold gets harder to clear as the model improves, which is correct; gains shrink near the optimum.
 
 ## Override: max_iterations
 
@@ -60,7 +60,7 @@ This script is called by the stop hook (`scripts/stop-hook.sh`) which runs autom
 
 ## Noisy Metrics and /turing:validate
 
-Some ML tasks produce metrics with high variance across runs. A model that scores 0.83 on one run and 0.79 on the next makes convergence detection unreliable -- the patience counter triggers on noise, not genuine plateau.
+Some ML tasks produce metrics with high variance across runs. A model that scores 0.83 on one run and 0.79 on the next makes convergence detection unreliable: the patience counter triggers on noise, not genuine plateau.
 
 `/turing:validate` detects and fixes this:
 
@@ -146,32 +146,24 @@ Reports are saved to `experiments/reproductions/exp-NNN-repro.yaml`.
 
 Putting it all together, the full statistical rigor pipeline looks like this:
 
-```
-/turing:train             Run experiment loop until convergence
-         │
-         ▼
-   Patience exhausted     N consecutive non-improvements
-         │
-         ▼
-   seed_runner --quick    Automatic seed check at convergence
-         │
-    ┌────┴────┐
-    │         │
- CV < 5%   CV >= 5%
-    │         │
-    ▼         ▼
- Report    Report mean ± std
- single    Flag seed-sensitive
- result
-         │
-         ▼
-/turing:validate          (Optional) Check metric stability
-         │
-         ▼
-/turing:seed 10           (Optional) Deep seed study
-         │
-         ▼
-/turing:reproduce exp-N   (Optional) Full reproducibility check
+```mermaid
+flowchart TD
+    TRAIN["/turing:train<br/>Run experiment loop until convergence"]
+    TRAIN --> PATIENCE["Patience exhausted<br/>N consecutive non-improvements"]
+    PATIENCE --> SEED["seed_runner --quick<br/>Automatic seed check"]
+    SEED --> CHECK{"CV < 5%?"}
+    CHECK -- Yes --> SINGLE["Report single result"]
+    CHECK -- No --> MULTI["Report mean ± std<br/>Flag seed-sensitive"]
+    SINGLE --> VALIDATE
+    MULTI --> VALIDATE
+    VALIDATE["/turing:validate<br/>(Optional) Check metric stability"]
+    VALIDATE --> SEEDDEEP["/turing:seed 10<br/>(Optional) Deep seed study"]
+    SEEDDEEP --> REPRO["/turing:reproduce exp-N<br/>(Optional) Full reproducibility check"]
+
+    style TRAIN fill:#1a472a,stroke:#2d6a4f,color:#fff
+    style VALIDATE fill:#1b3a4b,stroke:#2a6f97,color:#fff
+    style SEEDDEEP fill:#1b3a4b,stroke:#2a6f97,color:#fff
+    style REPRO fill:#1b3a4b,stroke:#2a6f97,color:#fff
 ```
 
 The automatic checks happen without user intervention. The optional commands provide deeper validation for results that matter.

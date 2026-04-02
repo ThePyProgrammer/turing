@@ -1,6 +1,6 @@
 ---
 title: "Architecture"
-description: "High-level architecture of the Turing ML research harness -- command surface, agent model, configuration system, and the three-tier access model that makes autonomous experimentation trustworthy."
+description: "High-level architecture of the Turing ML research harness: command surface, agent model, configuration system, and the three-tier access model that makes autonomous experimentation trustworthy."
 ---
 
 # Architecture
@@ -71,79 +71,63 @@ turing/
 
 ## The Three-Tier Access Model
 
-The core architectural invariant is a strict separation of file access into three tiers. This is not a convention -- it is enforced at the tool level.
+The core architectural invariant is a strict separation of file access into three tiers. This is not a convention; it is enforced at the tool level.
 
-```
-┌─────────────────────────────────────────────────────┐
-│  HYPOTHESIS SPACE                                   │
-│  train.py, config.yaml                              │
-│  Access: READ-WRITE                                 │
-│  The agent modifies these files to test hypotheses. │
-│  Every change is committed to git before execution. │
-└─────────────────────────────────────────────────────┘
-                         │
-                         │ produces run.log
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│  MEASUREMENT APPARATUS                              │
-│  prepare.py, features/featurizers.py                │
-│  Access: READ-ONLY                                  │
-│  The agent can read data loading code but cannot    │
-│  modify it. Ensures consistent preprocessing.       │
-└─────────────────────────────────────────────────────┘
-                         │
-                         │ calls at runtime
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│  HIDDEN TIER                                        │
-│  evaluate.py                                        │
-│  Access: NONE -- invisible to the agent             │
-│  The agent cannot read, reference, or access the    │
-│  evaluation code. This prevents metric gaming,      │
-│  seed exploitation, and test data memorization.     │
-└─────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph HYPO["HYPOTHESIS SPACE — READ-WRITE"]
+        direction LR
+        H1[train.py]
+        H2[config.yaml]
+    end
+
+    subgraph MEAS["MEASUREMENT APPARATUS — READ-ONLY"]
+        direction LR
+        M1[prepare.py]
+        M2[features/featurizers.py]
+    end
+
+    subgraph HIDE["HIDDEN TIER — NONE"]
+        direction LR
+        E1[evaluate.py]
+    end
+
+    HYPO -- "produces run.log" --> MEAS
+    MEAS -- "calls at runtime" --> HIDE
+
+    style HYPO fill:#1a472a,stroke:#2d6a4f,color:#fff
+    style MEAS fill:#1b3a4b,stroke:#2a6f97,color:#fff
+    style HIDE fill:#3d1308,stroke:#9d0208,color:#fff
 ```
 
 !!! warning "Why evaluate.py is hidden"
-    If the agent could read the scoring function, it could exploit fixed seeds, memorize test data distributions, or reverse-engineer the metric calculation. The separation is not a prompt instruction -- it is an architectural constraint enforced by tool-level access control.
+    If the agent could read the scoring function, it could exploit fixed seeds, memorize test data distributions, or reverse-engineer the metric calculation. The separation is not a prompt instruction; it is an architectural constraint enforced by tool-level access control.
 
 ## Layer Boundaries
 
-```
-┌──────────────────────────────────────────────────────┐
-│  USER / CLAUDE CODE                                  │
-│  Invokes /turing:* commands                          │
-└──────────────────┬───────────────────────────────────┘
-                   │ skill invocation
-                   ▼
-┌──────────────────────────────────────────────────────┐
-│  SKILL LAYER  (commands/)                            │
-│  Thin dispatchers. Route intent to agent or script.  │
-│  No business logic. No state.                        │
-└──────────┬────────────────────────┬──────────────────┘
-           │ spawn agent            │ run script
-           ▼                        ▼
-┌──────────────────────┐  ┌────────────────────────────┐
-│  AGENT LAYER         │  │  SCAFFOLDED PROJECT        │
-│  (agents/)           │  │  (templates/ -> user repo) │
-│                      │  │                            │
-│  @ml-researcher ──────────> train.py, config.yaml    │
-│  (read/write)        │  │  (hypothesis space)        │
-│                      │  │                            │
-│  @ml-evaluator ───────────> scripts/*.py             │
-│  (read only)         │  │  (analysis tools)          │
-└──────────────────────┘  │                            │
-                          │  prepare.py, evaluate.py   │
-                          │  (measurement apparatus)   │
-                          └────────────┬───────────────┘
-                                       │ reads
-                                       ▼
-                          ┌────────────────────────────┐
-                          │  DOMAIN KNOWLEDGE (config/) │
-                          │  lifecycle.toml             │
-                          │  taxonomy.toml              │
-                          │  defaults.yaml              │
-                          └────────────────────────────┘
+```mermaid
+flowchart TD
+    USER["USER / CLAUDE CODE<br/>Invokes /turing:* commands"]
+    USER -- "skill invocation" --> SKILL
+
+    SKILL["SKILL LAYER (commands/)<br/>Thin dispatchers, no business logic, no state"]
+    SKILL -- "spawn agent" --> AGENT
+    SKILL -- "run script" --> PROJECT
+
+    subgraph AGENT["AGENT LAYER (agents/)"]
+        RES["@ml-researcher<br/>read/write"]
+        EVAL["@ml-evaluator<br/>read only"]
+    end
+
+    subgraph PROJECT["SCAFFOLDED PROJECT (templates/ → user repo)"]
+        HYPO["train.py, config.yaml<br/>(hypothesis space)"]
+        SCRIPTS["scripts/*.py<br/>(analysis tools)"]
+        APPARATUS["prepare.py, evaluate.py<br/>(measurement apparatus)"]
+    end
+
+    RES --> HYPO
+    EVAL --> SCRIPTS
+    PROJECT -- "reads" --> CONFIG["DOMAIN KNOWLEDGE (config/)<br/>lifecycle.toml, taxonomy.toml, defaults.yaml"]
 ```
 
 ## Configuration Philosophy
@@ -157,8 +141,8 @@ This means the agent's behavior changes by editing config files, not by rewritin
 
 ## Further Reading
 
-- [The Experiment Loop](experiment-loop.md) -- the 9-step protocol
-- [Anti-Cheating Guardrails](anti-cheating.md) -- six defense layers
-- [Agent Architecture](agents.md) -- capability boundaries
-- [Convergence Detection](convergence.md) -- when to stop
-- [The Hypothesis Database](hypothesis-database.md) -- structured experiment queue
+- [The Experiment Loop](experiment-loop.md): the 9-step protocol
+- [Anti-Cheating Guardrails](anti-cheating.md): six defense layers
+- [Agent Architecture](agents.md): capability boundaries
+- [Convergence Detection](convergence.md): when to stop
+- [The Hypothesis Database](hypothesis-database.md): structured experiment queue

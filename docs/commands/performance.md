@@ -9,7 +9,7 @@ These commands help you understand and optimize the computational cost of your e
 
 ---
 
-### `/turing:profile` -- Training Run Profiler
+### `/turing:profile`: Training Run Profiler
 
 Profile a training run to identify performance bottlenecks. Measures timing breakdown, memory usage, throughput, and provides actionable recommendations for the detected bottleneck.
 
@@ -40,7 +40,7 @@ The profiler reports:
 
 ---
 
-### `/turing:checkpoint` -- Checkpoint Management
+### `/turing:checkpoint`: Checkpoint Management
 
 Smart checkpoint management using Pareto dominance. List all checkpoints, prune dominated ones to save disk, average top-K weights, resume from any point, and view disk usage statistics.
 
@@ -49,11 +49,11 @@ A checkpoint is **dominated** if another checkpoint is better on every metric. P
 **Syntax:** `/turing:checkpoint <action> [exp-id] [--top N] [--dry-run]`
 
 Actions:
-- `list` -- table of all checkpoints with metrics, size, and Pareto status.
-- `prune` -- remove dominated checkpoints, report space saved.
-- `average` -- list top-K checkpoints for weight averaging.
-- `resume` -- locate the checkpoint for a specific experiment.
-- `stats` -- disk usage summary by total, average, and model type.
+- `list`: table of all checkpoints with metrics, size, and Pareto status.
+- `prune`: remove dominated checkpoints, report space saved.
+- `average`: list top-K checkpoints for weight averaging.
+- `resume`: locate the checkpoint for a specific experiment.
+- `stats`: disk usage summary by total, average, and model type.
 
 **Examples:**
 
@@ -78,4 +78,4 @@ Actions:
 ```
 
 !!! tip
-    Run `/turing:checkpoint prune --dry-run` first to see what would be removed. Pareto-based pruning is conservative -- it only removes checkpoints that are strictly worse than another on every metric -- but previewing is always safer.
+    Run `/turing:checkpoint prune --dry-run` first to see what would be removed. Pareto-based pruning is conservative; it only removes checkpoints that are strictly worse than another on every metric. Previewing is always safer.

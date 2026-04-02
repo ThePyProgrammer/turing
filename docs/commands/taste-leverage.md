@@ -9,7 +9,7 @@ These commands bridge human research taste and machine execution leverage. You d
 
 ---
 
-### `/turing:try` -- Inject a Hypothesis
+### `/turing:try`: Inject a Hypothesis
 
 Inject a hypothesis into the agent's experiment queue. This is the primary taste-leverage mechanism: you provide judgment about what is worth trying, the agent provides disciplined execution.
 
@@ -43,9 +43,9 @@ Available archetypes: `model_comparison` (~5 experiments), `hyperparameter_sweep
 
 ---
 
-### `/turing:brief` -- Research Intelligence Report
+### `/turing:brief`: Research Intelligence Report
 
-Generate a structured research intelligence report from experiment history -- what has been learned, what is promising, what is exhausted, and what the human should consider next. Designed to be read in 2 minutes.
+Generate a structured research intelligence report from experiment history: what has been learned, what is promising, what is exhausted, and what the human should consider next. Designed to be read in 2 minutes.
 
 The briefing has 6 sections: Campaign Summary, Current Best, Improvement Trajectory, Model Types Explored, Hypothesis Queue, and Recommendations. The `--deep` flag adds a 7th section with Literature-Grounded Suggestions that searches recent papers and auto-queues hypotheses.
 
@@ -72,9 +72,9 @@ The briefing has 6 sections: Campaign Summary, Current Best, Improvement Traject
 
 ---
 
-### `/turing:suggest` -- Literature-Grounded Model Selection
+### `/turing:suggest`: Literature-Grounded Model Selection
 
-Read the ML task context, search recent literature, and suggest model architectures worth trying -- with citations. Suggestions are auto-queued as hypotheses for the next `/turing:train` iteration.
+Read the ML task context, search recent literature, and suggest model architectures worth trying, with citations. Suggestions are auto-queued as hypotheses for the next `/turing:train` iteration.
 
 Supports two strategies: **literature** (default) searches the web for recent papers and synthesizes grounded suggestions, and **treequest** uses AB-MCTS tree search over the critique scoring function to explore refinement chains that linear search cannot find.
 
@@ -102,9 +102,9 @@ Supports two strategies: **literature** (default) searches the web for recent pa
 
 ---
 
-### `/turing:explore` -- Tree-Search Hypothesis Exploration
+### `/turing:explore`: Tree-Search Hypothesis Exploration
 
-Explore the hypothesis space using AB-MCTS tree search. Instead of suggesting independent ideas, this builds and searches a tree of refinement chains -- each node is a hypothesis scored by novelty, feasibility, and expected impact. Discovers non-obvious combinations that linear suggestion cannot find.
+Explore the hypothesis space using AB-MCTS tree search. Instead of suggesting independent ideas, this builds and searches a tree of refinement chains; each node is a hypothesis scored by novelty, feasibility, and expected impact. Discovers non-obvious combinations that linear suggestion cannot find.
 
 **Syntax:** `/turing:explore [ml/project] [--iterations N] [--top N] [--strategy abmcts-a|abmcts-m|greedy]`
 
@@ -135,7 +135,7 @@ Explore the hypothesis space using AB-MCTS tree search. Instead of suggesting in
 
 ---
 
-### `/turing:design` -- Experiment Design Document
+### `/turing:design`: Experiment Design Document
 
 Generate a structured experiment design for a hypothesis before running it. Reads experiment history, searches literature for methodology, and produces a scored design document. Front-loads the thinking before the coding.
 
@@ -164,7 +164,7 @@ The design includes a falsifiable objective, literature-grounded method, concret
 
 ---
 
-### `/turing:mode` -- Set Research Strategy
+### `/turing:mode`: Set Research Strategy
 
 Set the research strategy mode: explore (try new things), exploit (refine what works), or replicate (verify results). The mode drives the novelty guard policy and agent behavior during `/turing:train`.
 

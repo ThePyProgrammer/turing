@@ -9,7 +9,7 @@ These commands connect the experiment loop to the broader research and deploymen
 
 ---
 
-### `/turing:lit` -- Literature Search
+### `/turing:lit`: Literature Search
 
 Search the literature scoped to the current experiment domain. Find papers, SOTA baselines, and related work without leaving the terminal. Results can auto-queue hypotheses into the experiment pipeline.
 
@@ -44,7 +44,7 @@ Supports three modes: free query for general search, baseline mode for SOTA comp
 
 ---
 
-### `/turing:paper` -- Draft Paper Sections
+### `/turing:paper`: Draft Paper Sections
 
 Draft mechanical paper sections directly from experiment logs: setup, results, ablation tables, and hyperparameter appendices. Supports both LaTeX and markdown output. Numbers are pulled directly from experiment logs with no manual transcription.
 
@@ -76,7 +76,7 @@ Available sections: `setup` (experimental setup prose), `results` (comparison ta
 
 ---
 
-### `/turing:export` -- Export Model to Production
+### `/turing:export`: Export Model to Production
 
 Export a trained model to a production-ready format with equivalence verification, latency benchmarking, and a deployment model card. Ensures the exported model produces the same predictions as the original.
 

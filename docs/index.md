@@ -1,6 +1,6 @@
 ---
-title: "Turing — The Research Assistant That Can't Fool Itself"
-description: "Autonomous ML research harness for Claude Code implementing the autoresearch pattern — iterative training, immutable evaluation, and structured experiment loops with convergence detection and safety guardrails."
+title: "Turing: The Research Assistant That Can't Fool Itself"
+description: "Autonomous ML research harness for Claude Code implementing the autoresearch pattern. Iterative training, immutable evaluation, and structured experiment loops with convergence detection and safety guardrails."
 template: home.html
 hide:
   - navigation
@@ -34,7 +34,7 @@ Initialize. Train. Read the briefing. Inject your taste. Repeat.
 /turing:brief --deep                   Get literature-backed suggestions
 ```
 
-Everything else — experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails — happens automatically. You think about *what* to try. Turing handles *how* to try it.
+Everything else (experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails) happens automatically. You think about *what* to try. Turing handles *how* to try it.
 
 ---
 
@@ -42,7 +42,7 @@ Everything else — experiment logging, convergence detection, hypothesis tracki
 
 Turing is built around a single loop: the **taste-leverage loop**.
 
-You have taste — the accumulated judgment about which problems are tractable, which metrics capture what you care about, which directions are dead ends. Turing has leverage — the discipline to run experiments without fatigue, track every result without amnesia, and measure without contamination.
+You have taste: the accumulated judgment about which problems are tractable, which metrics capture what you care about, which directions are dead ends. Turing has leverage: the discipline to run experiments without fatigue, track every result without amnesia, and measure without contamination.
 
 The interface is built around two verbs: **try** and **brief**. `/turing:try` is how your taste reaches the agent. `/turing:brief` is how the agent's results reach you. Everything else is infrastructure connecting those two endpoints.
 
@@ -59,7 +59,7 @@ Read more in [The Taste-Leverage Loop](philosophy/taste-leverage.md).
 | | |
 |---|---|
 | **74 commands** | Core loop, taste-leverage interface, reporting, validation, exploration, model surgery, experiment archaeology, research communication, and more |
-| **2 agents** | `@ml-researcher` (read/write) and `@ml-evaluator` (read-only) — strict capability boundary |
+| **2 agents** | `@ml-researcher` (read/write) and `@ml-evaluator` (read-only), strict capability boundary |
 | **1986 tests** | Unit, integration, anti-pattern, and manifest coverage |
 | **29 phases** | Complete development roadmap, fully delivered |
 
@@ -67,7 +67,7 @@ Read more in [The Taste-Leverage Loop](philosophy/taste-leverage.md).
 
 ## Why "Turing"?
 
-The name references Alan Turing — the person who first asked whether machines could think, then built the framework for answering the question. Turing the plugin does what Turing the person formalized: it **defines** a computational process, **executes** it mechanically, and **determines** whether the result constitutes an improvement.
+The name references Alan Turing, the person who first asked whether machines could think, then built the framework for answering the question. Turing the plugin does what Turing the person formalized: it **defines** a computational process, **executes** it mechanically, and **determines** whether the result constitutes an improvement.
 
 ---
 

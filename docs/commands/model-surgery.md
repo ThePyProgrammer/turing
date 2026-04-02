@@ -5,11 +5,11 @@ description: "Weight pruning, post-training quantization, model merging, and pro
 
 # Model Surgery
 
-Commands for modifying models after training -- removing redundant weights, reducing numerical precision, merging weights from multiple checkpoints, and making structural architecture changes.
+Commands for modifying models after training: removing redundant weights, reducing numerical precision, merging weights from multiple checkpoints, and making structural architecture changes.
 
 ---
 
-### `/turing:prune` -- Weight pruning
+### `/turing:prune`: Weight pruning
 
 Remove redundant weights for faster inference and smaller models. Measures accuracy at different sparsity levels to find the knee point where further pruning degrades performance. Methods include magnitude pruning (zero small weights), structured pruning (remove entire neurons), and lottery ticket (iterative pruning with weight rewinding). For tree models, progressively reduces `n_estimators`.
 
@@ -24,7 +24,7 @@ Remove redundant weights for faster inference and smaller models. Measures accur
 
 ---
 
-### `/turing:quantize` -- Post-training quantization
+### `/turing:quantize`: Post-training quantization
 
 Quantize for production with minimal effort. Achieves 2-4x speedup and 2-4x memory reduction with typically less than 0.5% accuracy loss. Compares FP32 (baseline), FP16 (GPU), INT8 dynamic (simplest), and INT8 static (best accuracy) precision levels. Suggests quantization-aware training if post-training quantization causes unacceptable degradation.
 
@@ -38,7 +38,7 @@ Quantize for production with minimal effort. Achieves 2-4x speedup and 2-4x memo
 
 ---
 
-### `/turing:merge` -- Model weight merging
+### `/turing:merge`: Model weight merging
 
 Combine model weights (not predictions) into a single, better model with no latency overhead. Methods include uniform soup (simple average), greedy soup (include only if it improves), TIES (trim, elect, merge), and DARE (drop and rescale). Unlike ensembling, the merged model has the same inference cost as a single model.
 
@@ -52,7 +52,7 @@ Combine model weights (not predictions) into a single, better model with no late
 
 ---
 
-### `/turing:surgery` -- Architecture modification
+### `/turing:surgery`: Architecture modification
 
 Programmatic architecture changes with automatic warm-start from existing weights. Specify what to change and the system handles how. Operations include add-layer, remove-layer, widen, narrow, swap-activation, add-skip, add-norm, deepen, and swap-objective. For tree models: deepen (increase `max_depth`), widen (more estimators), and swap-objective.
 

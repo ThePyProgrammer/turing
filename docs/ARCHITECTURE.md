@@ -6,7 +6,7 @@ This document describes the high-level architecture. For **why** things are the 
 
 ## One-Paragraph Summary
 
-Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into user projects, then provides AI agents that autonomously iterate through an experiment loop. The system enforces a strict separation between the **hypothesis space** (agent-modifiable training code) and the **measurement apparatus** (immutable evaluation code) — this is the load-bearing invariant documented in [ADR-0002](adr/0002-separate-hypothesis-space-from-measurement-apparatus.md). Two agents with distinct capability boundaries ([ADR-0003](adr/0003-two-agent-architecture-with-least-privilege-boundaries.md)) execute the loop and analyze results. Domain knowledge is encoded in TOML config files ([ADR-0004](adr/0004-toml-config-dsl-for-domain-knowledge.md)), not agent prompts.
+Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into user projects, then provides AI agents that autonomously iterate through an experiment loop. The system enforces a strict separation between the **hypothesis space** (agent-modifiable training code) and the **measurement apparatus** (immutable evaluation code). This is the load-bearing invariant documented in [ADR-0002](adr/0002-separate-hypothesis-space-from-measurement-apparatus.md). Two agents with distinct capability boundaries ([ADR-0003](adr/0003-two-agent-architecture-with-least-privilege-boundaries.md)) execute the loop and analyze results. Domain knowledge is encoded in TOML config files ([ADR-0004](adr/0004-toml-config-dsl-for-domain-knowledge.md)), not agent prompts.
 
 ## Codemap
 
@@ -185,7 +185,7 @@ These are the rules that must not be broken. They are documented formally in the
    - The evaluator MUST NOT have Write or Edit tools
 
 3. **Append-Only Experiment Log** ([ADR-0007](adr/0007-jsonl-append-only-experiment-logging.md))
-   - `experiments/log.jsonl` is append-only — never edit past entries
+   - `experiments/log.jsonl` is append-only; never edit past entries
    - Every experiment (kept AND discarded) is logged
 
 4. **Config Format Separation** ([ADR-0004](adr/0004-toml-config-dsl-for-domain-knowledge.md))

@@ -5,13 +5,13 @@ description: "Incremental model updates with forgetting detection and a model re
 
 # Model Lifecycle
 
-Commands for managing models beyond initial training -- updating them with new data without full retraining, and governing the promotion pipeline from candidate to production.
+Commands for managing models beyond initial training: updating them with new data without full retraining, and governing the promotion pipeline from candidate to production.
 
 ---
 
-### `/turing:update` -- Incremental model update
+### `/turing:update`: Incremental model update
 
-Add new data to an existing model without starting from scratch. Model-specific strategies: continued boosting with additional rounds for XGBoost/LightGBM, fine-tuning with reduced learning rate and replay buffer for neural networks, and `partial_fit()` or `warm_start=True` for scikit-learn. Includes automatic catastrophic forgetting detection -- if performance on old data degrades beyond tolerance, the update is flagged.
+Add new data to an existing model without starting from scratch. Model-specific strategies: continued boosting with additional rounds for XGBoost/LightGBM, fine-tuning with reduced learning rate and replay buffer for neural networks, and `partial_fit()` or `warm_start=True` for scikit-learn. Includes automatic catastrophic forgetting detection; if performance on old data degrades beyond tolerance, the update is flagged.
 
 **Syntax:** `/turing:update <exp-id> --new-data <path> [--replay-ratio 0.1] [--tolerance 0.005] [--json]`
 
@@ -25,7 +25,7 @@ Add new data to an existing model without starting from scratch. Model-specific 
 
 ---
 
-### `/turing:registry` -- Model registry
+### `/turing:registry`: Model registry
 
 Track which model is production, staging, candidate, or archived. Promotion between stages requires passing gates: candidate to staging requires a regression check and seed study; staging to production requires a methodology audit and calibration check. Use `--force` to skip gate checks when necessary. The registry maintains a full promotion/demotion history for each model.
 

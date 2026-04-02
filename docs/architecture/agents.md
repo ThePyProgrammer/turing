@@ -1,11 +1,11 @@
 ---
 title: "Agent Architecture"
-description: "Two agents with strict capability boundaries -- a researcher that can modify code and an evaluator that cannot. The separation is the safety mechanism."
+description: "Two agents with strict capability boundaries: a researcher that can modify code and an evaluator that cannot. The separation is the safety mechanism."
 ---
 
 # Agent Architecture
 
-Turing uses two agents with a strict capability boundary between them. The researcher can modify code and run experiments. The evaluator can only read and analyze. This is not a convenience division -- it is the load-bearing safety mechanism that makes the evaluator's observations trustworthy.
+Turing uses two agents with a strict capability boundary between them. The researcher can modify code and run experiments. The evaluator can only read and analyze. This is not a convenience division; it is the load-bearing safety mechanism that makes the evaluator's observations trustworthy.
 
 > An analyst who cannot act on their observations makes more trustworthy observations.
 
@@ -68,31 +68,26 @@ The evaluator has no Write tool and no Edit tool. This is a structural guarantee
 
 ## Capability Boundary
 
-```
-                  ┌──────────────┐     ┌──────────────┐
-                  │ @ml-researcher│     │ @ml-evaluator │
-                  └──────┬───────┘     └──────┬───────┘
-                         │                    │
-  Read tool              │  ✓                 │  ✓
-  Write tool             │  ✓                 │  ✗
-  Edit tool              │  ✓                 │  ✗
-  Bash (whitelisted)     │  ✓                 │  ✓
-  Grep tool              │  ✓                 │  ✓
-  Glob tool              │  ✓                 │  ✓
-                         │                    │
-  Modify train.py        │  ✓                 │  ✗
-  Modify config.yaml     │  ✓                 │  ✗
-  Read prepare.py        │  ✓                 │  ✓
-  Read evaluate.py       │  ✗ (hidden)        │  ✗ (hidden)
-  Run training           │  ✓                 │  ✗
-  Run analysis scripts   │  ✓                 │  ✓
-  Run evaluate.py        │  via train.py only │  ✓ (directly)
-  Persistent memory      │  ✓                 │  ✗
-  Max turns              │  200               │  50
-```
+| Capability | @ml-researcher | @ml-evaluator |
+|-----------|:-:|:-:|
+| Read tool | :white_check_mark: | :white_check_mark: |
+| Write tool | :white_check_mark: | :x: |
+| Edit tool | :white_check_mark: | :x: |
+| Bash (whitelisted) | :white_check_mark: | :white_check_mark: |
+| Grep tool | :white_check_mark: | :white_check_mark: |
+| Glob tool | :white_check_mark: | :white_check_mark: |
+| Modify train.py | :white_check_mark: | :x: |
+| Modify config.yaml | :white_check_mark: | :x: |
+| Read prepare.py | :white_check_mark: | :white_check_mark: |
+| Read evaluate.py | :x: (hidden) | :x: (hidden) |
+| Run training | :white_check_mark: | :x: |
+| Run analysis scripts | :white_check_mark: | :white_check_mark: |
+| Run evaluate.py | via train.py only | directly |
+| Persistent memory | :white_check_mark: | :x: |
+| Max turns | 200 | 50 |
 
 !!! note "The evaluator can run evaluate.py"
-    The evaluator can execute `python evaluate.py` directly because it has Bash access and the file exists on disk. It cannot *read the source code* of evaluate.py (hidden tier), but it can run it as a black box. This is intentional -- the evaluator needs to produce metrics but should not be able to inspect the scoring logic any more than the researcher can.
+    The evaluator can execute `python evaluate.py` directly because it has Bash access and the file exists on disk. It cannot *read the source code* of evaluate.py (hidden tier), but it can run it as a black box. This is intentional: the evaluator needs to produce metrics but should not be able to inspect the scoring logic any more than the researcher can.
 
 ## Which Commands Use Which Agent
 
@@ -142,20 +137,18 @@ A single agent with all capabilities could do everything both agents do. The spl
 
 The researcher delegates to the evaluator for analysis tasks during the experiment loop:
 
-```
-@ml-researcher: "I've run 10 experiments. Analyze the trends
-                 and tell me what direction to explore next."
-                          │
-                          ▼
-                 @ml-evaluator runs:
-                 - show_metrics.py --last 10
-                 - compare_runs.py on top experiments
-                 - convergence assessment
-                          │
-                          ▼
-                 Returns: "Diminishing returns on hyperparameter
-                 tuning. Feature engineering likely to yield
-                 bigger gains. Try polynomial interactions."
+```mermaid
+sequenceDiagram
+    participant R as @ml-researcher
+    participant E as @ml-evaluator
+
+    R->>E: Analyze trends from 10 experiments
+    activate E
+    E->>E: show_metrics.py --last 10
+    E->>E: compare_runs.py on top experiments
+    E->>E: Convergence assessment
+    E-->>R: Diminishing returns on hyperparameter tuning.<br/>Feature engineering likely to yield bigger gains.<br/>Try polynomial interactions.
+    deactivate E
 ```
 
 This delegation pattern means the researcher's Write/Edit capabilities are never active during analysis. The analysis happens in a context where modification is impossible.

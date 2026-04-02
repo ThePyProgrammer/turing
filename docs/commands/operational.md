@@ -5,11 +5,11 @@ description: "Failure postmortems, harness self-diagnosis, strategic research pl
 
 # Operational Intelligence
 
-Commands for keeping the research harness healthy and the research direction strategic -- diagnosing why experiments stopped improving, verifying the environment is sound, planning the next batch of experiments by ROI, and checking system resources before training.
+Commands for keeping the research harness healthy and the research direction strategic: diagnosing why experiments stopped improving, verifying the environment is sound, planning the next batch of experiments by ROI, and checking system resources before training.
 
 ---
 
-### `/turing:postmortem` -- Failure postmortem
+### `/turing:postmortem`: Failure postmortem
 
 When experiments stop improving, find out why. Diagnoses search space exhaustion (micro-tuning parameters that do not matter), systematic config errors (all experiments share a bad common config), data issues (all model types fail similarly), metric ceilings (near theoretical maximum), and noise floors (improvements within seed variance). Each diagnosis comes with actionable next steps.
 
@@ -24,7 +24,7 @@ When experiments stop improving, find out why. Diagnoses search space exhaustion
 
 ---
 
-### `/turing:doctor` -- Harness self-diagnosis
+### `/turing:doctor`: Harness self-diagnosis
 
 Is Turing healthy? Checks the Python environment, dependency imports, config validity, experiment log integrity, script existence, disk space, and git state. Reports a health score and, with `--fix`, auto-repairs common issues. Run this first when something seems off.
 
@@ -39,7 +39,7 @@ Is Turing healthy? Checks the Python environment, dependency imports, config val
 
 ---
 
-### `/turing:plan` -- Research planning assistant
+### `/turing:plan`: Research planning assistant
 
 Design the next N experiments strategically, not randomly. Analyzes experiment history to compute per-family ROI, adjusts strategy priorities based on project state and goal, and allocates budget across feature engineering, model search, ensemble, calibration, and verification. Generates a phased plan with specific experiment descriptions.
 
@@ -54,7 +54,7 @@ Design the next N experiments strategically, not randomly. Analyzes experiment h
 
 ---
 
-### `/turing:preflight` -- Pre-flight resource check
+### `/turing:preflight`: Pre-flight resource check
 
 Check whether the current system has enough resources to run the planned experiment before hitting an OOM error 3 hours in. Estimates VRAM, RAM, and disk requirements based on model type, parameter count, and batch size, then compares against available system resources. Issues PASS, WARN, or FAIL with specific mitigation suggestions (reduce batch size, use fp16, enable gradient checkpointing, switch to CPU-friendly model).
 

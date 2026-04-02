@@ -1,11 +1,11 @@
 ---
 title: "The Hypothesis Database"
-description: "A structured queue of experiment ideas -- human-injected and agent-generated -- with novelty detection, experiment families, and 8 archetypes. Every idea gets registered before execution."
+description: "A structured queue of experiment ideas, both human-injected and agent-generated, with novelty detection, experiment families, and 8 archetypes. Every idea gets registered before execution."
 ---
 
 # The Hypothesis Database
 
-Every experiment starts as a hypothesis. Turing maintains a structured database of hypotheses -- both human-injected (via `/turing:try`) and agent-generated (during the experiment loop). The database serves as the complete record of what was considered, what was tried, and what worked.
+Every experiment starts as a hypothesis. Turing maintains a structured database of hypotheses, both human-injected (via `/turing:try`) and agent-generated (during the experiment loop). The database serves as the complete record of what was considered, what was tried, and what worked.
 
 ## Structure
 
@@ -69,25 +69,16 @@ tags: [lightgbm, dart, overfitting]
 
 ## The Lifecycle
 
-```
-┌─────────┐     ┌───────────────┐     ┌─────────────┐     ┌─────────┐
-│ INJECT  │────>│ NOVELTY GUARD │────>│  EXPERIMENT  │────>│ RESULT  │
-│         │     │               │     │              │     │         │
-│ /try or │     │ Duplicate?    │     │ OBSERVE      │     │ tested  │
-│ agent   │     │ Similar?      │     │ HYPOTHESIZE  │     │ promisi │
-│ auto-   │     │ Blocked by    │     │ PREPARE      │     │ dead-end│
-│ queues  │     │ mode policy?  │     │ COMMIT       │     │         │
-└─────────┘     └───────┬───────┘     │ EXECUTE      │     └────┬────┘
-                        │             │ MEASURE      │          │
-                   ┌────┴────┐        │ DECIDE       │     ┌────┴────┐
-                   │         │        │ RECORD       │     │ AUTO-   │
-                PASS      BLOCK       └──────────────┘     │ QUEUE   │
-                   │         │                             │ follow- │
-                   │    Log reason                         │ ups     │
-                   │    & skip                             └─────────┘
-                   │
-              Add to queue
-              (status: queued)
+```mermaid
+flowchart LR
+    INJECT["INJECT<br/>/try, agent,<br/>auto-queues"] --> GUARD{"NOVELTY GUARD<br/>Duplicate?<br/>Similar?<br/>Mode policy?"}
+    GUARD -- Pass --> QUEUE["Add to queue<br/>(status: queued)"]
+    GUARD -- Block --> SKIP["Log reason<br/>& skip"]
+    QUEUE --> EXPERIMENT["EXPERIMENT LOOP<br/>Observe, Hypothesize,<br/>Prepare, Commit,<br/>Execute, Measure,<br/>Decide, Record"]
+    EXPERIMENT --> RESULT{"RESULT"}
+    RESULT -- "tested / promising" --> AUTOQUEUE["AUTO-QUEUE<br/>follow-ups"]
+    RESULT -- "dead-end" --> DONE(["Done"])
+    AUTOQUEUE --> GUARD
 ```
 
 ### Injection
@@ -165,7 +156,7 @@ Two hypotheses that touch the same concept group with the same directional token
 
 ## Experiment Families
 
-Hypotheses are grouped into families -- strategic clusters of related experiments. Families enable:
+Hypotheses are grouped into families, strategic clusters of related experiments. Families enable:
 
 - **Progress tracking:** how many experiments in this family have been tested?
 - **Exhaustion detection:** has this line of inquiry been fully explored?
@@ -215,19 +206,20 @@ This expands the archetype into a sequence of hypotheses with the correct family
 
 ### When to Use Each Archetype
 
-```
-Project Timeline
-────────────────────────────────────────────────────────>
-
-Early               Mid                 Late
-│                   │                   │
-├─ model_comparison ├─ feature_sweep    ├─ ensemble_construction
-├─ data_quality     ├─ hyperparameter   ├─ ablation_study
-│  _audit           │  _sweep           │
-│                   ├─ regularization   │
-│                   │  _search          │
-│                   ├─ learning_rate    │
-│                   │  _schedule        │
+```mermaid
+timeline
+    title Project Timeline
+    section Early
+        model_comparison : Establish which model family works best
+        data_quality_audit : Check data quality and leakage
+    section Mid
+        feature_sweep : Add/remove feature transforms
+        hyperparameter_sweep : Grid search parameter space
+        regularization_search : Optimal regularization strength
+        learning_rate_schedule : LR vs estimator tradeoff
+    section Late
+        ensemble_construction : Voting, stacking, blending
+        ablation_study : Measure feature contributions
 ```
 
 - **Early:** Establish which model family works best. Check data quality.

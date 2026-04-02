@@ -9,7 +9,7 @@ These five commands form the backbone of the Turing experiment lifecycle. `init`
 
 ---
 
-### `/turing:init` -- Scaffold a New ML Project
+### `/turing:init`: Scaffold a New ML Project
 
 Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure: immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment.
 
@@ -40,9 +40,9 @@ The `--plan` flag generates a `RESEARCH_PLAN.md` after scaffolding, giving the a
 
 ---
 
-### `/turing:train` -- Run the Autonomous Experiment Loop
+### `/turing:train`: Run the Autonomous Experiment Loop
 
-Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides -- keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback.
+Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides, keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback.
 
 Each iteration follows the experiment lifecycle: `proposed -> running -> evaluating -> kept/discarded`. The agent proposes a hypothesis, executes it, measures the result against the immutable evaluation harness, and decides whether to keep or discard. Only improvements survive in git history.
 
@@ -70,7 +70,7 @@ Each iteration follows the experiment lifecycle: `proposed -> running -> evaluat
 
 ---
 
-### `/turing:sweep` -- Systematic Hyperparameter Sweep
+### `/turing:sweep`: Systematic Hyperparameter Sweep
 
 Generate and run a systematic hyperparameter sweep. Computes the cartesian product of configured parameter ranges and processes the queue sequentially with full experiment logging.
 
@@ -99,9 +99,9 @@ The sweep generates a queue from the configuration, then processes each combinat
 
 ---
 
-### `/turing:status` -- Show Experiment Status
+### `/turing:status`: Show Experiment Status
 
-Show current ML experiment status: best model, recent experiments, convergence state, and trend analysis. This is an observation-only operation -- no code is modified. Delegates to the read-only `@ml-evaluator` agent for safety.
+Show current ML experiment status: best model, recent experiments, convergence state, and trend analysis. This is an observation-only operation; no code is modified. Delegates to the read-only `@ml-evaluator` agent for safety.
 
 **Syntax:** `/turing:status`
 
@@ -122,7 +122,7 @@ No arguments. Auto-detects the project directory.
 
 ---
 
-### `/turing:compare` -- Side-by-Side Experiment Comparison
+### `/turing:compare`: Side-by-Side Experiment Comparison
 
 Compare two ML experiment runs side-by-side: metrics, configuration deltas, and a verdict on which approach is more promising.
 

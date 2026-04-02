@@ -1,6 +1,6 @@
 ---
 title: "Pre-Training Intelligence"
-description: "Sanity checks, automatic baselines, and data leakage detection -- everything to run before committing to a full training loop."
+description: "Sanity checks, automatic baselines, and data leakage detection. Everything to run before committing to a full training loop."
 ---
 
 # Pre-Training Intelligence
@@ -9,9 +9,9 @@ Commands to run before investing compute in a full training loop. Catch broken p
 
 ---
 
-### `/turing:sanity` -- Pre-training sanity checks
+### `/turing:sanity`: Pre-training sanity checks
 
-Run a battery of fast checks before committing to a full training run. Catches wiring bugs in seconds: broken data loaders, misconfigured losses, dead gradients, and models that cannot memorize a single batch. The single-batch overfit test is the most powerful -- if the model cannot fit one batch in 50 steps, something is fundamentally wrong.
+Run a battery of fast checks before committing to a full training run. Catches wiring bugs in seconds: broken data loaders, misconfigured losses, dead gradients, and models that cannot memorize a single batch. The single-batch overfit test is the most powerful: if the model cannot fit one batch in 50 steps, something is fundamentally wrong.
 
 **Syntax:** `/turing:sanity [--quick] [--verbose] [--json]`
 
@@ -23,7 +23,7 @@ Run a battery of fast checks before committing to a full training run. Catches w
 
 ---
 
-### `/turing:baseline` -- Automatic baseline generation
+### `/turing:baseline`: Automatic baseline generation
 
 Generate trivial baselines so you always know if your model is meaningfully better than simple approaches. Produces random, majority/mean, linear, and k-NN baselines in 60 seconds, evaluated with the same protocol as real experiments. Satisfies the "baseline comparison" check in `/turing:audit`.
 
@@ -38,9 +38,9 @@ Generate trivial baselines so you always know if your model is meaningfully bett
 
 ---
 
-### `/turing:leak` -- Data leakage detection
+### `/turing:leak`: Data leakage detection
 
-Actively probe for data leakage -- the number one cause of "too good to be true" results. Checks feature-target correlation, single-feature predictiveness (with `--deep`), and train/test overlap via hash-based deduplication. Issues CLEAN, SUSPICIOUS, or LEAKAGE DETECTED verdicts. Satisfies the "data leakage" check in `/turing:audit`.
+Actively probe for data leakage, the number one cause of "too good to be true" results. Checks feature-target correlation, single-feature predictiveness (with `--deep`), and train/test overlap via hash-based deduplication. Issues CLEAN, SUSPICIOUS, or LEAKAGE DETECTED verdicts. Satisfies the "data leakage" check in `/turing:audit`.
 
 **Syntax:** `/turing:leak [--deep] [--features "feat_1,feat_2"] [--json]`
 

@@ -100,10 +100,10 @@ Defines the artifact schema for saved models. Consumers of your model (serving c
 
 Key fields:
 
-- **Bundle format** -- joblib file at `models/best/model.joblib` containing the fitted model, featurizer, config, and contract version
-- **Metadata** -- JSON at `models/best/metadata.json` with metrics, feature names, and timestamps
-- **Consumer contract** -- `.predict()` on the model, `.transform()` on the featurizer
-- **Breaking changes** -- increment `contract_version` when the feature schema, label encoding, or bundle format changes
+- **Bundle format**: joblib file at `models/best/model.joblib` containing the fitted model, featurizer, config, and contract version
+- **Metadata**: JSON at `models/best/metadata.json` with metrics, feature names, and timestamps
+- **Consumer contract**: `.predict()` on the model, `.transform()` on the featurizer
+- **Breaking changes**: increment `contract_version` when the feature schema, label encoding, or bundle format changes
 
 ## `model_registry.yaml`
 

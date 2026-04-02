@@ -5,11 +5,11 @@ description: "Answer hypothetical questions from existing data, generate counter
 
 # What-If Analysis
 
-Commands for answering questions without running new experiments -- hypothetical scenario analysis from existing data, minimum-change counterfactual explanations for individual predictions, and outcome prediction for proposed configurations.
+Commands for answering questions without running new experiments: hypothetical scenario analysis from existing data, minimum-change counterfactual explanations for individual predictions, and outcome prediction for proposed configurations.
 
 ---
 
-### `/turing:whatif` -- What-if scenario analysis
+### `/turing:whatif`: What-if scenario analysis
 
 Answer "what if?" questions using existing experiment data without running new experiments. Routes to the right estimator automatically based on the question type: data scaling extrapolation, ablation study data, pipeline stitch estimation, sensitivity interpolation, ensemble correlation analysis, pruning sweep interpolation, and budget allocation comparison.
 
@@ -25,7 +25,7 @@ Answer "what if?" questions using existing experiment data without running new e
 
 ---
 
-### `/turing:counterfactual` -- Input-level counterfactual explanations
+### `/turing:counterfactual`: Input-level counterfactual explanations
 
 Find the smallest input change needed to flip a prediction. For individual samples, identifies which features need to change (and by how much) to produce a different classification. Uses both greedy perturbation (change one feature at a time) and prototype-based methods (find nearest training sample from target class), selecting the explanation with the smallest distance.
 
@@ -41,7 +41,7 @@ Find the smallest input change needed to flip a prediction. For individual sampl
 
 ---
 
-### `/turing:simulate` -- Experiment outcome prediction
+### `/turing:simulate`: Experiment outcome prediction
 
 Predict which configs will beat the current best before spending compute. Builds a surrogate model from experiment history (weighted k-NN), predicts metrics for each proposed config, applies a novelty penalty for configs far from the training distribution, and ranks the results. Only recommends configs predicted to improve over the current best.
 

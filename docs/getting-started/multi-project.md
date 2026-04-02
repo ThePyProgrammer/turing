@@ -11,12 +11,12 @@ Each Turing project is fully self-contained. You can run multiple experiments in
 
 Every `/turing:init` creates an isolated directory with its own:
 
-- `config.yaml` -- independent hyperparameters, metric, data source
-- `data/` -- separate splits and preprocessing
-- `experiments/` -- its own `log.jsonl` and `results.tsv`
-- `models/` -- independent model artifacts and archive
-- `hypotheses.yaml` -- separate hypothesis queue
-- `MEMORY.md` -- per-project agent memory (what worked, what failed, domain context)
+- `config.yaml`: independent hyperparameters, metric, data source
+- `data/`: separate splits and preprocessing
+- `experiments/`: its own `log.jsonl` and `results.tsv`
+- `models/`: independent model artifacts and archive
+- `hypotheses.yaml`: separate hypothesis queue
+- `MEMORY.md`: per-project agent memory (what worked, what failed, domain context)
 
 No state is shared between projects.
 
@@ -72,7 +72,7 @@ cd ml/sentiment
 
 ## Comparing across projects
 
-Each project has independent metrics, so cross-project comparison is not built in. If you need to compare results across projects, use `/turing:brief` in each and compare the reports manually -- the metrics are different scales anyway.
+Each project has independent metrics, so cross-project comparison is not built in. If you need to compare results across projects, use `/turing:brief` in each and compare the reports manually; the metrics are different scales anyway.
 
 ## Per-project memory
 

@@ -5,11 +5,11 @@ description: "Cross-project knowledge transfer and pre-submission methodology au
 
 # Meta-Intelligence
 
-Commands that operate above individual experiments -- transferring institutional knowledge across projects and auditing research methodology before submission.
+Commands that operate above individual experiments: transferring institutional knowledge across projects and auditing research methodology before submission.
 
 ---
 
-### `/turing:transfer` -- Cross-project knowledge transfer
+### `/turing:transfer`: Cross-project knowledge transfer
 
 Find similar prior projects and surface what worked. Builds institutional ML memory: "Last time you had tabular classification with class imbalance, LightGBM beat everything by 3%." Similarity matching uses task type, dataset size, feature types, class balance, and dimensionality. With `--auto`, winning strategies are queued as hypotheses for the current project.
 
@@ -24,7 +24,7 @@ Find similar prior projects and surface what worked. Builds institutional ML mem
 
 ---
 
-### `/turing:audit` -- Pre-submission methodology audit
+### `/turing:audit`: Pre-submission methodology audit
 
 A reviewer checklist you run before submitting. Catches methodology mistakes that cause desk rejections: data leakage, missing baselines, cherry-picked seeds, incomplete ablations, undocumented hyperparameter budgets, and more. Each failure suggests the specific `/turing:` command to fix it. Supports venue-specific checklists for NeurIPS, ICML, and ICLR.
 

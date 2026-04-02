@@ -1,6 +1,6 @@
 ---
 title: "The Taste-Leverage Loop"
-description: "How Turing's bidirectional interface connects human research taste with autonomous agent discipline — the try/brief loop that makes autoresearch a conversation, not a black box."
+description: "How Turing's bidirectional interface connects human research taste with autonomous agent discipline. The try/brief loop that makes autoresearch a conversation, not a black box."
 ---
 
 # The Taste-Leverage Loop
@@ -53,14 +53,14 @@ The loop is bidirectional. You inject hypotheses. The agent executes them. The b
 
 The entire human-facing interface is built around two verbs:
 
-- **`/turing:try`** — how taste reaches the agent
-- **`/turing:brief`** — how results reach the human
+- **`/turing:try`**: how taste reaches the agent
+- **`/turing:brief`**: how results reach the human
 
-Everything else is infrastructure connecting those two endpoints. The `try` command accepts free text — six words are enough to redirect an entire research campaign. The `brief` command returns a structured summary of what happened, what was exhausted, and what looks promising.
+Everything else is infrastructure connecting those two endpoints. The `try` command accepts free text; six words are enough to redirect an entire research campaign. The `brief` command returns a structured summary of what happened, what was exhausted, and what looks promising.
 
 !!! info "Why two verbs?"
 
-    Research taste is not a parameter you tune. It is a judgment call that requires seeing results, reflecting, and redirecting. The try/brief loop is designed to make that cycle as frictionless as possible — inject an idea, let it run, read the outcome, inject the next idea.
+    Research taste is not a parameter you tune. It is a judgment call that requires seeing results, reflecting, and redirecting. The try/brief loop is designed to make that cycle as frictionless as possible: inject an idea, let it run, read the outcome, inject the next idea.
 
 ---
 
@@ -135,4 +135,4 @@ The agent trains, evaluates, keeps improvements, discards regressions, detects c
 
     "Research taste is about how well you choose your coins: how well you choose which problems are worth working on at all."
 
-The taste-leverage loop is designed so that the human contribution — the part that cannot be automated — flows naturally into the system, and the system's output flows naturally back to the human. No dashboards to monitor. No notebooks to manage. Just `try` and `brief`.
+The taste-leverage loop is designed so that the human contribution, the part that cannot be automated, flows naturally into the system, and the system's output flows naturally back to the human. No dashboards to monitor. No notebooks to manage. Just `try` and `brief`.

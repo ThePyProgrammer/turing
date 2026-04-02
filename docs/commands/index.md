@@ -1,6 +1,6 @@
 ---
 title: "Command Reference"
-description: "Complete reference for all 74 Turing commands organized into 16 categories — from project scaffolding to model export."
+description: "Complete reference for all 74 Turing commands organized into 16 categories, from project scaffolding to model export."
 ---
 
 # Command Reference

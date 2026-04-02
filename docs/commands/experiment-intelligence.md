@@ -9,7 +9,7 @@ These commands go beyond aggregate metrics to understand *why* models behave the
 
 ---
 
-### `/turing:diagnose` -- Error Analysis
+### `/turing:diagnose`: Error Analysis
 
 Analyze where and why the model fails, beyond aggregate metrics. Clusters failure cases, identifies systematic failure modes, and suggests targeted fixes with auto-queued hypotheses.
 
@@ -42,7 +42,7 @@ For classification tasks, the diagnosis includes confusion matrices, most-confus
 
 ---
 
-### `/turing:ablate` -- Ablation Study
+### `/turing:ablate`: Ablation Study
 
 Run a systematic ablation study: remove components one at a time, measure impact, and produce a publication-ready table. Flags dead-weight components whose removal actually improves the metric.
 
@@ -76,7 +76,7 @@ Each ablation can be run with multiple seeds for statistical robustness. Output 
 
 ---
 
-### `/turing:frontier` -- Pareto Frontier Visualization
+### `/turing:frontier`: Pareto Frontier Visualization
 
 Visualize the Pareto frontier across multiple objectives. Answers "which model is actually best?" when there are tradeoffs between accuracy, speed, and model size.
 
@@ -108,7 +108,7 @@ Identifies Pareto-optimal experiments (no other experiment is better on all metr
 
 ---
 
-### `/turing:card` -- Model Card Generation
+### `/turing:card`: Model Card Generation
 
 Generate a standardized model card documenting the trained model: type, performance, training data, limitations, intended use, and artifact contract. Follows the model card format for responsible ML documentation.
 
@@ -131,7 +131,7 @@ No arguments. Reads from `config.yaml`, `experiments/log.jsonl`, and `model_cont
 
 ---
 
-### `/turing:logbook` -- Research Logbook
+### `/turing:logbook`: Research Logbook
 
 Generate a research logbook showing the full experiment narrative: hypotheses proposed, experiments run, decisions made, and progress over time. Outputs HTML (with interactive Chart.js trajectory chart) or markdown.
 
@@ -161,7 +161,7 @@ The logbook captures the complete story of the research campaign, not just the f
 
 ---
 
-### `/turing:report` -- Research Report
+### `/turing:report`: Research Report
 
 Generate a structured markdown research report from experiment history. More detailed than a brief, less visual than a poster. Includes executive summary, methodology, key findings, model comparison, and recommendations.
 
@@ -190,9 +190,9 @@ The report enhances the raw logbook data with synthesized analysis: which model 
 
 ---
 
-### `/turing:poster` -- Research Poster
+### `/turing:poster`: Research Poster
 
-Generate a single-page HTML research poster summarizing the experiment campaign: best result, trajectory chart, key findings, and methodology. Self-contained HTML file with no build step -- works when opened as `file://`.
+Generate a single-page HTML research poster summarizing the experiment campaign: best result, trajectory chart, key findings, and methodology. Self-contained HTML file with no build step; works when opened as `file://`.
 
 Poster layout uses a card-based design with colored top borders, clean typography, and a Chart.js trajectory visualization. Print-optimized CSS supports direct PDF export from the browser.
 

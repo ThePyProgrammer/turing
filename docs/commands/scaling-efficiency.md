@@ -5,11 +5,11 @@ description: "Predict full-scale performance from small experiments, manage comp
 
 # Scaling & Efficiency
 
-Commands for making informed decisions about compute allocation -- predicting whether scaling up is worth it, enforcing experiment budgets, and compressing large models for production deployment.
+Commands for making informed decisions about compute allocation: predicting whether scaling up is worth it, enforcing experiment budgets, and compressing large models for production deployment.
 
 ---
 
-### `/turing:scale` -- Scaling law estimator
+### `/turing:scale`: Scaling law estimator
 
 Run small experiments at different sizes, fit a power law, and predict full-scale performance before committing compute. Answers "is it worth training on the full dataset?" in 30 minutes instead of 3 days. Supports scaling along data, compute, and parameter axes. Use plan mode to generate scale point configs, then analyze mode to fit the curve after running them.
 
@@ -24,7 +24,7 @@ Run small experiments at different sizes, fit a power law, and predict full-scal
 
 ---
 
-### `/turing:budget` -- Compute budget manager
+### `/turing:budget`: Compute budget manager
 
 Set a compute ceiling and let the system optimize within it. Prevents runaway experiment loops. The budget manager tracks allocation across explore and exploit phases, automatically shifting modes as the budget is consumed: exploration early, exploitation late, hard stop at 100%. The `/turing:train` loop checks the budget before each experiment.
 
@@ -40,7 +40,7 @@ Set a compute ceiling and let the system optimize within it. Prevents runaway ex
 
 ---
 
-### `/turing:distill` -- Model distillation
+### `/turing:distill`: Model distillation
 
 Compress a large model into a smaller, faster one for production via knowledge distillation. A student model is trained to match the teacher's predictions. Measures the accuracy/size/latency tradeoff and issues a verdict from EXCELLENT to TOO MUCH LOSS. Supports soft-label, feature-matching, and dataset distillation methods across tree, neural, and scikit-learn model types.
 

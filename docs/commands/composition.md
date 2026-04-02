@@ -5,11 +5,11 @@ description: "Combine models via ensembling, compose pipelines from swappable st
 
 # Model Composition
 
-Commands for building on top of existing work -- combining multiple models into ensembles, decomposing pipelines into reusable stages, and initializing new experiments from prior checkpoints.
+Commands for building on top of existing work: combining multiple models into ensembles, decomposing pipelines into reusable stages, and initializing new experiments from prior checkpoints.
 
 ---
 
-### `/turing:ensemble` -- Automated ensemble construction
+### `/turing:ensemble`: Automated ensemble construction
 
 Combines top-K models via voting, stacking, and blending for zero-cost improvement. Often yields 1-3% improvement with no additional training. The ensemble builder evaluates prediction diversity, tries multiple combination methods, and reports the best one with improvement deltas against the best single model.
 
@@ -25,7 +25,7 @@ Combines top-K models via voting, stacking, and blending for zero-cost improveme
 
 ---
 
-### `/turing:stitch` -- Pipeline composition
+### `/turing:stitch`: Pipeline composition
 
 Decompose ML pipelines into swappable stages that can be independently varied, cached, and reused across experiments. When only the model stage changes, preprocessing and feature engineering are skipped. Stages include preprocess, features, model, and postprocess (configurable in `config.yaml` under `pipeline.stages`).
 
@@ -41,7 +41,7 @@ Decompose ML pipelines into swappable stages that can be independently varied, c
 
 ---
 
-### `/turing:warm` -- Warm-start from checkpoint
+### `/turing:warm`: Warm-start from checkpoint
 
 Take a trained checkpoint and use it as initialization for a new experiment. Automates the "start from here but change X" pattern with model-type-aware strategies: continued boosting for tree models, weight loading with optional layer freezing for neural networks, and `warm_start=True` for scikit-learn. Supports gradual unfreezing and learning rate reduction.
 

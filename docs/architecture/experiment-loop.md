@@ -1,6 +1,6 @@
 ---
 title: "The Experiment Loop"
-description: "The 9-step autoresearch protocol that encodes the scientific method as a formal state machine. Each iteration is one experiment -- one hypothesis tested, measured, and decided."
+description: "The 9-step autoresearch protocol that encodes the scientific method as a formal state machine. Each iteration is one experiment: one hypothesis tested, measured, and decided."
 ---
 
 # The Experiment Loop
@@ -11,55 +11,18 @@ The loop runs inside the `@ml-researcher` agent, dispatched by `/turing:train`.
 
 ## The Protocol
 
-```
-    ┌──────────┐
-    │ OBSERVE  │ Read metrics, memory, hypothesis queue
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────────┐
-    │ HYPOTHESIZE  │ Pick from queue or generate new
-    └────┬─────────┘
-         │
-         ▼
-    ┌──────────┐
-    │ PREPARE  │ Modify train.py / config.yaml
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐
-    │  COMMIT  │ git commit before execution
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐
-    │ EXECUTE  │ python train.py > run.log 2>&1
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐
-    │ MEASURE  │ Parse metrics from run.log
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐
-    │  DECIDE  │ Keep improvement or revert
-    └────┬─────┘
-         │
-         ▼
-    ┌──────────┐
-    │  RECORD  │ Log experiment, update memory
-    └────┬─────┘
-         │
-         ▼
-    ┌───────────┐     No
-    │ CONVERGE? ├──────────┐
-    └─────┬─────┘          │
-      Yes │                │
-          ▼                ▼
-    ┌──────────┐    Back to OBSERVE
-    │   STOP   │
-    └──────────┘
+```mermaid
+flowchart TD
+    OBSERVE["OBSERVE<br/>Read metrics, memory, hypothesis queue"] --> HYPOTHESIZE["HYPOTHESIZE<br/>Pick from queue or generate new"]
+    HYPOTHESIZE --> PREPARE["PREPARE<br/>Modify train.py / config.yaml"]
+    PREPARE --> COMMIT["COMMIT<br/>git commit before execution"]
+    COMMIT --> EXECUTE["EXECUTE<br/>python train.py > run.log 2>&1"]
+    EXECUTE --> MEASURE["MEASURE<br/>Parse metrics from run.log"]
+    MEASURE --> DECIDE["DECIDE<br/>Keep improvement or revert"]
+    DECIDE --> RECORD["RECORD<br/>Log experiment, update memory"]
+    RECORD --> CONVERGE{"CONVERGED?"}
+    CONVERGE -- Yes --> STOP(["STOP"])
+    CONVERGE -- No --> OBSERVE
 ```
 
 ## Step-by-Step
@@ -74,7 +37,7 @@ python scripts/manage_hypotheses.py next 2>/dev/null || echo "No queued hypothes
 cat RESEARCH_PLAN.md 2>/dev/null || true
 ```
 
-The agent also reads actual git diffs from recent discarded experiments -- not its own memory of what it changed, but the literal code differences:
+The agent also reads actual git diffs from recent discarded experiments, not its own memory of what it changed, but the literal code differences:
 
 ```bash
 for branch in $(git branch --list 'exp/*' | tail -3); do
@@ -84,7 +47,7 @@ done
 ```
 
 !!! note "Why diffs, not descriptions"
-    The agent's summary of what it tried can drift from reality. Git diffs are the ground truth. This is one of the six anti-cheating layers -- see [Anti-Cheating Guardrails](anti-cheating.md).
+    The agent's summary of what it tried can drift from reality. Git diffs are the ground truth. This is one of the six anti-cheating layers; see [Anti-Cheating Guardrails](anti-cheating.md).
 
 ### 2. HYPOTHESIZE
 
@@ -103,13 +66,13 @@ python scripts/manage_hypotheses.py add "switch to LightGBM with dart boosting" 
   --expected "dart boosting should reduce overfitting"
 ```
 
-Every experiment must have a corresponding hypothesis. The hypothesis database is a complete record of every idea -- human and agent alike.
+Every experiment must have a corresponding hypothesis. The hypothesis database is a complete record of every idea, human and agent alike.
 
 ### 3. PREPARE
 
 Modify the hypothesis space:
 
-- **`config.yaml`** for hyperparameter changes (preferred -- no code changes needed)
+- **`config.yaml`** for hyperparameter changes (preferred; no code changes needed)
 - **`train.py`** for structural changes (model architecture, training logic)
 
 Nothing else is modifiable. `prepare.py` is read-only. `evaluate.py` is invisible.
@@ -123,7 +86,7 @@ git checkout -b exp/007-lightgbm-dart
 git commit -am "exp: switch to LightGBM with dart boosting"
 ```
 
-The commit happens before execution so that every experiment variant is preserved in version control, regardless of whether it improves or not. Failed experiments are as valuable as successful ones -- they define the boundary of what does not work.
+The commit happens before execution so that every experiment variant is preserved in version control, regardless of whether it improves or not. Failed experiments are as valuable as successful ones; they define the boundary of what does not work.
 
 ### 5. EXECUTE
 
@@ -144,7 +107,7 @@ Parse metrics from the run log. The evaluation harness writes metrics between `-
 grep -A 10 "^---" run.log | head -10
 ```
 
-The agent sees the metrics but not how they were computed. `evaluate.py` is a black box -- the agent knows the score but not the scoring function.
+The agent sees the metrics but not how they were computed. `evaluate.py` is a black box: the agent knows the score but not the scoring function.
 
 ### 7. DECIDE
 
@@ -162,7 +125,7 @@ Compare the primary metric against the current best:
 
 ### 8. RECORD
 
-Log everything -- kept and discarded experiments alike:
+Log everything, kept and discarded experiments alike:
 
 ```bash
 python scripts/log_experiment.py experiments/log.jsonl exp-007 kept \
@@ -194,9 +157,9 @@ Finally, the agent updates its persistent memory at `.claude/agent-memory/ml-res
 
 Check stopping conditions:
 
-1. **N consecutive non-improvements** (from `config.yaml` -> `convergence.patience`) -- STOP
-2. **`max_iterations` reached** (if provided by user) -- STOP
-3. Otherwise -- return to OBSERVE
+1. **N consecutive non-improvements** (from `config.yaml` -> `convergence.patience`): STOP
+2. **`max_iterations` reached** (if provided by user): STOP
+3. Otherwise: return to OBSERVE
 
 Before declaring final results, the agent runs a quick seed study to verify robustness:
 
@@ -210,12 +173,15 @@ If the coefficient of variation exceeds 5%, the result is seed-sensitive and get
 
 Each experiment transitions through formally defined states from `config/lifecycle.toml`:
 
-```
-proposed ──> running ──> evaluating ──> kept ──> (next proposed)
-                │              │
-                │              └──> discarded ──> (next proposed)
-                │
-                └──> discarded  (training crashed)
+```mermaid
+stateDiagram-v2
+    proposed --> running : Changes committed, venv activated
+    running --> evaluating : train.py completed, run.log exists
+    running --> discarded : Training crashed or timed out
+    evaluating --> kept : Primary metric improved
+    evaluating --> discarded : Primary metric did not improve
+    kept --> proposed : Next experiment
+    discarded --> proposed : Next experiment
 ```
 
 | Transition | Precondition |

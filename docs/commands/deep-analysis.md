@@ -9,7 +9,7 @@ Commands for understanding what changed between experiments, catching problems d
 
 ---
 
-### `/turing:diff` -- Deep experiment comparison
+### `/turing:diff`: Deep experiment comparison
 
 Goes beyond "which metric is higher" to show where, when, and why two experiments diverge. The diff covers config changes with magnitudes, metric deltas with statistical significance, per-class regressions hidden by aggregate improvement, training curve divergence points, and feature importance shifts. Optionally includes the git diff of `train.py` between the two experiments' commits.
 
@@ -24,7 +24,7 @@ Goes beyond "which metric is higher" to show where, when, and why two experiment
 
 ---
 
-### `/turing:watch` -- Live training monitor
+### `/turing:watch`: Live training monitor
 
 Stream metrics during training with early-warning alerts for loss spikes, NaN values, overfitting onset, and metric plateaus. Catches problems mid-run instead of at the end. Supports both live monitoring (in a separate terminal) and post-hoc analysis of completed training logs. Alert thresholds are configurable via `config/watch_alerts.yaml`.
 
@@ -40,7 +40,7 @@ Stream metrics during training with early-warning alerts for loss spikes, NaN va
 
 ---
 
-### `/turing:regress` -- Performance regression gate
+### `/turing:regress`: Performance regression gate
 
 CI for your model. After any change to code, dependencies, or data, re-run the best experiment and verify metrics have not silently regressed. Reports PASS, WARNING, or FAIL with per-metric deltas and relative differences. On failure, suggests investigation commands including `/turing:diff` and environment comparison.
 

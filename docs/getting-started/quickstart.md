@@ -15,9 +15,9 @@ description: Go from zero to autonomous ML experiments in five steps.
 
 Turing asks three questions:
 
-1. **Project name** -- directory and namespace for this experiment (e.g., `sentiment`)
-2. **Primary metric** -- what you are optimizing (e.g., `f1_weighted`, `accuracy`, `rmse`)
-3. **Data source** -- path to your dataset (e.g., `data/reviews.csv`)
+1. **Project name**: directory and namespace for this experiment (e.g., `sentiment`)
+2. **Primary metric**: what you are optimizing (e.g., `f1_weighted`, `accuracy`, `rmse`)
+3. **Data source**: path to your dataset (e.g., `data/reviews.csv`)
 
 This creates the full experiment harness: `config.yaml`, `train.py`, `evaluate.py`, `prepare.py`, feature templates, and the hypothesis queue. Everything lands in a self-contained directory.
 
@@ -27,7 +27,7 @@ This creates the full experiment harness: `config.yaml`, `train.py`, `evaluate.p
 /turing:train
 ```
 
-The `@ml-researcher` agent takes over. It reads the config, trains a baseline model, evaluates it against the immutable evaluation harness, then iterates -- modifying hyperparameters, trying feature engineering ideas, swapping model architectures. Each experiment is logged to `experiments/log.jsonl`.
+The `@ml-researcher` agent takes over. It reads the config, trains a baseline model, evaluates it against the immutable evaluation harness, then iterates, modifying hyperparameters, trying feature engineering ideas, swapping model architectures. Each experiment is logged to `experiments/log.jsonl`.
 
 A typical first run produces 5-10 experiments before convergence triggers the patience threshold.
 
@@ -37,7 +37,7 @@ A typical first run produces 5-10 experiments before convergence triggers the pa
 /turing:brief
 ```
 
-The `@ml-evaluator` agent (read-only -- it cannot touch your code) generates an intelligence report:
+The `@ml-evaluator` agent (read-only, it cannot touch your code) generates an intelligence report:
 
 ```
 Research Brief: sentiment
@@ -88,7 +88,7 @@ If you want Turing to keep iterating while you do other work:
 /loop 5m /turing:train
 ```
 
-This runs the training loop every 5 minutes. Each invocation picks up where the last left off -- new hypotheses, updated convergence state, the full context.
+This runs the training loop every 5 minutes. Each invocation picks up where the last left off: new hypotheses, updated convergence state, the full context.
 
 ## What to do next
 

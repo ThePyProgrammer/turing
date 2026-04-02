@@ -9,7 +9,7 @@ These commands ensure your results are trustworthy before you report them. Valid
 
 ---
 
-### `/turing:validate` -- Stability Validation
+### `/turing:validate`: Stability Validation
 
 Run stability validation on the current experiment configuration. Executes multiple runs to measure metric variance and auto-configures multi-run evaluation if variance is too high.
 
@@ -34,7 +34,7 @@ A coefficient of variation (CV) below 5% means single-run evaluation is sufficie
 
 ---
 
-### `/turing:seed` -- Multi-Seed Study
+### `/turing:seed`: Multi-Seed Study
 
 Run a multi-seed study on an experiment to compute mean, standard deviation, and 95% confidence interval. Flags seed-sensitive results to prevent publishing lucky seeds.
 
@@ -64,11 +64,11 @@ Results are classified as **STABLE** (CV < 5%, safe to report) or **SEED-SENSITI
 ```
 
 !!! tip
-    Always run `/turing:seed` before reporting final numbers. A result that looks like accuracy=0.92 on one seed might be 0.89 +/- 0.03 across seeds -- a very different story. Results are saved to `experiments/seed_studies/` for reference.
+    Always run `/turing:seed` before reporting final numbers. A result that looks like accuracy=0.92 on one seed might be 0.89 +/- 0.03 across seeds, a very different story. Results are saved to `experiments/seed_studies/` for reference.
 
 ---
 
-### `/turing:reproduce` -- Reproducibility Verification
+### `/turing:reproduce`: Reproducibility Verification
 
 Verify reproducibility of a specific experiment by re-running from logged config and checking metrics fall within tolerance. Catches environment drift, non-determinism, and configuration errors.
 

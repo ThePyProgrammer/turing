@@ -1,17 +1,16 @@
 ---
 title: Installation
-description: Install the Turing ML research harness as a Claude Code plugin via npm or local path.
 ---
 
 # Installation
 
 ## Prerequisites
 
-- **Claude Code CLI** -- installed and authenticated
-- **Node.js** -- v18 or later
-- **Python 3.10+** -- with `pip` or `uv` available on PATH
+- **Claude Code CLI**, installed and authenticated
+- **Python 3.10+**, with `pip` or `uv` available on PATH
 
-## Option 1: npm (recommended)
+
+## Option 1: npm
 
 ```bash
 npm install -g claude-turing && claude-turing install --global && claude-turing verify
@@ -23,6 +22,8 @@ This does three things:
 2. Registers the plugin with Claude Code (writes to `~/.claude/plugins.json`)
 3. Runs verification to confirm all commands, agents, and Python dependencies resolve
 
+Requires **Node.js v18+**.
+
 ## Option 2: Local path
 
 If you are developing Turing or prefer a local install:
@@ -31,7 +32,7 @@ If you are developing Turing or prefer a local install:
 claude plugin add /path/to/turing
 ```
 
-This registers the plugin directly from a local checkout. Changes to command files take effect immediately -- no reinstall needed.
+This registers the plugin directly from a local checkout. Changes to command files take effect immediately; no reinstall needed.
 
 ## Verification
 

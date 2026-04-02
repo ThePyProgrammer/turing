@@ -537,7 +537,7 @@ Inspired by [Google's Model Cards](https://arxiv.org/abs/1810.03993) and [Huggin
 ## Installation
 
 ```bash
-# Via npm (recommended)
+# Via npm
 npm install -g claude-turing
 claude-turing install --global
 claude-turing verify

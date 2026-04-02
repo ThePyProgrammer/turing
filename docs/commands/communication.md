@@ -5,11 +5,11 @@ description: "Citation management, presentation figure generation, and model cha
 
 # Research Communication
 
-Commands for turning experiment results into communicable artifacts -- tracking citations, generating publication-ready figures, and writing human-readable progress narratives.
+Commands for turning experiment results into communicable artifacts: tracking citations, generating publication-ready figures, and writing human-readable progress narratives.
 
 ---
 
-### `/turing:cite` -- Citation and attribution manager
+### `/turing:cite`: Citation and attribution manager
 
 Track which papers, datasets, and methods influenced each experiment. Associate citations with specific experiments, audit for missing attributions before submission, and generate BibTeX. Catches the "forgot to cite the method we used" problem before a reviewer does.
 
@@ -25,7 +25,7 @@ Track which papers, datasets, and methods influenced each experiment. Associate 
 
 ---
 
-### `/turing:present` -- Presentation figure generation
+### `/turing:present`: Presentation figure generation
 
 Generate presentation-ready figure specifications from experiment data in seconds. Produces training curves, comparison charts, ablation tables, Pareto plots, and sensitivity heatmaps. Supports light (papers), dark (demos), and poster (large fonts) styles.
 
@@ -40,7 +40,7 @@ Generate presentation-ready figure specifications from experiment data in second
 
 ---
 
-### `/turing:changelog` -- Model changelog generation
+### `/turing:changelog`: Model changelog generation
 
 Translate experiment logs into a narrative that PMs and stakeholders can read in 2 minutes. Auto-generates a human-readable progress summary from experiment history. Technical audience gets experiment IDs and configs; stakeholder audience gets plain English and percentages.
 
