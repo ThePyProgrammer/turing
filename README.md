@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-> [autoresearch](https://github.com/karpathy/autoresearch) showed ML experiment loops can be automated, but the agent that generates hypotheses kept gaming the metrics. Turing fixes this by enforcing a strict wall between the agent that writes code and the agent that scores it.
+[autoresearch](https://github.com/karpathy/autoresearch) proved the experiment loop is mechanical enough to automate. [helios](https://github.com/snoglobe/helios) and [autocrucible](https://github.com/suzuke/autocrucible) added structure and guardrails. But the agent that generates hypotheses still games the metrics, nothing remembers what was tried across sessions, and the human has no clean interface for injecting research taste. Turing closes all three gaps: immutable evaluation the agent cannot see, structured memory that survives context resets, and a two-verb interface ([when code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269)).
 
 > [!NOTE]
 > Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
@@ -19,7 +19,7 @@
 - **Separation:** the agent modifies `train.py`; it cannot see or touch `evaluate.py`
 - **Memory:** every hypothesis registered, every experiment logged, every variant preserved
 - **Convergence:** automatic detection of diminishing returns; the agent stops when it should
-- **Taste interface:** you inject ideas with `/turing:try`, read results with `/turing:brief`
+- **Taste:** you inject ideas with `/turing:try`, read results with `/turing:brief`
 
 ## Install
 
@@ -121,7 +121,7 @@ Turing would not exist without these projects, ideas, and intellectual tradition
 
 **Ideas**
 
-- ["When Code Is Free"](https://x.com/amytam01/status/2031072399731675269) (Tam, 2026): when execution cost approaches zero, research taste is the differentiator. The entire taste-leverage interface is built around this insight.
+- ["When Code Is Free, Research Is All That Matters"](https://x.com/amytam01/status/2031072399731675269) (Tam, 2026): when execution cost approaches zero, research taste is the differentiator. The entire taste-leverage interface is built around this insight.
 - "The first principle is that you must not fool yourself, and you are the easiest person to fool." (Feynman) The separation of hypothesis from measurement is Turing's answer to Feynman's first principle.
 - [*The Tacit Dimension*](https://en.wikipedia.org/wiki/The_Tacit_Dimension) (Polanyi, 1966): "We can know more than we can tell." Research taste is tacit knowledge that resists formalization, which is why the human stays in the loop.
 - [The context of discovery vs. the context of justification](https://en.wikipedia.org/wiki/Context_of_justification) (Reichenbach, 1938; Popper, 1959): hypothesis generation is creative and non-logical; only testing admits of formal treatment. Turing is a justification machine. You provide the discovery.
