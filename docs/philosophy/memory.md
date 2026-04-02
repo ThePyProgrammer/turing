@@ -41,39 +41,27 @@ Turing addresses this with a layered memory system where each layer serves a dis
 
 Every experiment, whether human-injected or agent-generated, flows through the hypothesis database:
 
-```
-  /turing:try "idea"                     Agent generates idea
-        │                                       │
-        ▼                                       ▼
-  ┌──────────────────────────────────────────────────┐
-  │  hypotheses.yaml (index)                          │
-  │  hypotheses/hyp-001.yaml (detail)                 │
-  │                                                   │
-  │  architecture:                                    │
-  │    model_type: lightgbm                           │
-  │  hyperparameters:                                 │
-  │    n_estimators: 200                              │
-  │    learning_rate: 0.05                            │
-  │  expected_outcome:                                │
-  │    rationale: "dart boosting may escape plateau"  │
-  │  family: architecture-search                      │
-  │  tags: [lightgbm, dart]                           │
-  └────────────────────┬──────────────────────────────┘
-                       │
-                 novelty guard
-                 (block duplicates)
-                       │
-                       ▼
-                  experiment
-                       │
-                       ▼
-  ┌──────────────────────────────────────────────────┐
-  │  result:                                          │
-  │    experiment_id: exp-007                          │
-  │    metrics: {accuracy: 0.89}                      │
-  │    verdict: promising                             │
-  │    notes: "3% improvement, follow up with..."     │
-  └──────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    HUMAN["/turing:try 'idea'"]
+    AGENT["Agent generates idea"]
+    DB["hypotheses.yaml + hyp-NNN.yaml\narchitecture, hyperparams, expected outcome\nfamily, tags, lineage"]
+    GUARD{{"novelty guard\n(block duplicates)"}}
+    EXP["experiment"]
+    RESULT["result\nexp-007 · accuracy 0.89\nverdict: promising"]
+
+    HUMAN --> DB
+    AGENT --> DB
+    DB --> GUARD
+    GUARD --> EXP
+    EXP --> RESULT
+
+    style HUMAN fill:#3a1520,stroke:#ff4d4d,color:#fff
+    style AGENT fill:#2a1a08,stroke:#ffb74d,color:#fff
+    style DB fill:#1a1a1a,stroke:#888,color:#fff
+    style GUARD fill:#1a1a1a,stroke:#ff4d4d,color:#fff
+    style EXP fill:#1a1a1a,stroke:#888,color:#fff
+    style RESULT fill:#1a1a1a,stroke:#888,color:#fff
 ```
 
 The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypotheses/hyp-NNN.yaml`) hold the full structured record: architecture, hyperparameters, features, expected outcome, actual result, lineage, family tags. Both are updated atomically.

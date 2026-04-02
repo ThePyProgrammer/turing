@@ -95,16 +95,22 @@ The pattern is consistent: **every prompt-based rule got worked around; every co
 
 Turing enforces the separation with a three-tier access model:
 
-```
-┌──────────────────────────────────────────────────┐
-│                  HYPOTHESIS SPACE                 │
-│              (agent can modify)                   │
-│    train.py          config.yaml                 │
-├──────────────────────────────────────────────────┤
-│             MEASUREMENT APPARATUS                 │
-│    prepare.py (READ-ONLY to agent)               │
-│    evaluate.py (HIDDEN — agent cannot even see)  │
-└──────────────────────────────────────────────────┘
+```mermaid
+block-beta
+    columns 1
+    block:hyp["HYPOTHESIS SPACE — agent can modify"]:1
+        A["train.py"] B["config.yaml"]
+    end
+    block:meas["MEASUREMENT APPARATUS"]:1
+        C["prepare.py (READ-ONLY)"] D["evaluate.py (HIDDEN)"]
+    end
+
+    style hyp fill:#3a1520,stroke:#ff4d4d,color:#fff
+    style meas fill:#1a1a1a,stroke:#555,color:#fff
+    style A fill:#2a1018,stroke:#ff4d4d,color:#fff
+    style B fill:#2a1018,stroke:#ff4d4d,color:#fff
+    style C fill:#1a1a1a,stroke:#888,color:#aaa
+    style D fill:#111,stroke:#444,color:#666
 ```
 
 The evaluation harness is not just immutable; it is *invisible*. The agent cannot read `evaluate.py`, cannot discover its implementation, cannot reverse-engineer fixed seeds or scoring formulas. It knows only the metric name, the direction (higher or lower is better), and the result.
