@@ -85,6 +85,9 @@ const EXPECTED_COMMANDS = [
   "simulate/SKILL.md",
   "update/SKILL.md",
   "registry/SKILL.md",
+  "postmortem/SKILL.md",
+  "doctor/SKILL.md",
+  "plan/SKILL.md",
 ];
 
 const EXPECTED_AGENTS = ["ml-researcher.md", "ml-evaluator.md"];

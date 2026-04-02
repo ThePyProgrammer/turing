@@ -38,6 +38,7 @@ const SUB_COMMANDS = [
   "onboard", "share", "review",
   "whatif", "counterfactual", "simulate",
   "update", "registry",
+  "postmortem", "doctor", "plan",
 ];
 
 export async function install(opts = {}) {
