@@ -9,23 +9,17 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-> Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) proved that ML experiment loops are mechanical enough to automate, but the agent that generates hypotheses kept gaming the metrics.
-> We believe the entity that runs experiments must not be the entity that evaluates them.
-> Turing is an autonomous ML research harness that treats **separation of hypothesis from measurement** as a first class citizen.
-
-<p align="center">
-  <sub>Built with :heart: by <a href="https://github.com/ThePyProgrammer">@ThePyProgrammer</a></sub>
-</p>
+> [autoresearch](https://github.com/karpathy/autoresearch) showed ML experiment loops can be automated, but the agent that generates hypotheses kept gaming the metrics. Turing fixes this by enforcing a strict wall between the agent that writes code and the agent that scores it.
 
 > [!NOTE]
 > Turing is still in beta. Features may be broken or unpolished. Feedback is **always** welcome.
 
 **Turing is a Claude Code plugin that runs autonomous ML experiment loops with immutable evaluation, anti-cheating guardrails, and structured hypothesis tracking.**
 
-- **Separation** -- the agent modifies `train.py`; it cannot see or touch `evaluate.py`
-- **Memory** -- every hypothesis registered, every experiment logged, every variant preserved
-- **Convergence** -- automatic detection of diminishing returns; the agent stops when it should
-- **Taste interface** -- you inject ideas with `/turing:try`, read results with `/turing:brief`
+- **Separation:** the agent modifies `train.py`; it cannot see or touch `evaluate.py`
+- **Memory:** every hypothesis registered, every experiment logged, every variant preserved
+- **Convergence:** automatic detection of diminishing returns; the agent stops when it should
+- **Taste interface:** you inject ideas with `/turing:try`, read results with `/turing:brief`
 
 ## Install
 
@@ -44,7 +38,7 @@ The interface is two verbs:
 /turing:brief --deep                   The agent's results → you
 ```
 
-Everything in between — experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails — is infrastructure connecting those two endpoints. You think about *what* to try. Turing handles *how* to try it.
+Everything in between (experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails) is infrastructure connecting those two endpoints. You think about *what* to try. Turing handles *how* to try it.
 
 ### What a Session Looks Like
 
@@ -115,21 +109,32 @@ See [the command reference](docs/commands/index.md) for all 74 commands.
 
 ## Credits
 
-Huge thanks to the work done by the autonomous ML research community. Turing would not exist without these projects and ideas:
+Turing would not exist without these projects, ideas, and intellectual traditions:
 
-- [karpathy/autoresearch](https://github.com/karpathy/autoresearch) — proved the experiment loop is mechanical enough to automate. Turing's core loop is a direct descendant.
-- [snoglobe/helios](https://github.com/snoglobe/helios) — early inspiration for structured ML experiment harnesses.
-- [suzuke/autocrucible](https://github.com/suzuke/autocrucible) — autoresearch with guardrails. Turing's six-layer anti-cheating stack is directly informed by autocrucible's documented failure modes.
-- [Amy Tam](https://x.com/amytam01/status/2031072399731675269) — the "When Code Is Free" thesis. The entire taste-leverage interface is built around her insight that when execution cost approaches zero, research taste is the differentiator.
-- [SakanaAI/treequest](https://github.com/SakanaAI/treequest) — AB-MCTS for inference-time scaling, repurposed in `/turing:explore` for hypothesis-space tree search.
-- [Google's Model Cards](https://arxiv.org/abs/1810.03993) — inspiration for `/turing:card` and structured model documentation.
-- [This article](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents) by HumanLayer — a great starting point for thinking about harness engineering for AI agents.
+**Projects**
+
+- [karpathy/autoresearch](https://github.com/karpathy/autoresearch): proved the experiment loop is mechanical enough to automate. Turing's core loop is a direct descendant.
+- [snoglobe/helios](https://github.com/snoglobe/helios): early inspiration for structured ML experiment harnesses.
+- [suzuke/autocrucible](https://github.com/suzuke/autocrucible): autoresearch with guardrails. Turing's six-layer anti-cheating stack is directly informed by autocrucible's documented failure modes.
+- [SakanaAI/treequest](https://github.com/SakanaAI/treequest): AB-MCTS for inference-time scaling, repurposed in `/turing:explore` for hypothesis-space tree search.
+- [Google's Model Cards](https://arxiv.org/abs/1810.03993): inspiration for `/turing:card` and structured model documentation.
+
+**Ideas**
+
+- [Amy Tam](https://x.com/amytam01/status/2031072399731675269): the "When Code Is Free" thesis. The entire taste-leverage interface is built around her insight that when execution cost approaches zero, research taste is the differentiator.
+- [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman): "The first principle is that you must not fool yourself, and you are the easiest person to fool." The separation of hypothesis from measurement is Turing's answer to Feynman's first principle.
+- [Michael Polanyi](https://en.wikipedia.org/wiki/The_Tacit_Dimension), *The Tacit Dimension* (1966): "We can know more than we can tell." Research taste is tacit knowledge that resists formalization, which is why the human stays in the loop.
+- [Hans Reichenbach](https://en.wikipedia.org/wiki/Hans_Reichenbach) and [Karl Popper](https://en.wikipedia.org/wiki/Karl_Popper): the distinction between the context of discovery (creative, non-logical) and the context of justification (mechanical, rule-based). Turing is a justification machine. You provide the discovery.
+- [Thomas Kuhn](https://en.wikipedia.org/wiki/The_Structure_of_Scientific_Revolutions), *The Structure of Scientific Revolutions* (1962): the risk of efficiently optimizing within a degenerating paradigm. Convergence detection is Turing's partial answer; knowing when to leave the corner is still yours.
+- [Goodhart's Law](https://en.wikipedia.org/wiki/Goodhart%27s_law) (1975) and [Campbell's Law](https://en.wikipedia.org/wiki/Campbell%27s_law) (1979): when a measure becomes a target, it ceases to be a good measure. The entire anti-cheating stack exists because these laws activate the moment an agent evaluates itself.
+- [Amodei et al.](https://arxiv.org/abs/1606.06565) (2016) and [DeepMind's specification gaming catalogue](https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/): documented that reward hacking is not a theoretical risk but an observed behavior of capable optimizers.
+- [NIST CAISI](https://www.nist.gov/artificial-intelligence/executive-order-safe-secure-and-trustworthy-artificial-intelligence) (2025): documented systematic cheating by frontier models (downloading solutions, commenting out assertions, crashing servers). Every prompt-based rule got worked around; every code-based rule held.
 
 The name references Alan Turing, who first asked whether machines could think, then built the framework for answering the question.
 
 ## Links
 
-- [License](LICENSE) -- MIT
+- [License](LICENSE) (MIT)
 
 ---
 
