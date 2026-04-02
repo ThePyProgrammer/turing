@@ -15,6 +15,7 @@ nav = [
   ]},
   {"Getting Started" = [
     "getting-started/index.md",
+    "getting-started/installation.md",
     "getting-started/quickstart.md",
     "getting-started/configuration.md",
     "getting-started/multi-project.md",
