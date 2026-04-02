@@ -121,8 +121,8 @@ pre.mermaid {
 
 .layer-card__number {
   display: inline-block;
-  background: rgba(255, 55, 55, 0.12);
-  color: #ff4d4d;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 700;
   font-size: 0.75rem;
   width: 1.6rem;
