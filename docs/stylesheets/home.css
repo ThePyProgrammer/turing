@@ -85,9 +85,9 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  font-size: 1.05rem;
-  padding: 0.9rem 2rem;
-  border-radius: 8px;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 6px;
   backdrop-filter: blur(4px);
   transition: all 0.25s;
 }
@@ -103,9 +103,9 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
   font-weight: 500;
-  font-size: 1.05rem;
-  padding: 0.9rem 2rem;
-  border-radius: 8px;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 6px;
   backdrop-filter: blur(4px);
   transition: all 0.25s;
 }
@@ -434,7 +434,8 @@
   border: none;
   color: #fff;
   font-weight: 600;
-  padding: 0.7rem 1.5rem;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.6rem;
   border-radius: 6px;
   transition: all 0.25s;
 }
@@ -450,7 +451,8 @@
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
   font-weight: 500;
-  padding: 0.7rem 1.5rem;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.6rem;
   border-radius: 6px;
   transition: all 0.25s;
 }
