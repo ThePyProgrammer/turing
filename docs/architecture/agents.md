@@ -137,18 +137,4 @@ A single agent with all capabilities could do everything both agents do. The spl
 
 The researcher delegates to the evaluator for analysis tasks during the experiment loop:
 
-```mermaid
-sequenceDiagram
-    participant R as @ml-researcher
-    participant E as @ml-evaluator
-
-    R->>E: Analyze last 10 experiments
-    activate E
-    E->>E: show_metrics.py
-    E->>E: compare_runs.py
-    E->>E: Convergence check
-    E-->>R: Verdict: try feature engineering
-    deactivate E
-```
-
-This delegation pattern means the researcher's Write/Edit capabilities are never active during analysis. The analysis happens in a context where modification is impossible.
+The researcher asks the evaluator to analyze trends. The evaluator runs read-only scripts (`show_metrics.py`, `compare_runs.py`), assesses convergence, and returns a verdict. During this delegation, the researcher's Write/Edit capabilities are never active — the analysis happens in a context where modification is impossible.
