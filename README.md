@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-A Claude Code plugin that runs autonomous ML experiment loops with immutable evaluation, anti-cheating guardrails, and structured hypothesis tracking. Two agents enforce a strict separation: one writes code, one scores it, and neither can see the other's work. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste; named after [the guy who asked whether machines could think](https://en.wikipedia.org/wiki/Alan_Turing), Turing handles the rest.
+A Claude Code plugin that runs autonomous ML experiment loops with immutable evaluation, anti-cheating guardrails, and structured hypothesis tracking. Two agents enforce a strict separation: one writes code, one scores it, and neither can see the other's work. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste. Turing, [named after the man who first asked whether machines could think](https://en.wikipedia.org/wiki/Alan_Turing), handles everything else.
 
 - **Separation:** the agent modifies `train.py`; it cannot see or touch `evaluate.py`
 - **Memory:** every hypothesis registered, every experiment logged, every variant preserved
