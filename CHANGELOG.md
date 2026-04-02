@@ -3,6 +3,25 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.4.0] — 2026-04-02 — Operational Intelligence
+
+*The final phase. All 29 phases (84 features, v1.0.0 through v4.4.0) are now complete.*
+
+### Added
+- `/turing:postmortem` — automated failure diagnosis: identifies search space exhaustion, systematic config errors, data issues, metric ceilings, and noise floors with scored evidence and actionable recommendations
+- `/turing:doctor` — harness self-diagnosis: 7 health checks (environment, dependencies, config, log integrity, scripts, disk space, git state), `--fix` mode for safe auto-repair with backup
+- `/turing:plan` — research planning assistant: strategic campaign design allocating experiments across feature engineering, model search, ensemble, calibration, and verification by ROI with goal-aware priority adjustment
+- Postmortem diagnosis and active research plan integrated into `/turing:brief` research briefing
+
+### Phase
+- **29.1** Automated Failure Postmortem
+- **29.2** Harness Self-Diagnosis
+- **29.3** Research Planning Assistant
+- All 29 phases (84 implementation items) complete
+
+**1986 tests | 74 commands | 93 scripts | 18 commits**
+
+
 ## [4.3.0] — 2026-04-01 — Model Lifecycle
 
 ### Added
@@ -377,6 +396,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 [4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
 [4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
+[4.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.4.0
 [4.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.3.0
 [4.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.2.0
 [4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
