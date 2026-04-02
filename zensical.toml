@@ -1,9 +1,57 @@
 [project]
 site_name = "Turing"
-site_url = "https://thepyprogrammer.github.io/turing"
+site_url = "https://thepyprogrammer.github.io/turing/"
 site_description = "The research assistant that can't fool itself. Autonomous ML research harness — 74 commands, 2 agents, 1986 tests."
 site_author = "Prannaya Gupta"
 copyright = "&copy; 2026 Prannaya Gupta"
+nav = [
+  {"Home" = "index.md"},
+  {"Philosophy" = [
+    "philosophy/index.md",
+    "philosophy/taste-leverage.md",
+    "philosophy/separation.md",
+    "philosophy/memory.md",
+    "philosophy/heritage.md",
+  ]},
+  {"Getting Started" = [
+    "getting-started/index.md",
+    "getting-started/quickstart.md",
+    "getting-started/configuration.md",
+    "getting-started/multi-project.md",
+  ]},
+  {"Commands" = [
+    "commands/index.md",
+    "commands/core.md",
+    "commands/taste-leverage.md",
+    "commands/statistical-rigor.md",
+    "commands/experiment-intelligence.md",
+    "commands/performance.md",
+    "commands/research-workflow.md",
+    "commands/orchestration.md",
+    "commands/deep-analysis.md",
+    "commands/composition.md",
+    "commands/scaling-efficiency.md",
+    "commands/meta-intelligence.md",
+    "commands/pre-training.md",
+    "commands/model-debugging.md",
+    "commands/model-surgery.md",
+    "commands/archaeology.md",
+    "commands/communication.md",
+    "commands/collaboration.md",
+    "commands/whatif-analysis.md",
+    "commands/model-lifecycle.md",
+    "commands/operational.md",
+  ]},
+  {"Architecture" = [
+    "architecture/index.md",
+    "architecture/experiment-loop.md",
+    "architecture/anti-cheating.md",
+    "architecture/agents.md",
+    "architecture/convergence.md",
+    "architecture/hypothesis-database.md",
+  ]},
+  {"Changelog" = "changelog.md"},
+]
 
 [project.theme]
 variant = "modern"
@@ -48,54 +96,3 @@ edit_uri = "edit/main/docs/"
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/ThePyProgrammer/turing"
-
-[project]
-nav = [
-  {"Home" = "index.md"},
-  {"Philosophy" = [
-    "philosophy/index.md",
-    "philosophy/taste-leverage.md",
-    "philosophy/separation.md",
-    "philosophy/memory.md",
-    "philosophy/heritage.md",
-  ]},
-  {"Getting Started" = [
-    "getting-started/index.md",
-    "getting-started/quickstart.md",
-    "getting-started/configuration.md",
-    "getting-started/multi-project.md",
-  ]},
-  {"Commands" = [
-    "commands/index.md",
-    "commands/core.md",
-    "commands/taste-leverage.md",
-    "commands/statistical-rigor.md",
-    "commands/experiment-intelligence.md",
-    "commands/performance.md",
-    "commands/research-workflow.md",
-    "commands/orchestration.md",
-    "commands/deep-analysis.md",
-    "commands/composition.md",
-    "commands/scaling-efficiency.md",
-    "commands/meta-intelligence.md",
-    "commands/pre-training.md",
-    "commands/model-debugging.md",
-    "commands/feature-training.md",
-    "commands/model-surgery.md",
-    "commands/archaeology.md",
-    "commands/communication.md",
-    "commands/collaboration.md",
-    "commands/whatif-analysis.md",
-    "commands/model-lifecycle.md",
-    "commands/operational.md",
-  ]},
-  {"Architecture" = [
-    "architecture/index.md",
-    "architecture/experiment-loop.md",
-    "architecture/anti-cheating.md",
-    "architecture/agents.md",
-    "architecture/convergence.md",
-    "architecture/hypothesis-database.md",
-  ]},
-  {"Changelog" = "changelog.md"},
-]
