@@ -137,4 +137,26 @@ A single agent with all capabilities could do everything both agents do. The spl
 
 The researcher delegates to the evaluator for analysis tasks during the experiment loop:
 
-The researcher asks the evaluator to analyze trends. The evaluator runs read-only scripts (`show_metrics.py`, `compare_runs.py`), assesses convergence, and returns a verdict. During this delegation, the researcher's Write/Edit capabilities are never active — the analysis happens in a context where modification is impossible.
+```mermaid
+sequenceDiagram
+    actor You
+    participant R as Researcher
+    participant E as Evaluator
+
+    You->>R: /turing:train
+    activate R
+    loop Experiment loop
+        R->>R: Edit train.py
+        R->>R: Run experiment
+        R->>R: Log result
+    end
+    R->>E: Analyze trends
+    activate E
+    Note right of E: Read-only context —<br/>no Write, no Edit
+    E-->>R: Recommendation
+    deactivate E
+    R->>R: Act on recommendation
+    deactivate R
+```
+
+During delegation, the researcher's Write/Edit capabilities are never active — the analysis happens in a context where modification is impossible.
