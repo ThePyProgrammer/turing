@@ -1,6 +1,11 @@
 ---
 title: "Turing — The Research Assistant That Can't Fool Itself"
 description: "Autonomous ML research harness for Claude Code implementing the autoresearch pattern — iterative training, immutable evaluation, and structured experiment loops with convergence detection and safety guardrails."
+template: home.html
+hide:
+  - navigation
+  - toc
+  - path
 ---
 
 # Turing
@@ -69,7 +74,7 @@ The name references Alan Turing — the person who first asked whether machines 
 ## Installation
 
 ```bash
-# Via npm (recommended)
+# Via npm
 npm install -g claude-turing
 claude-turing install --global
 claude-turing verify

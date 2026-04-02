@@ -1,0 +1,333 @@
+/* === HERO SECTION === */
+
+.tx-hero {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 40%, #0d0d1a 100%);
+  color: #fff;
+  padding: 4rem 1rem 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle grid pattern overlay */
+.tx-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 193, 32, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.tx-hero__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 960px) {
+  .tx-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* --- Teaser (left side) --- */
+
+.tx-hero__title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .tx-hero__title {
+    font-size: 2rem;
+  }
+}
+
+.tx-hero__tagline {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 1.5rem;
+}
+
+.tx-hero__quote {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 2rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(138, 43, 226, 0.5);
+}
+
+.tx-hero__attribution {
+  display: inline-block;
+  margin-left: 0.5rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* --- CTA Buttons --- */
+
+.tx-hero__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tx-hero__actions .md-button--primary {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(255, 152, 0, 0.8));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  transition: all 0.25s;
+}
+
+.tx-hero__actions .md-button--primary:hover {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 1), rgba(255, 152, 0, 1));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(138, 43, 226, 0.3);
+}
+
+.tx-hero__actions .md-button:not(.md-button--primary) {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-weight: 500;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  transition: all 0.25s;
+}
+
+.tx-hero__actions .md-button:not(.md-button--primary):hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* --- Terminal (right side) --- */
+
+.tx-hero__terminal {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.tx-hero__terminal-bar {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.6rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tx-hero__terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.tx-hero__terminal-dot--red { background: #ff5f57; }
+.tx-hero__terminal-dot--yellow { background: #febc2e; }
+.tx-hero__terminal-dot--green { background: #28c840; }
+
+.tx-hero__terminal-title {
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tx-hero__terminal-body {
+  padding: 1.2rem;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.tx-hero__terminal-body code {
+  background: none;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: inherit;
+}
+
+.tx-cmd {
+  color: #bb86fc;
+  font-weight: 600;
+}
+
+.tx-arg {
+  color: #ffb74d;
+}
+
+.tx-cmt {
+  color: rgba(255, 255, 255, 0.3);
+  margin-left: 0.5rem;
+}
+
+.tx-out {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* === FEATURES SECTION === */
+
+.tx-features {
+  background: #0f0f1e;
+  padding: 4rem 1rem;
+  border-top: 1px solid rgba(138, 43, 226, 0.15);
+}
+
+.tx-features__inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 960px) {
+  .tx-features__inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .tx-features__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tx-feature {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: all 0.25s;
+}
+
+.tx-feature:hover {
+  background: rgba(138, 43, 226, 0.06);
+  border-color: rgba(138, 43, 226, 0.2);
+  transform: translateY(-2px);
+}
+
+.tx-feature__icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.tx-feature h3 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.tx-feature p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tx-feature code {
+  background: rgba(138, 43, 226, 0.15);
+  color: #bb86fc;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.82em;
+}
+
+/* === PHASES SECTION === */
+
+.tx-phases {
+  background: linear-gradient(180deg, #0f0f1e 0%, #0d0d1a 100%);
+  padding: 4rem 1rem 5rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tx-phases__inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.tx-phases h2 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.tx-phases__subtitle {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  margin: 0 0 2.5rem;
+}
+
+.tx-phases__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .tx-phases__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tx-phase {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 1.25rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  transition: border-color 0.25s;
+}
+
+.tx-phase:hover {
+  border-color: rgba(138, 43, 226, 0.25);
+}
+
+.tx-phase strong {
+  color: #bb86fc;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* === HEADER TRANSPARENCY ON HOME === */
+
+.md-header {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Force dark scheme for home page hero compatibility */
+[data-md-color-scheme="default"] .tx-hero,
+[data-md-color-scheme="default"] .tx-features,
+[data-md-color-scheme="default"] .tx-phases {
+  color: #fff;
+}

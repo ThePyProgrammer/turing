@@ -4,6 +4,7 @@ site_url = "https://thepyprogrammer.github.io/turing/"
 site_description = "The research assistant that can't fool itself. Autonomous ML research harness — 74 commands, 2 agents, 1986 tests."
 site_author = "Prannaya Gupta"
 copyright = "&copy; 2026 Prannaya Gupta"
+extra_css = ["stylesheets/home.css"]
 nav = [
   {"Home" = "index.md"},
   {"Philosophy" = [

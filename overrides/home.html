@@ -1,0 +1,130 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+  {{ super() }}
+
+  <div class="tx-hero">
+    <div class="tx-hero__inner">
+
+      <div class="tx-hero__teaser">
+        <h1 class="tx-hero__title">
+          The research assistant<br>
+          that can't fool itself.
+        </h1>
+        <p class="tx-hero__tagline">
+          74 commands. 2 agents. 1,986 tests.<br>
+          Autonomous ML experiments with immutable evaluation,<br>
+          anti-cheating guardrails, and structured memory.
+        </p>
+        <p class="tx-hero__quote">
+          <em>"What comes across as luck is really the refinement of taste."</em>
+          <span class="tx-hero__attribution">&mdash; Amy Tam</span>
+        </p>
+        <div class="tx-hero__actions">
+          <a href="getting-started/quickstart/" class="md-button md-button--primary">
+            Get started
+          </a>
+          <a href="philosophy/" class="md-button">
+            Read the philosophy
+          </a>
+        </div>
+      </div>
+
+      <div class="tx-hero__commands">
+        <div class="tx-hero__terminal">
+          <div class="tx-hero__terminal-bar">
+            <span class="tx-hero__terminal-dot tx-hero__terminal-dot--red"></span>
+            <span class="tx-hero__terminal-dot tx-hero__terminal-dot--yellow"></span>
+            <span class="tx-hero__terminal-dot tx-hero__terminal-dot--green"></span>
+            <span class="tx-hero__terminal-title">claude code</span>
+          </div>
+          <div class="tx-hero__terminal-body">
+            <code>
+              <span class="tx-cmd">/turing:init</span>
+              <span class="tx-cmt"># Scaffold project</span>
+              <br>
+              <span class="tx-cmd">/turing:train</span>
+              <span class="tx-cmt"># Run experiment loop</span>
+              <br>
+              <span class="tx-cmd">/turing:brief</span>
+              <span class="tx-cmt"># What happened?</span>
+              <br><br>
+              <span class="tx-out">Campaign: 8 experiments, 5 kept</span>
+              <br>
+              <span class="tx-out">Best: accuracy 0.87 (exp-005)</span>
+              <br>
+              <span class="tx-out">Exhausted: hyperparameter tuning</span>
+              <br>
+              <span class="tx-out">Recommendation: try feature engineering</span>
+              <br><br>
+              <span class="tx-cmd">/turing:try</span>
+              <span class="tx-arg">add polynomial interactions</span>
+              <br>
+              <span class="tx-cmd">/turing:train</span>
+              <span class="tx-cmt"># It follows your lead</span>
+            </code>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tx-features">
+    <div class="tx-features__inner md-grid">
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F9EA;</div>
+        <h3>Autonomous Loop</h3>
+        <p>Hypothesize, train, evaluate, decide, record. The agent runs the experiment loop while you sleep.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F512;</div>
+        <h3>Immutable Evaluation</h3>
+        <p>The agent can't see <code>evaluate.py</code>. Six defense layers prevent metric gaming. Code-based rules, not prompts.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F9E0;</div>
+        <h3>Structured Memory</h3>
+        <p>Every hypothesis tracked. Every experiment logged. Novelty guard prevents re-trying failed approaches across sessions.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F3AF;</div>
+        <h3>Taste-Leverage Loop</h3>
+        <p>You inject hypotheses. The agent executes. The briefing reports back. Your judgment steers; the agent's discipline sustains.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F4CA;</div>
+        <h3>Statistical Rigor</h3>
+        <p>Multi-seed studies, reproducibility verification, confidence intervals. Stop publishing lucky seeds.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F680;</div>
+        <h3>74 Commands</h3>
+        <p>From init to production export. Diagnosis, ablation, ensemble, pruning, quantization, model cards, peer review simulation.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tx-phases">
+    <div class="tx-phases__inner md-grid">
+      <h2>29 Phases Complete</h2>
+      <p class="tx-phases__subtitle">Every feature in the roadmap — from v1.0.0 to v4.4.0 — is implemented and tested.</p>
+      <div class="tx-phases__grid">
+        <div class="tx-phase"><strong>v1.x</strong> Core loop, statistical rigor, tree-search, cost frontier, model cards, profiling, checkpoints</div>
+        <div class="tx-phase"><strong>v2.x</strong> Model export, literature, paper drafting, orchestration, deep analysis, composition, scaling, distillation</div>
+        <div class="tx-phase"><strong>v3.x</strong> Meta-intelligence, pre-training checks, model debugging, feature intelligence, model surgery, experiment archaeology</div>
+        <div class="tx-phase"><strong>v4.x</strong> Research communication, collaboration, what-if analysis, model lifecycle, operational intelligence</div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block content %}{% endblock %}
