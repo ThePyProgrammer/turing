@@ -436,6 +436,38 @@ def load_update_history(update_dir: str = "experiments/updates") -> list[dict]:
     return results
 
 
+def load_postmortem_result(postmortem_dir: str = "experiments/postmortems") -> dict | None:
+    """Load the most recent postmortem result."""
+    path = Path(postmortem_dir)
+    if not path.exists():
+        return None
+    files = sorted(path.glob("postmortem-*.yaml"))
+    if not files:
+        return None
+    try:
+        with open(files[-1]) as f:
+            data = yaml.safe_load(f)
+            return data if isinstance(data, dict) else None
+    except (yaml.YAMLError, OSError):
+        return None
+
+
+def load_research_plan(plan_dir: str = "experiments/plans") -> dict | None:
+    """Load the most recent research plan."""
+    path = Path(plan_dir)
+    if not path.exists():
+        return None
+    files = sorted(path.glob("plan-*.yaml"))
+    if not files:
+        return None
+    try:
+        with open(files[-1]) as f:
+            data = yaml.safe_load(f)
+            return data if isinstance(data, dict) else None
+    except (yaml.YAMLError, OSError):
+        return None
+
+
 def format_brief(
     campaign: dict,
     best: dict | None,
@@ -462,6 +494,8 @@ def format_brief(
     simulation_result: dict | None = None,
     registry_summary: dict | None = None,
     update_history: list[dict] | None = None,
+    postmortem_result: dict | None = None,
+    research_plan: dict | None = None,
 ) -> str:
     """Format the research briefing as markdown."""
     direction = "lower" if lower_is_better else "higher"
@@ -815,6 +849,29 @@ def format_brief(
                 lines.append(f"- {exp_id}: {strategy} — {verdict}")
             lines.append("")
 
+    # Operational Intelligence section
+    if postmortem_result or research_plan:
+        lines.extend(["", "## Operational Intelligence", ""])
+
+        if postmortem_result and "primary_diagnosis" in postmortem_result:
+            diagnosis = postmortem_result["primary_diagnosis"].replace("_", " ").title()
+            streak = postmortem_result.get("streak_length", "?")
+            score = postmortem_result.get("diagnosis_score", 0)
+            lines.append(f"**Failure postmortem:** {diagnosis} ({score:.0%} confidence, {streak} experiment streak)")
+            recs = postmortem_result.get("recommendations", [])
+            if recs:
+                lines.append(f"  Action: {recs[0]}")
+            lines.append("")
+
+        if research_plan and "plan" in research_plan:
+            plan = research_plan["plan"]
+            n = plan.get("total_experiments", 0)
+            gain = plan.get("expected_gain", 0)
+            lines.append(f"**Active research plan:** {n} experiments planned (+{gain} expected gain)")
+            for phase in plan.get("phases", [])[:3]:
+                lines.append(f"  - {phase['label']}: {phase['n_experiments']} experiments")
+            lines.append("")
+
     lines.extend([
         "",
         "## Recommendations",
@@ -889,6 +946,8 @@ def generate_brief(
     simulation_result = load_simulation_results()
     registry_summary = load_registry_summary()
     update_history = load_update_history()
+    postmortem_result = load_postmortem_result()
+    research_plan = load_research_plan()
 
     return format_brief(
         campaign, best, trajectory, model_types, hypotheses,
@@ -909,6 +968,8 @@ def generate_brief(
         simulation_result=simulation_result,
         registry_summary=registry_summary,
         update_history=update_history if update_history else None,
+        postmortem_result=postmortem_result,
+        research_plan=research_plan,
     )
 
 
