@@ -142,12 +142,12 @@ sequenceDiagram
     participant R as @ml-researcher
     participant E as @ml-evaluator
 
-    R->>E: Analyze trends from 10 experiments
+    R->>E: Analyze last 10 experiments
     activate E
-    E->>E: show_metrics.py --last 10
-    E->>E: compare_runs.py on top experiments
-    E->>E: Convergence assessment
-    E-->>R: Diminishing returns on hyperparameter tuning.<br/>Feature engineering likely to yield bigger gains.<br/>Try polynomial interactions.
+    E->>E: show_metrics.py
+    E->>E: compare_runs.py
+    E->>E: Convergence check
+    E-->>R: Verdict: try feature engineering
     deactivate E
 ```
 
