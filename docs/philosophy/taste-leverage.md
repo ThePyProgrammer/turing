@@ -11,38 +11,23 @@ Turing is not a black box you point at data and hope for the best. It is a conve
 
 ## The Loop
 
-```
-         ┌─────────────────────┐
-         │  YOU (taste)         │
-         │                     │
-         │  /turing:brief      │◄──── "What have we learned?"
-         │  /turing:try ...    │────► "Try this next."
-         └────────┬────────────┘
-                  │
-                  ▼
-         ┌─────────────────────┐
-         │  TURING (discipline) │
-         │                     │
-         │  Hypothesize        │◄──── Reads your injection + history
-         │  Train              │────► Runs the experiment
-         │  Evaluate           │────► Immutable measurement
-         │  Decide             │────► Keep or discard
-         │  Record             │────► Updates hypothesis database
-         └────────┬────────────┘
-                  │
-                  ▼
-         ┌─────────────────────┐
-         │  BRIEFING            │
-         │                     │
-         │  Campaign summary   │
-         │  Best model         │
-         │  What's exhausted   │
-         │  What's promising   │
-         │  Recommendations    │
-         └─────────────────────┘
-                  │
-                  ▼
-              You again.
+```mermaid
+flowchart TD
+    YOU@{ shape: stadium, label: "YOU · taste" }
+    TURING@{ shape: stadium, label: "TURING · discipline" }
+    BRIEF@{ shape: stadium, label: "BRIEFING" }
+
+    YOU -- "/turing:try" --> TURING
+    TURING -- "experiment results" --> BRIEF
+    BRIEF -- "/turing:brief" --> YOU
+
+    style YOU fill:#3a1520,stroke:#ff4d4d,color:#fff
+    style TURING fill:#2a1a08,stroke:#ffb74d,color:#fff
+    style BRIEF fill:#1a1a1a,stroke:#999,color:#fff
+
+    linkStyle 0 stroke:#ff4d4d
+    linkStyle 1 stroke:#ffb74d
+    linkStyle 2 stroke:#999
 ```
 
 The loop is bidirectional. You inject hypotheses. The agent executes them. The briefing tells you what happened. You inject new hypotheses informed by the results. The agent never forgets what it tried. You never lose context between sessions.
