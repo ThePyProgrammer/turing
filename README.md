@@ -4,9 +4,9 @@
 
 ---
 
-An autonomous ML research harness for Claude Code. Turing implements the autoresearch pattern — an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
+An autonomous ML research harness for Claude Code. Turing implements the autoresearch pattern: an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
 
-The name references Alan Turing — the person who first asked whether machines could think, then built the framework for answering the question. Turing the plugin does what Turing the person formalized: it defines a computational process, executes it mechanically, and determines whether the result constitutes an improvement.
+The name references Alan Turing, the person who first asked whether machines could think, then built the framework for answering the question. Turing the plugin does what Turing the person formalized: it defines a computational process, executes it mechanically, and determines whether the result constitutes an improvement.
 
 Inspired by [karpathy/autoresearch](https://github.com/karpathy/autoresearch) and [snoglobe/helios](https://github.com/snoglobe/helios).
 
@@ -28,7 +28,7 @@ Initialize. Train. Read the briefing. Inject your taste. Repeat.
 /turing:brief --deep                   Get literature-backed suggestions
 ```
 
-Everything else — experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails — happens automatically. You think about *what* to try. Turing handles *how* to try it.
+Everything else (experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails) happens automatically. You think about *what* to try. Turing handles *how* to try it.
 
 ## Table of Contents
 
@@ -48,11 +48,11 @@ Everything else — experiment logging, convergence detection, hypothesis tracki
 
 ## When Code Is Free, Research Is All That Matters
 
-> *"You're in a room with a quadrillion biased coins, and you want to maximize the number of heads in the shortest amount of time. Almost all coins are 'duds.' The novice coin-flipper might start flipping one-by-one, but heads come few and far between. The learned coin-flipper weaves through the quadrillion-coin room with a preternatural air; they flip many coins at once. What comes across as luck is really the refinement of taste: years of feeling faint differences in the weight of the metal, the subtle offsets of a mis-mint."* — [Amy Tam](https://x.com/amytam01/status/2031072399731675269)
+> *"You're in a room with a quadrillion biased coins, and you want to maximize the number of heads in the shortest amount of time. Almost all coins are 'duds.' The novice coin-flipper might start flipping one-by-one, but heads come few and far between. The learned coin-flipper weaves through the quadrillion-coin room with a preternatural air; they flip many coins at once. What comes across as luck is really the refinement of taste: years of feeling faint differences in the weight of the metal, the subtle offsets of a mis-mint."* - [Amy Tam](https://x.com/amytam01/status/2031072399731675269)
 
 This is the most precise metaphor for ML research in the age of autonomous agents: a quadrillion-coin room where the researcher's value lies not in the mechanical act of flipping but in *choosing which coins to flip at all*.
 
-Tam's insight cuts to the heart of what Turing exists to do. The agentic coding tools consuming software engineering alive right now — Cursor, Claude Code, Codex — work precisely because engineering has a built-in feedback signal: a test to pass, a spec to meet, a benchmark to clear. You can RL on [SWE-bench](https://www.swebench.com/) because the ground truth exists. **Research has no equivalent.** It is not clear what it means to RL on a research question, because it is not clear what definition of "ground truth" one should optimize for. The coin room has a quadrillion coins but no label telling you which ones are biased toward heads.
+Tam's insight cuts to the heart of what Turing exists to do. The agentic coding tools consuming software engineering alive right now (Cursor, Claude Code, Codex) work precisely because engineering has a built-in feedback signal: a test to pass, a spec to meet, a benchmark to clear. You can RL on [SWE-bench](https://www.swebench.com/) because the ground truth exists. **Research has no equivalent.** It is not clear what it means to RL on a research question, because it is not clear what definition of "ground truth" one should optimize for. The coin room has a quadrillion coins but no label telling you which ones are biased toward heads.
 
 And yet Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) ran 126 experiments overnight on a single GPU: agents modifying LLM training code, running a five-minute training loop, checking if the result improved, and repeating. [Tobias Lütke reported](https://fortune.com/2026/03/17/andrej-karpathy-loop-autonomous-ai-agents-future/) that after letting it run overnight, it executed 37 experiments and delivered a 19% performance gain. That is a lot more coins flipped than the average human in the same time.
 
@@ -68,7 +68,7 @@ Judgment under ambiguity            Measurement under control
 Knowing when the room has changed   Running the room as-is
 ```
 
-The researcher's job becomes the selection function: *which 20 of the quadrillion coins are worth flipping in the first place?* And the agent's job — Turing's job — is to flip those coins with the discipline, speed, and memory that humans cannot sustain. Every experiment logged. Every variant preserved. Every comparison valid. No amnesia. No fatigue. No accidental contamination of the measurement.
+The researcher's job becomes the selection function: *which 20 of the quadrillion coins are worth flipping in the first place?* And the agent's job, Turing's job, is to flip those coins with the discipline, speed, and memory that humans cannot sustain. Every experiment logged. Every variant preserved. Every comparison valid. No amnesia. No fatigue. No accidental contamination of the measurement.
 
 *When anyone can build for free, the differentiator is knowing what's worth building and whether it's buildable at all.* Turing handles the building. You bring the knowing.
 
@@ -171,23 +171,23 @@ That's the interface. Six words to inject an idea. One command to get a briefing
 
 ## The Problem Turing Solves
 
-> "An experiment is a question which science poses to Nature, and a measurement is the recording of Nature's answer." — Max Planck
+> "An experiment is a question which science poses to Nature, and a measurement is the recording of Nature's answer." - Max Planck
 
 The central activity of machine learning research is the experiment loop: change something, train, evaluate, decide, repeat. This loop is simultaneously the most important and the most tedious part of ML work. Researchers spend their days doing what is essentially a manual search over a high-dimensional space of model architectures, hyperparameters, feature transformations, and data preprocessing strategies.
 
-The tragedy is not that this is slow — it is that the process is structurally unsound. When a human researcher modifies both the training code *and* the evaluation code in the same session, the experiment is no longer a controlled experiment. When experiment results are tracked in notebook cells rather than structured logs, reproducibility is aspirational. When a promising direction is abandoned because the researcher forgot what they tried three hours ago, the search is not even a search — it is a random walk with amnesia.
+The tragedy is not that this is slow. It is that the process is structurally unsound. When a human researcher modifies both the training code *and* the evaluation code in the same session, the experiment is no longer a controlled experiment. When experiment results are tracked in notebook cells rather than structured logs, reproducibility is aspirational. When a promising direction is abandoned because the researcher forgot what they tried three hours ago, the search is not even a search. It is a random walk with amnesia.
 
-Turing does not replace the researcher's judgment. It replaces the researcher's *discipline* — or more precisely, it makes discipline the default rather than an act of willpower. The experiment loop is formalized. The evaluation harness is immutable. Every experiment is logged. Every code variant is preserved. Convergence is detected automatically. The researcher's role shifts from "person who types hyperparameters and reads loss curves" to "person who decides what hypotheses are worth testing" — from coin-flipper to coin-selector.
+Turing does not replace the researcher's judgment. It replaces the researcher's *discipline*, or more precisely, it makes discipline the default rather than an act of willpower. The experiment loop is formalized. The evaluation harness is immutable. Every experiment is logged. Every code variant is preserved. Convergence is detected automatically. The researcher's role shifts from "person who types hyperparameters and reads loss curves" to "person who decides what hypotheses are worth testing," from coin-flipper to coin-selector.
 
 ## Philosophical Foundations
 
 ### On Separating Hypothesis from Measurement
 
-> "The first principle is that you must not fool yourself — and you are the easiest person to fool." — Richard Feynman
+> "The first principle is that you must not fool yourself, and you are the easiest person to fool." - Richard Feynman
 
-Turing is built on a specific epistemological claim: **the entity that generates hypotheses must not be the entity that evaluates them**. This is not a software engineering pattern — it is the methodological foundation of modern science, and it predates software by centuries.
+Turing is built on a specific epistemological claim: **the entity that generates hypotheses must not be the entity that evaluates them**. This is not a software engineering pattern. It is the methodological foundation of modern science, and it predates software by centuries.
 
-In experimental physics, the [double-blind protocol](https://en.wikipedia.org/wiki/Blinded_experiment) ensures that the experimenter's expectations cannot influence the measurement. In ML, the equivalent risk is more insidious: an agent that can modify both `train.py` and `evaluate.py` can — deliberately or through optimization pressure — find metrics that look good but don't reflect genuine model improvement.
+In experimental physics, the [double-blind protocol](https://en.wikipedia.org/wiki/Blinded_experiment) ensures that the experimenter's expectations cannot influence the measurement. In ML, the equivalent risk is more insidious: an agent that can modify both `train.py` and `evaluate.py` can, deliberately or through optimization pressure, find metrics that look good but don't reflect genuine model improvement.
 
 This is [Goodhart's Law](https://en.wikipedia.org/wiki/Goodhart%27s_law) made architectural: *"When a measure becomes a target, it ceases to be a good measure."* The only defense is to make the measure structurally immutable.
 
@@ -205,13 +205,13 @@ Turing enforces this with a three-tier access model:
 └──────────────────────────────────────────────────────┘
 ```
 
-The evaluation harness is not just immutable — it is *invisible*. The agent cannot read `evaluate.py`, cannot discover its implementation, cannot reverse-engineer fixed seeds or scoring formulas. It knows only the metric name, the direction (higher or lower is better), and the result. This is the difference between "please don't change the test" and "you literally cannot see the test."
+The evaluation harness is not just immutable; it is *invisible*. The agent cannot read `evaluate.py`, cannot discover its implementation, cannot reverse-engineer fixed seeds or scoring formulas. It knows only the metric name, the direction (higher or lower is better), and the result. This is the difference between "please don't change the test" and "you literally cannot see the test."
 
 ### On Research Taste and Autonomous Execution
 
-> *"Research taste is about how well you choose your coins: how well you choose which problems are worth working on at all."* — Amy Tam
+> *"Research taste is about how well you choose your coins: how well you choose which problems are worth working on at all."* - Amy Tam
 
-There is a paradox at the heart of autonomous ML research: the parts of research that are hardest to automate are precisely the parts that matter most. Problem selection, hypothesis formation, knowing when a line of inquiry has become a dead end — these require what Tam calls *taste*, the accumulated judgment that comes from years of feeling faint differences in which problems are tractable, which results are meaningful, and which metrics actually capture what you care about.
+There is a paradox at the heart of autonomous ML research: the parts of research that are hardest to automate are precisely the parts that matter most. Problem selection, hypothesis formation, knowing when a line of inquiry has become a dead end; these require what Tam calls *taste*, the accumulated judgment that comes from years of feeling faint differences in which problems are tractable, which results are meaningful, and which metrics actually capture what you care about.
 
 Autoresearch does not solve this. Turing does not solve this. No one has solved this. But what autoresearch *does* solve is the complementary problem: given a well-selected hypothesis space, execute the search within it with superhuman discipline and throughput. The human provides the taste. The agent provides the tirelessness.
 
@@ -219,21 +219,21 @@ This is why Turing's interface is built around two verbs: **try** and **brief**.
 
 ### On Experiment Tracking as Institutional Memory
 
-> "Those who cannot remember the past are condemned to repeat it." — George Santayana
+> "Those who cannot remember the past are condemned to repeat it." - George Santayana
 
-An LLM agent without persistent memory is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain) — its next action depends only on its current state, not on the path that led there. This is catastrophically inefficient for optimization: the agent will re-try failed approaches, abandon promising directions, and fail to recognize when it has converged. It will keep flipping coins it has already flipped.
+An LLM agent without persistent memory is a [Markov chain](https://en.wikipedia.org/wiki/Markov_chain): its next action depends only on its current state, not on the path that led there. This is catastrophically inefficient for optimization: the agent will re-try failed approaches, abandon promising directions, and fail to recognize when it has converged. It will keep flipping coins it has already flipped.
 
 Turing addresses this with a structured memory stack:
 
 | System | Format | Purpose |
 |--------|--------|---------|
-| **Hypothesis database** | `hypotheses.yaml` + `hypotheses/hyp-NNN.yaml` | Complete ledger of every idea — human and agent — with full detail |
+| **Hypothesis database** | `hypotheses.yaml` + `hypotheses/hyp-NNN.yaml` | Complete ledger of every idea, human and agent, with full detail |
 | **Experiment log** | `experiments/log.jsonl` | Append-only record of every experiment run |
 | **Novelty guard** | `scripts/novelty_guard.py` | Blocks duplicate and near-duplicate hypotheses before execution |
 | **Agent memory** | `.claude/agent-memory/ml-researcher/MEMORY.md` | Working notes across sessions |
 | **Git history** | Experiment branches | Every code variant preserved |
 
-The hypothesis database is the single source of truth. Every idea gets registered before execution. Every outcome gets written back. The novelty guard reads the history and prevents the agent from re-trying things it has already failed at — even across `/loop` sessions where the agent's context is lost.
+The hypothesis database is the single source of truth. Every idea gets registered before execution. Every outcome gets written back. The novelty guard reads the history and prevents the agent from re-trying things it has already failed at, even across `/loop` sessions where the agent's context is lost.
 
 ## How Turing Works
 
@@ -255,7 +255,7 @@ Every iteration follows the same protocol:
 
 ### The Hypothesis Lifecycle
 
-Every experiment — human-injected or agent-generated — flows through the hypothesis database:
+Every experiment, whether human-injected or agent-generated, flows through the hypothesis database:
 
 ```
   /turing:try "idea"                     Agent generates idea
@@ -303,88 +303,88 @@ The index (`hypotheses.yaml`) is the lightweight queue. The detail files (`hypot
 | `/turing:init [--plan]` | Scaffold a new ML project. `--plan` generates a literature-grounded research plan. Supports multiple projects in subdirectories. |
 | `/turing:train [ml/project] [N]` | Run the experiment loop. Auto-detects project from cwd or explicit path. |
 | `/turing:sweep` | Systematic hyperparameter sweep via cartesian product |
-| `/turing:status` | Quick experiment status — best model, convergence state |
+| `/turing:status` | Quick experiment status: best model, convergence state |
 | `/turing:compare <a> <b>` | Side-by-side experiment comparison with causal analysis |
 
 ### Taste-Leverage Interface
 
 | Command | What it does |
 |---------|-------------|
-| `/turing:try <hypothesis>` | Inject a hypothesis — free text or `archetype:model_comparison` |
-| `/turing:brief [--deep]` | Research briefing — campaign summary, failure patterns, literature-grounded suggestions |
+| `/turing:try <hypothesis>` | Inject a hypothesis: free text or `archetype:model_comparison` |
+| `/turing:brief [--deep]` | Research briefing: campaign summary, failure patterns, literature-grounded suggestions |
 | `/turing:suggest` | Literature-grounded model architecture suggestions with citations |
 | `/turing:suggest --strategy treequest` | Tree-search hypothesis exploration (alias for `/turing:explore`) |
 | `/turing:explore` | AB-MCTS tree search over critique-scored hypothesis space |
 | `/turing:design <hyp-id>` | Generate structured experiment design from a hypothesis |
-| `/turing:mode <explore\|exploit\|replicate>` | Set research strategy — drives novelty guard policy |
+| `/turing:mode <explore\|exploit\|replicate>` | Set research strategy: drives novelty guard policy |
 
 ### Reporting & Validation
 
 | Command | What it does |
 |---------|-------------|
-| `/turing:validate [--auto]` | Check metric stability — auto-configure multi-run if noisy |
-| `/turing:seed [N] [--quick]` | Multi-seed study — mean/std/CI, flag seed-sensitive results |
-| `/turing:reproduce <exp-id>` | Reproducibility verification — re-run and check tolerance |
-| `/turing:diagnose [exp-id]` | Error analysis — failure modes, confused pairs, feature-range bias |
-| `/turing:ablate [--components]` | Ablation study — remove components, measure impact, flag dead weight |
-| `/turing:frontier [--metrics]` | Pareto frontier — multi-objective tradeoff visualization |
-| `/turing:profile [exp-id]` | Computational profiling — timing, memory, throughput, bottleneck detection |
-| `/turing:checkpoint <action>` | Smart checkpoint management — list, prune (Pareto), average, resume, stats |
-| `/turing:lit <query>` | Literature search — papers, SOTA baselines, related work |
+| `/turing:validate [--auto]` | Check metric stability: auto-configure multi-run if noisy |
+| `/turing:seed [N] [--quick]` | Multi-seed study: mean/std/CI, flag seed-sensitive results |
+| `/turing:reproduce <exp-id>` | Reproducibility verification: re-run and check tolerance |
+| `/turing:diagnose [exp-id]` | Error analysis: failure modes, confused pairs, feature-range bias |
+| `/turing:ablate [--components]` | Ablation study: remove components, measure impact, flag dead weight |
+| `/turing:frontier [--metrics]` | Pareto frontier: multi-objective tradeoff visualization |
+| `/turing:profile [exp-id]` | Computational profiling: timing, memory, throughput, bottleneck detection |
+| `/turing:checkpoint <action>` | Smart checkpoint management: list, prune (Pareto), average, resume, stats |
+| `/turing:lit <query>` | Literature search: papers, SOTA baselines, related work |
 | `/turing:paper [--sections] [--format]` | Draft paper sections from experiment logs (setup, results, ablation, hyperparams) |
-| `/turing:queue <action>` | Batch experiment scheduler — add, list, run, pause, clear |
-| `/turing:retry <exp-id>` | Smart failure recovery — auto-diagnose crash, apply fix, re-run |
-| `/turing:fork <exp-id>` | Experiment branching — run parallel tracks, report winner |
+| `/turing:queue <action>` | Batch experiment scheduler: add, list, run, pause, clear |
+| `/turing:retry <exp-id>` | Smart failure recovery: auto-diagnose crash, apply fix, re-run |
+| `/turing:fork <exp-id>` | Experiment branching: run parallel tracks, report winner |
 | `/turing:export [--format]` | Export model to production format with equivalence check + latency benchmark |
-| `/turing:card` | Generate a model card — performance, limitations, intended use, artifact contract |
+| `/turing:card` | Generate a model card: performance, limitations, intended use, artifact contract |
 | `/turing:logbook` | Generate HTML experiment logbook |
 | `/turing:report` | Generate research report |
 | `/turing:poster` | Generate research poster |
 | `/turing:preflight` | Pre-release validation checks |
-| `/turing:diff <a> <b>` | Deep experiment comparison — config diffs, metric significance, per-class regressions, curve divergence |
-| `/turing:watch [--analyze]` | Live training monitor — loss spikes, NaN detection, overfitting, plateau alerts |
-| `/turing:regress [--tolerance]` | Performance regression gate — verify metrics haven't degraded after changes |
-| `/turing:ensemble [--top-k]` | Automated ensemble — voting, stacking, blending from top-K models |
-| `/turing:stitch <action>` | Pipeline composition — show, swap, cache, and run stages independently |
-| `/turing:warm <exp-id>` | Warm-start from prior model — load checkpoint, freeze layers, adjust LR |
-| `/turing:scale [--axis]` | Scaling law estimator — power-law fit, full-scale predictions, diminishing returns verdict |
-| `/turing:budget <action>` | Compute budget manager — set limits, track allocation, auto-shift explore/exploit |
-| `/turing:distill <exp-id>` | Model compression — distill teacher into smaller student with accuracy/size tradeoff |
-| `/turing:transfer [--from]` | Cross-project knowledge transfer — find similar projects, surface what worked |
-| `/turing:audit [--strict]` | Pre-submission methodology audit — data leakage, baselines, seeds, ablations, reproducibility |
-| `/turing:sanity [--quick]` | Pre-training sanity checks — initial loss, single-batch overfit, gradient flow, output validation |
-| `/turing:baseline [--methods]` | Automatic baseline generation — random, majority/mean, linear, k-NN |
-| `/turing:leak [--deep]` | Targeted leakage detection — single-feature tests, correlation, train/test overlap |
-| `/turing:xray [exp-id]` | Internal model diagnostics — gradient flow, dead neurons, weight distributions, tree analysis |
-| `/turing:sensitivity [exp-id]` | Hyperparameter sensitivity — rank parameters by impact, detect non-monotonic responses |
-| `/turing:calibrate [exp-id]` | Probability calibration — ECE/MCE, reliability diagrams, Platt/isotonic/temperature scaling |
-| `/turing:feature [--method]` | Automated feature selection — multi-method consensus ranking, redundancy, interactions |
-| `/turing:curriculum [exp-id]` | Training curriculum optimization — difficulty scoring, strategy comparison, mislabeled sample detection |
-| `/turing:prune <exp-id>` | Weight pruning — magnitude/structured/lottery, sparsity sweep, knee point detection |
-| `/turing:quantize <exp-id>` | Post-training quantization — FP16/INT8, accuracy-latency comparison |
-| `/turing:merge <exp-ids...>` | Model merging — uniform/greedy soup, TIES, DARE, zero latency cost |
-| `/turing:surgery <exp-id>` | Architecture modification — add/remove layer, widen/narrow, swap activation |
-| `/turing:trend` | Long-term trend analysis — improvement velocity, family ROI, diminishing returns |
-| `/turing:flashback` | Session context restoration — "where was I?" after days away |
-| `/turing:archive` | Experiment lifecycle cleanup — compress old artifacts, summary index |
-| `/turing:annotate <exp-id>` | Retrospective annotations — human notes and tags on experiments |
-| `/turing:search <query>` | Natural language experiment search — text + structured filters |
-| `/turing:template <action>` | Experiment template library — save/list/apply reusable configs |
-| `/turing:replay <exp-id>` | Experiment replay — re-run old approach with current infrastructure |
-| `/turing:cite <action>` | Citation & attribution manager — track papers, audit missing citations, generate BibTeX |
-| `/turing:present [--figures]` | Presentation figures — training curves, comparisons, ablation, Pareto, sensitivity |
-| `/turing:changelog [--audience]` | Model changelog — version-grouped improvements for technical or stakeholder audiences |
-| `/turing:onboard [--audience]` | Project onboarding — walkthrough for new collaborators |
-| `/turing:share <exp-ids...>` | Experiment packaging — portable archive with manifest |
-| `/turing:review [--venue]` | Peer review simulation — weaknesses, fix commands, score |
-| `/turing:whatif "<question>"` | What-if analysis — answer hypotheticals from existing experiment data |
-| `/turing:counterfactual <exp-id>` | Counterfactual explanations — minimum input change to flip a prediction |
-| `/turing:simulate [--configs]` | Experiment outcome prediction — pre-filter configs, save budget |
-| `/turing:update <exp-id>` | Incremental model update — add new data without full retraining |
-| `/turing:registry [action]` | Model registry — track lifecycle from candidate to production with gates |
-| `/turing:postmortem` | Failure postmortem — diagnose why experiments stopped improving |
-| `/turing:doctor [--fix]` | Harness self-diagnosis — check environment, project, resources |
-| `/turing:plan [--budget N]` | Research planning — strategic experiment campaign by ROI |
+| `/turing:diff <a> <b>` | Deep experiment comparison: config diffs, metric significance, per-class regressions, curve divergence |
+| `/turing:watch [--analyze]` | Live training monitor: loss spikes, NaN detection, overfitting, plateau alerts |
+| `/turing:regress [--tolerance]` | Performance regression gate: verify metrics haven't degraded after changes |
+| `/turing:ensemble [--top-k]` | Automated ensemble: voting, stacking, blending from top-K models |
+| `/turing:stitch <action>` | Pipeline composition: show, swap, cache, and run stages independently |
+| `/turing:warm <exp-id>` | Warm-start from prior model: load checkpoint, freeze layers, adjust LR |
+| `/turing:scale [--axis]` | Scaling law estimator: power-law fit, full-scale predictions, diminishing returns verdict |
+| `/turing:budget <action>` | Compute budget manager: set limits, track allocation, auto-shift explore/exploit |
+| `/turing:distill <exp-id>` | Model compression: distill teacher into smaller student with accuracy/size tradeoff |
+| `/turing:transfer [--from]` | Cross-project knowledge transfer: find similar projects, surface what worked |
+| `/turing:audit [--strict]` | Pre-submission methodology audit: data leakage, baselines, seeds, ablations, reproducibility |
+| `/turing:sanity [--quick]` | Pre-training sanity checks: initial loss, single-batch overfit, gradient flow, output validation |
+| `/turing:baseline [--methods]` | Automatic baseline generation: random, majority/mean, linear, k-NN |
+| `/turing:leak [--deep]` | Targeted leakage detection: single-feature tests, correlation, train/test overlap |
+| `/turing:xray [exp-id]` | Internal model diagnostics: gradient flow, dead neurons, weight distributions, tree analysis |
+| `/turing:sensitivity [exp-id]` | Hyperparameter sensitivity: rank parameters by impact, detect non-monotonic responses |
+| `/turing:calibrate [exp-id]` | Probability calibration: ECE/MCE, reliability diagrams, Platt/isotonic/temperature scaling |
+| `/turing:feature [--method]` | Automated feature selection: multi-method consensus ranking, redundancy, interactions |
+| `/turing:curriculum [exp-id]` | Training curriculum optimization: difficulty scoring, strategy comparison, mislabeled sample detection |
+| `/turing:prune <exp-id>` | Weight pruning: magnitude/structured/lottery, sparsity sweep, knee point detection |
+| `/turing:quantize <exp-id>` | Post-training quantization: FP16/INT8, accuracy-latency comparison |
+| `/turing:merge <exp-ids...>` | Model merging: uniform/greedy soup, TIES, DARE, zero latency cost |
+| `/turing:surgery <exp-id>` | Architecture modification: add/remove layer, widen/narrow, swap activation |
+| `/turing:trend` | Long-term trend analysis: improvement velocity, family ROI, diminishing returns |
+| `/turing:flashback` | Session context restoration: "where was I?" after days away |
+| `/turing:archive` | Experiment lifecycle cleanup: compress old artifacts, summary index |
+| `/turing:annotate <exp-id>` | Retrospective annotations: human notes and tags on experiments |
+| `/turing:search <query>` | Natural language experiment search: text + structured filters |
+| `/turing:template <action>` | Experiment template library: save/list/apply reusable configs |
+| `/turing:replay <exp-id>` | Experiment replay: re-run old approach with current infrastructure |
+| `/turing:cite <action>` | Citation & attribution manager: track papers, audit missing citations, generate BibTeX |
+| `/turing:present [--figures]` | Presentation figures: training curves, comparisons, ablation, Pareto, sensitivity |
+| `/turing:changelog [--audience]` | Model changelog: version-grouped improvements for technical or stakeholder audiences |
+| `/turing:onboard [--audience]` | Project onboarding: walkthrough for new collaborators |
+| `/turing:share <exp-ids...>` | Experiment packaging: portable archive with manifest |
+| `/turing:review [--venue]` | Peer review simulation: weaknesses, fix commands, score |
+| `/turing:whatif "<question>"` | What-if analysis: answer hypotheticals from existing experiment data |
+| `/turing:counterfactual <exp-id>` | Counterfactual explanations: minimum input change to flip a prediction |
+| `/turing:simulate [--configs]` | Experiment outcome prediction: pre-filter configs, save budget |
+| `/turing:update <exp-id>` | Incremental model update: add new data without full retraining |
+| `/turing:registry [action]` | Model registry: track lifecycle from candidate to production with gates |
+| `/turing:postmortem` | Failure postmortem: diagnose why experiments stopped improving |
+| `/turing:doctor [--fix]` | Harness self-diagnosis: check environment, project, resources |
+| `/turing:plan [--budget N]` | Research planning: strategic experiment campaign by ROI |
 
 And for fully hands-off operation:
 
@@ -403,11 +403,11 @@ Two agents with a strict capability boundary:
 | **@ml-researcher** | Read, Write, Edit, Bash (whitelisted), Grep, Glob | Modifies `train.py` and `config.yaml`. Runs experiments. | 200 |
 | **@ml-evaluator** | Read, Bash (whitelisted), Grep, Glob | Reads results. Analyzes trends. Cannot modify code. | 50 |
 
-The evaluator's read-only constraint is not a limitation — it is a feature. An analyst who cannot act on their observations makes more trustworthy observations.
+The evaluator's read-only constraint is not a limitation. It is a feature. An analyst who cannot act on their observations makes more trustworthy observations.
 
 ## The Anti-Cheating Stack
 
-Research on autonomous ML agents has documented a recurring problem: [agents learn to game their own metrics](https://suzuke.github.io/blog/posts/ai-cheating-experiments/). Given a number to push up and a code editor, the agent finds the shortest path to a high number — even if that path subverts the entire purpose of the experiment. This is not theoretical. It has been observed in practice.
+Research on autonomous ML agents has documented a recurring problem: [agents learn to game their own metrics](https://suzuke.github.io/blog/posts/ai-cheating-experiments/). Given a number to push up and a code editor, the agent finds the shortest path to a high number, even if that path subverts the entire purpose of the experiment. This is not theoretical. It has been observed in practice.
 
 Turing implements six defense layers, informed by the [autocrucible](https://github.com/suzuke/autocrucible) project and documented failure modes from [karpathy/autoresearch#322](https://github.com/karpathy/autoresearch/discussions/322):
 
@@ -461,7 +461,7 @@ Before claiming a result, run a seed study:
 /turing:seed 10           # 10 seeds for thorough study
 ```
 
-This runs the same experiment across multiple random seeds and reports mean +/- std with 95% confidence intervals. If the coefficient of variation exceeds 5%, the result is flagged as **seed-sensitive** — meaning you should report the distribution, not a single number.
+This runs the same experiment across multiple random seeds and reports mean +/- std with 95% confidence intervals. If the coefficient of variation exceeds 5%, the result is flagged as **seed-sensitive**, meaning you should report the distribution, not a single number.
 
 To verify an experiment can be reproduced:
 
@@ -471,7 +471,7 @@ To verify an experiment can be reproduced:
 /turing:reproduce exp-042 --tolerance 0.05 # Custom tolerance
 ```
 
-This re-runs the experiment from the logged config and checks that metrics fall within tolerance. It also detects environment drift — if library versions have changed since the original run, you'll know before a reviewer tells you.
+This re-runs the experiment from the logged config and checks that metrics fall within tolerance. It also detects environment drift. If library versions have changed since the original run, you'll know before a reviewer tells you.
 
 Seed study results automatically appear in `/turing:brief` and `/turing:card`.
 
@@ -504,7 +504,7 @@ How it works:
   +subsamp      +target-enc
 ```
 
-Unlike `/turing:suggest` (which searches the web for papers), `/turing:explore` searches the space of *refinement chains* — combinations and sequences of modifications that score well together. It discovers non-obvious experiment strategies that independent suggestions cannot find.
+Unlike `/turing:suggest` (which searches the web for papers), `/turing:explore` searches the space of *refinement chains*, combinations and sequences of modifications that score well together. It discovers non-obvious experiment strategies that independent suggestions cannot find.
 
 Falls back to greedy best-first search when TreeQuest is not installed.
 
@@ -512,7 +512,7 @@ Falls back to greedy best-first search when TreeQuest is not installed.
 
 > *"This model is 2% better but takes 10x longer to train. Is that worth it?"*
 
-The briefing now surfaces [Pareto-optimal](https://en.wikipedia.org/wiki/Pareto_efficiency) experiments — the efficient set where no other experiment is both faster AND has a better metric. The cost report tells you the tradeoff in plain language:
+The briefing now surfaces [Pareto-optimal](https://en.wikipedia.org/wiki/Pareto_efficiency) experiments, the efficient set where no other experiment is both faster AND has a better metric. The cost report tells you the tradeoff in plain language:
 
 ```
 Best metric: exp-012 (accuracy=0.893, 2400s)
@@ -591,18 +591,18 @@ turing/
 
 ## Intellectual Heritage
 
-- **[When Code Is Free](https://x.com/amytam01/status/2031072399731675269)** (Tam, 2026) — when execution cost approaches zero, the differentiator becomes research taste
-- **[Autoresearch](https://github.com/karpathy/autoresearch)** (Karpathy, 2026) — ML experiment loops are mechanical enough to automate, with the constraint that evaluation must be immutable
-- **[AutoCrucible](https://github.com/suzuke/autocrucible)** (suzuke, 2026) — autoresearch with guardrails: hidden evaluation, behavioral probes, tool restriction, stability validation
-- **[Goodhart's Law](https://en.wikipedia.org/wiki/Goodhart%27s_law)** — "When a measure becomes a target, it ceases to be a good measure." The architectural justification for immutable, hidden evaluation
-- **[Double-Blind Protocols](https://en.wikipedia.org/wiki/Blinded_experiment)** — the entity that evaluates must not be the entity that modifies
-- **[Falsificationism](https://en.wikipedia.org/wiki/Falsifiability)** (Popper, 1934) — hypotheses gain credibility by surviving falsification, not by accumulating confirmations
-- **[Principle of Least Privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege)** (Saltzer & Schroeder, 1975) — each agent has exactly the capabilities needed for its role
-- **[Early Stopping](https://en.wikipedia.org/wiki/Early_stopping)** (Prechelt, 1998) — convergence detection as discrete early stopping
-- **[Multi-Armed Bandits](https://en.wikipedia.org/wiki/Multi-armed_bandit)** — the explore-exploit tradeoff
-- **[TreeQuest](https://github.com/SakanaAI/treequest)** (Sakana AI, 2025) — AB-MCTS for inference-time scaling; repurposed here for hypothesis-space exploration
-- **[Version Control as Lab Notebook](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004668)** (Ram, 2013) — git as a scientific record-keeping system
-- **[Reproducibility Crisis](https://en.wikipedia.org/wiki/Replication_crisis)** — if the measurement can change between experiments, results are not reproducible
+- **[When Code Is Free](https://x.com/amytam01/status/2031072399731675269)** (Tam, 2026): when execution cost approaches zero, the differentiator becomes research taste
+- **[Autoresearch](https://github.com/karpathy/autoresearch)** (Karpathy, 2026): ML experiment loops are mechanical enough to automate, with the constraint that evaluation must be immutable
+- **[AutoCrucible](https://github.com/suzuke/autocrucible)** (suzuke, 2026): autoresearch with guardrails: hidden evaluation, behavioral probes, tool restriction, stability validation
+- **[Goodhart's Law](https://en.wikipedia.org/wiki/Goodhart%27s_law)**: "When a measure becomes a target, it ceases to be a good measure." The architectural justification for immutable, hidden evaluation
+- **[Double-Blind Protocols](https://en.wikipedia.org/wiki/Blinded_experiment)**: the entity that evaluates must not be the entity that modifies
+- **[Falsificationism](https://en.wikipedia.org/wiki/Falsifiability)** (Popper, 1934): hypotheses gain credibility by surviving falsification, not by accumulating confirmations
+- **[Principle of Least Privilege](https://en.wikipedia.org/wiki/Principle_of_least_privilege)** (Saltzer & Schroeder, 1975): each agent has exactly the capabilities needed for its role
+- **[Early Stopping](https://en.wikipedia.org/wiki/Early_stopping)** (Prechelt, 1998): convergence detection as discrete early stopping
+- **[Multi-Armed Bandits](https://en.wikipedia.org/wiki/Multi-armed_bandit)**: the explore-exploit tradeoff
+- **[TreeQuest](https://github.com/SakanaAI/treequest)** (Sakana AI, 2025): AB-MCTS for inference-time scaling; repurposed here for hypothesis-space exploration
+- **[Version Control as Lab Notebook](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004668)** (Ram, 2013): git as a scientific record-keeping system
+- **[Reproducibility Crisis](https://en.wikipedia.org/wiki/Replication_crisis)**: if the measurement can change between experiments, results are not reproducible
 
 ## License
 
@@ -610,8 +610,8 @@ MIT
 
 ---
 
-*"In God we trust. All others must bring data."* — W. Edwards Deming
+*"In God we trust. All others must bring data."* - W. Edwards Deming
 
-*"When code is free, research is all that matters."* — Amy Tam
+*"When code is free, research is all that matters."* - Amy Tam
 
 *Turing flips the coins. You choose which ones.*
