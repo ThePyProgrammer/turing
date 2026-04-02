@@ -9,13 +9,9 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
----
-
 > Karpathy's [autoresearch](https://github.com/karpathy/autoresearch) proved that ML experiment loops are mechanical enough to automate, but the agent that generates hypotheses kept gaming the metrics.
 > We believe the entity that runs experiments must not be the entity that evaluates them.
 > Turing is an autonomous ML research harness that treats **separation of hypothesis from measurement** as a first class citizen.
-
----
 
 <p align="center">
   <sub>Built with :heart: by <a href="https://github.com/ThePyProgrammer">@ThePyProgrammer</a></sub>
@@ -34,54 +30,51 @@
 ## Install
 
 ```bash
-# Via npm
-npm install -g claude-turing
-claude-turing install --global
-claude-turing verify
-
-# Via local path
-claude plugin add /path/to/turing
+npm install -g claude-turing && claude-turing install --global && claude-turing verify
 ```
 
-## Three Commands
+## The Taste-Leverage Loop
 
-That's all you need.
+You have taste: the accumulated judgment about which problems are tractable, which metrics matter, and which directions are dead ends. Turing has leverage: the discipline to run experiments without fatigue, track every result without amnesia, and measure without contamination.
 
-```
-/turing:init                          Set up a new ML project
-/turing:train                         Run the experiment loop
-/turing:brief                         What happened? What's next?
-```
-
-Initialize. Train. Read the briefing. Inject your taste. Repeat.
+The interface is two verbs:
 
 ```
-/turing:try switch to LightGBM        Steer the agent
-/turing:train                          It follows your lead
-/turing:brief --deep                   Get literature-backed suggestions
+/turing:try switch to LightGBM        Your taste → the agent
+/turing:brief --deep                   The agent's results → you
 ```
 
-Everything else (experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails) happens automatically. You think about *what* to try. Turing handles *how* to try it.
+Everything in between — experiment logging, convergence detection, hypothesis tracking, statistical validation, anti-cheating guardrails — is infrastructure connecting those two endpoints. You think about *what* to try. Turing handles *how* to try it.
 
-And for fully hands-off operation:
+### What a Session Looks Like
+
+```
+/turing:init                          Scaffold a new ML project
+/turing:train                         Agent runs 5-10 experiments autonomously
+/turing:brief                         Campaign summary: what improved, what's exhausted
+/turing:try "add polynomial features" Inject your next idea
+/turing:train                         Agent follows your lead
+```
+
+For fully hands-off operation:
 
 ```
 /loop 5m /turing:train
 ```
 
-## How It Works
+The agent trains, evaluates, keeps improvements, discards regressions, detects convergence, and stops. You come back to a briefing.
 
-Turing structures ML research around the **taste-leverage loop**: you bring research taste (which hypotheses are worth testing), the agent brings discipline (running them without fatigue, amnesia, or measurement contamination).
+## How It Works
 
 **The experiment loop.** Every iteration: observe metrics, hypothesize (human ideas first), edit `train.py`, commit to a git branch, train, measure (agent can't see how), keep or revert, log, check convergence.
 
-**Hypothesis tracking.** Every idea, human-injected or agent-generated, flows through `hypotheses.yaml`. A novelty guard blocks duplicates. Detail files record architecture, hyperparameters, expected outcome, actual result, and lineage. Nothing is forgotten.
+**Hypothesis tracking.** Every idea flows through `hypotheses.yaml` with a novelty guard that blocks duplicates. Detail files record architecture, hyperparameters, expected outcome, actual result, and lineage. Nothing is forgotten between sessions.
 
-**Anti-cheating stack.** Six layers: architectural separation (hypothesis vs measurement), hidden evaluation (`evaluate.py` invisible to agent), behavioral probes, statistical validation, tool restriction (whitelisted Bash only), and diff-based history. Every prompt-based rule got worked around in prior research; every code-based rule held. Turing's guardrails are structural.
+**Anti-cheating stack.** Six structural layers, not prompt-based rules. The agent cannot see `evaluate.py`, cannot discover scoring formulas, cannot reverse-engineer fixed seeds. It knows the metric name, the direction, and the result. That's it. Research on autonomous ML agents shows that [every prompt-based rule got worked around; every code-based rule held](https://github.com/karpathy/autoresearch/discussions/322).
 
-**Two agents.** `@ml-researcher` (Read/Write/Edit/Bash) modifies code and runs experiments. `@ml-evaluator` (Read/Bash only) analyzes results. The evaluator's read-only constraint makes its observations more trustworthy.
+**Two agents, strict boundary.** `@ml-researcher` (Read/Write/Edit/Bash) modifies code and runs experiments. `@ml-evaluator` (Read/Bash only) analyzes results. An analyst who cannot act on their observations makes more trustworthy observations.
 
-**Convergence detection.** After N consecutive non-improvements (default 3, configurable), the agent stops and reports. For noisy metrics, `/turing:validate` auto-configures multi-run evaluation.
+**Convergence detection.** After N consecutive non-improvements (default 3, configurable), the agent stops. For noisy metrics, `/turing:validate` auto-configures multi-run evaluation so the agent can't be rewarded for lucky single runs.
 
 ## Command Reference
 
@@ -118,7 +111,7 @@ Turing structures ML research around the **taste-leverage loop**: you bring rese
 | `/turing:leak` | Targeted data leakage detection |
 | `/turing:audit` | Pre-submission methodology audit |
 
-See [COMMANDS.md](docs/commands/index.md) for the full reference covering all 74 commands.
+See [the command reference](docs/commands/index.md) for all 74 commands.
 
 ## Credits
 
