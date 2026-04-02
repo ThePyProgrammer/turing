@@ -3,9 +3,9 @@
 *The research assistant that can't fool itself.*
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.4.0-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Version" />
-  <img src="https://img.shields.io/badge/license-MIT-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="License" />
-  <img src="https://img.shields.io/badge/Claude_Code-plugin-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Claude Code" />
+  <img src="https://img.shields.io/badge/version-4.4.0-ffb74d?style=flat-square&labelColor=1a1a2e" alt="Version" /> 
+  <img src="https://img.shields.io/badge/license-MIT-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="License" /> 
+  <img src="https://img.shields.io/badge/Claude_Code-plugin-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Claude Code" /> 
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
@@ -120,30 +120,6 @@ Turing structures ML research around the **taste-leverage loop**: you bring rese
 
 See [COMMANDS.md](docs/commands/index.md) for the full reference covering all 74 commands.
 
-## Architecture
-
-74 commands, 2 agents, 10 config files, 93 template scripts, model registry, artifact contract, cost-performance frontier, model cards, tree-search exploration, statistical rigor, experiment intelligence, performance profiling, smart checkpoints, production model export, literature integration, paper section drafting, experiment orchestration, deep analysis, model composition, scaling & efficiency, meta-intelligence, pre-training intelligence, model debugging, feature & training intelligence, model surgery, experiment archaeology, research communication, what-if analysis, model lifecycle, operational intelligence, 16 ADRs.
-
-```
-turing/
-├── commands/              70 skill files
-├── agents/                2 agents (researcher: read/write, evaluator: read-only)
-├── config/                8 files (lifecycle, taxonomy, archetypes, novelty aliases)
-├── templates/             Scaffolded into user projects by /turing:init
-│   ├── prepare.py         Data loading (HIDDEN from agent)
-│   ├── evaluate.py        Evaluation harness (HIDDEN from agent)
-│   ├── train.py           Training code (AGENT-EDITABLE)
-│   ├── model_contract.md  Artifact schema for production consumers
-│   ├── model_registry.yaml  Available model architectures + hyperparams
-│   └── scripts/           26 Python scripts
-├── tests/                 338 tests
-├── src/                   5 JS installer files (npm deployment)
-├── bin/                   CLI entry points
-└── docs/                  ARCHITECTURE.md + 16 ADRs + philosophy
-```
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full codemap.
-
 ## Credits
 
 Huge thanks to the work done by the autonomous ML research community. Turing would not exist without these projects and ideas:
@@ -152,23 +128,15 @@ Huge thanks to the work done by the autonomous ML research community. Turing wou
 - [snoglobe/helios](https://github.com/snoglobe/helios) — early inspiration for structured ML experiment harnesses.
 - [suzuke/autocrucible](https://github.com/suzuke/autocrucible) — autoresearch with guardrails. Turing's six-layer anti-cheating stack is directly informed by autocrucible's documented failure modes.
 - [Amy Tam](https://x.com/amytam01/status/2031072399731675269) — the "When Code Is Free" thesis. The entire taste-leverage interface is built around her insight that when execution cost approaches zero, research taste is the differentiator.
-- [Sakana AI / TreeQuest](https://github.com/SakanaAI/treequest) — AB-MCTS for inference-time scaling, repurposed in `/turing:explore` for hypothesis-space tree search.
+- [SakanaAI/treequest](https://github.com/SakanaAI/treequest) — AB-MCTS for inference-time scaling, repurposed in `/turing:explore` for hypothesis-space tree search.
 - [Google's Model Cards](https://arxiv.org/abs/1810.03993) — inspiration for `/turing:card` and structured model documentation.
 - [This article](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents) by HumanLayer — a great starting point for thinking about harness engineering for AI agents.
 
 The name references Alan Turing, who first asked whether machines could think, then built the framework for answering the question.
 
-## Documentation
-
--> [The Taste-Leverage Thesis](docs/philosophy/index.md) -- why Turing exists, the philosophical foundations, and what it means when code is free
-
--> [Technical Documentation](docs/ARCHITECTURE.md) -- architectural narrative, system design rationale
-
--> [docs/](docs/) -- commands, philosophy, architecture, getting started, and more
-
 ## Links
 
--> [License](LICENSE) -- MIT
+- [License](LICENSE) -- MIT
 
 ---
 
