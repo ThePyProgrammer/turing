@@ -12,20 +12,21 @@
           that can't fool itself.
         </h1>
         <p class="tx-hero__tagline">
-          74 commands. 2 agents. 1,986 tests.<br>
-          Autonomous ML experiments with immutable evaluation,<br>
-          anti-cheating guardrails, and structured memory.
+          An autonomous ML research harness for <a href="https://claude.ai/claude-code" class="tx-link">Claude Code</a>. Turing runs the experiment loop &mdash; hypothesize, train, evaluate, decide, record &mdash; while you decide which experiments are worth running. Named after the person who first asked whether machines could think, then built the framework for answering the question.
         </p>
         <p class="tx-hero__quote">
-          <em>"What comes across as luck is really the refinement of taste."</em>
+          <em>"What comes across as luck is really the refinement of taste: years of feeling faint differences in the weight of the metal, the subtle offsets of a mis-mint."</em>
           <span class="tx-hero__attribution">&mdash; Amy Tam</span>
         </p>
         <div class="tx-hero__actions">
           <a href="getting-started/quickstart/" class="md-button md-button--primary">
             Get started
           </a>
+          <a href="commands/" class="md-button">
+            74 commands
+          </a>
           <a href="philosophy/" class="md-button">
-            Read the philosophy
+            The philosophy
           </a>
         </div>
       </div>
@@ -70,57 +71,125 @@
     </div>
   </div>
 
+  <div class="tx-explainer">
+    <div class="tx-explainer__inner md-grid">
+      <div class="tx-explainer__text">
+        <h2>You bring the taste. Turing handles the discipline.</h2>
+        <p>
+          ML research is a search over a high-dimensional space of models, hyperparameters, features, and preprocessing strategies. The tragedy is not that this search is slow &mdash; it&rsquo;s that when humans do it manually, the process is structurally unsound. Researchers modify training code <em>and</em> evaluation code in the same session. Results live in notebook cells, not structured logs. Promising directions get abandoned because someone forgot what they tried three hours ago.
+        </p>
+        <p>
+          Turing formalizes the experiment loop so that discipline is the default, not an act of willpower. The evaluation harness is immutable &mdash; the agent that trains models literally cannot see how they&rsquo;re scored. Every experiment is logged. Every hypothesis is tracked. Convergence is detected automatically. The agent can run 700 experiments in two days with the kind of consistency no human can sustain.
+        </p>
+        <p>
+          Your job shifts from &ldquo;person who types hyperparameters and reads loss curves&rdquo; to &ldquo;person who decides which hypotheses are worth testing.&rdquo; From coin-flipper to coin-selector. That&rsquo;s the division of labor that <a href="philosophy/">six decades of philosophy of science</a> says is correct.
+        </p>
+      </div>
+      <div class="tx-explainer__diagram">
+        <div class="tx-diagram">
+          <div class="tx-diagram__row">
+            <div class="tx-diagram__node tx-diagram__node--human">
+              <strong>You</strong>
+              <span>Research taste</span>
+              <span>Problem selection</span>
+              <span>Judgment under ambiguity</span>
+            </div>
+            <div class="tx-diagram__arrow">&darr; <code>/turing:try</code></div>
+          </div>
+          <div class="tx-diagram__row">
+            <div class="tx-diagram__node tx-diagram__node--agent">
+              <strong>Turing</strong>
+              <span>Hypothesize &rarr; Train &rarr; Evaluate</span>
+              <span>Decide &rarr; Record &rarr; Converge?</span>
+              <span>Immutable evaluation. No amnesia.</span>
+            </div>
+            <div class="tx-diagram__arrow">&darr; <code>/turing:brief</code></div>
+          </div>
+          <div class="tx-diagram__row">
+            <div class="tx-diagram__node tx-diagram__node--brief">
+              <strong>Briefing</strong>
+              <span>Campaign summary &bull; Best model</span>
+              <span>What&rsquo;s exhausted &bull; What&rsquo;s promising</span>
+              <span>Recommendations &bull; Next steps</span>
+            </div>
+            <div class="tx-diagram__arrow tx-diagram__arrow--loop">&uarr; You again</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="tx-features">
     <div class="tx-features__inner md-grid">
 
       <div class="tx-feature">
         <div class="tx-feature__icon">&#x1F9EA;</div>
         <h3>Autonomous Loop</h3>
-        <p>Hypothesize, train, evaluate, decide, record. The agent runs the experiment loop while you sleep.</p>
+        <p>Hypothesize, train, evaluate, decide, record. The agent runs experiments while you sleep. <code>/loop 5m /turing:train</code> for fully hands-off operation.</p>
       </div>
 
       <div class="tx-feature">
         <div class="tx-feature__icon">&#x1F512;</div>
         <h3>Immutable Evaluation</h3>
-        <p>The agent can't see <code>evaluate.py</code>. Six defense layers prevent metric gaming. Code-based rules, not prompts.</p>
+        <p>The agent can&rsquo;t see <code>evaluate.py</code>. Six defense layers prevent metric gaming. Every prompt-based rule got worked around; every code-based rule held.</p>
       </div>
 
       <div class="tx-feature">
         <div class="tx-feature__icon">&#x1F9E0;</div>
         <h3>Structured Memory</h3>
-        <p>Every hypothesis tracked. Every experiment logged. Novelty guard prevents re-trying failed approaches across sessions.</p>
+        <p>Hypothesis database with priority queue and detail files. Novelty guard blocks duplicates. Experiment families with exhaustion detection. Nothing forgotten across sessions.</p>
       </div>
 
       <div class="tx-feature">
         <div class="tx-feature__icon">&#x1F3AF;</div>
-        <h3>Taste-Leverage Loop</h3>
-        <p>You inject hypotheses. The agent executes. The briefing reports back. Your judgment steers; the agent's discipline sustains.</p>
+        <h3>Taste-Leverage Interface</h3>
+        <p><code>/turing:try</code> injects your judgment. <code>/turing:brief</code> reports intelligence. The loop is bidirectional by design &mdash; human taste steers, agent discipline sustains.</p>
       </div>
 
       <div class="tx-feature">
         <div class="tx-feature__icon">&#x1F4CA;</div>
         <h3>Statistical Rigor</h3>
-        <p>Multi-seed studies, reproducibility verification, confidence intervals. Stop publishing lucky seeds.</p>
+        <p>Multi-seed studies with confidence intervals. Reproducibility verification. Calibration checks. Regression gates. Stop publishing lucky seeds &mdash; publish distributions.</p>
       </div>
 
       <div class="tx-feature">
-        <div class="tx-feature__icon">&#x1F680;</div>
-        <h3>74 Commands</h3>
-        <p>From init to production export. Diagnosis, ablation, ensemble, pruning, quantization, model cards, peer review simulation.</p>
+        <div class="tx-feature__icon">&#x2699;&#xFE0F;</div>
+        <h3>Two Specialized Agents</h3>
+        <p><strong>@ml-researcher</strong> modifies code and runs experiments. <strong>@ml-evaluator</strong> analyzes results read-only. An analyst who can&rsquo;t act on observations makes more trustworthy observations.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F50D;</div>
+        <h3>Deep Analysis</h3>
+        <p>Error diagnosis, ablation studies, Pareto frontiers, sensitivity analysis, scaling laws, counterfactual explanations, failure postmortems. Understand <em>why</em>, not just <em>what</em>.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F4E6;</div>
+        <h3>Research to Production</h3>
+        <p>Model export (ONNX, TorchScript, TFLite). Model registry with promotion gates. Incremental updates. Model cards with fairness analysis. Peer review simulation before submission.</p>
+      </div>
+
+      <div class="tx-feature">
+        <div class="tx-feature__icon">&#x1F4D6;</div>
+        <h3>Complete Documentation Trail</h3>
+        <p>Literature search. Paper section drafting. Citation management. Presentation figures. Changelogs. Onboarding guides. Every artifact a researcher needs, generated from experiment data.</p>
       </div>
 
     </div>
   </div>
 
-  <div class="tx-phases">
-    <div class="tx-phases__inner md-grid">
-      <h2>29 Phases Complete</h2>
-      <p class="tx-phases__subtitle">Every feature in the roadmap — from v1.0.0 to v4.4.0 — is implemented and tested.</p>
-      <div class="tx-phases__grid">
-        <div class="tx-phase"><strong>v1.x</strong> Core loop, statistical rigor, tree-search, cost frontier, model cards, profiling, checkpoints</div>
-        <div class="tx-phase"><strong>v2.x</strong> Model export, literature, paper drafting, orchestration, deep analysis, composition, scaling, distillation</div>
-        <div class="tx-phase"><strong>v3.x</strong> Meta-intelligence, pre-training checks, model debugging, feature intelligence, model surgery, experiment archaeology</div>
-        <div class="tx-phase"><strong>v4.x</strong> Research communication, collaboration, what-if analysis, model lifecycle, operational intelligence</div>
+  <div class="tx-cta">
+    <div class="tx-cta__inner md-grid">
+      <p class="tx-cta__text">
+        Inspired by <a href="https://github.com/karpathy/autoresearch">Karpathy&rsquo;s autoresearch</a>,
+        <a href="https://github.com/suzuke/autocrucible">AutoCrucible</a>,
+        <a href="https://github.com/SakanaAI/treequest">TreeQuest</a>,
+        Popper&rsquo;s falsificationism, Goodhart&rsquo;s Law, and the principle of least privilege.
+      </p>
+      <div class="tx-cta__actions">
+        <a href="getting-started/" class="md-button md-button--primary">Install Turing</a>
+        <a href="https://github.com/ThePyProgrammer/turing" class="md-button">View on GitHub</a>
       </div>
     </div>
   </div>

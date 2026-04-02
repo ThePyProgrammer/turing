@@ -12,7 +12,7 @@ hide:
 
 **The research assistant that can't fool itself.**
 
-An autonomous ML research harness for Claude Code. Turing implements the autoresearch pattern — an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
+An autonomous ML research harness for Claude Code. Turing implements the autoresearch pattern: an AI agent that iteratively trains, evaluates, and improves machine learning models through a structured experiment loop with convergence detection, immutable evaluation infrastructure, and safety guardrails.
 
 ---
 
@@ -96,8 +96,8 @@ claude plugin add /path/to/turing
 
 ## Learn More
 
-- [Philosophy](philosophy/index.md) — Why Turing exists and the ideas behind it
-- [The Taste-Leverage Loop](philosophy/taste-leverage.md) — The bidirectional interface between human judgment and agent execution
-- [Separating Hypothesis from Measurement](philosophy/separation.md) — The epistemological foundation
-- [Experiment Tracking as Institutional Memory](philosophy/memory.md) — Why agents need structured memory
-- [Intellectual Heritage](philosophy/heritage.md) — The ideas Turing builds on
+- [Philosophy](philosophy/index.md): Why Turing exists and the ideas behind it
+- [The Taste-Leverage Loop](philosophy/taste-leverage.md): The bidirectional interface between human judgment and agent execution
+- [Separating Hypothesis from Measurement](philosophy/separation.md): The epistemological foundation
+- [Experiment Tracking as Institutional Memory](philosophy/memory.md): Why agents need structured memory
+- [Intellectual Heritage](philosophy/heritage.md): The ideas Turing builds on
