@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />
 </p>
 
-A Claude Code plugin that runs autonomous ML experiment loops. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste; Turing handles the rest.
+Named for [Alan Turing](https://en.wikipedia.org/wiki/Alan_Turing), who asked whether machines could think, then built the framework for finding out. Turing is a Claude Code plugin that runs autonomous ML experiment loops with immutable evaluation, anti-cheating guardrails, and structured hypothesis tracking. Two agents enforce a strict separation: one writes code, one scores it, and neither can see the other's work. [When code is free, research is all that matters](https://x.com/amytam01/status/2031072399731675269). You bring the research taste; Turing handles the rest.
 
 - **Separation:** the agent modifies `train.py`; it cannot see or touch `evaluate.py`
 - **Memory:** every hypothesis registered, every experiment logged, every variant preserved
@@ -128,7 +128,6 @@ Turing would not exist without these projects, ideas, and intellectual tradition
 - [Concrete Problems in AI Safety](https://arxiv.org/abs/1606.06565) (Amodei et al., 2016) and [DeepMind's specification gaming catalogue](https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/): documented that reward hacking is not a theoretical risk but an observed behavior of capable optimizers.
 - [NIST CAISI](https://www.nist.gov/artificial-intelligence/executive-order-safe-secure-and-trustworthy-artificial-intelligence) (2025): documented systematic cheating by frontier models (downloading solutions, commenting out assertions, crashing servers). Every prompt-based rule got worked around; every code-based rule held.
 
-The name references Alan Turing, who first asked whether machines could think, then built the framework for answering the question.
 
 ## Links
 
