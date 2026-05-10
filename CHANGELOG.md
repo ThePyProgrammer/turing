@@ -3,6 +3,16 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.8.1] — 2026-05-11 — Cwd-Robust uv Hooks
+
+### Fixed
+- Generated Turing hook commands now use absolute script paths so Claude cwd changes do not break stop and post-train hooks
+- Generated hook scripts now run Python through `uv run python` and fail loudly when `uv` is unavailable instead of falling back to ambient Python
+- Scaffolded setup, agent guidance, and command instructions now consistently teach `uv sync` and `uv run`
+
+**2041 tests | 74 commands | 93 scripts | 4 commits**
+
+
 ## [4.8.0] — 2026-05-10 — Skills as Command Source
 
 ### Changed
@@ -437,6 +447,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.8.1]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.8.1
 [4.8.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.8.0
 [4.7.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.7.0
 [4.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.5.0
