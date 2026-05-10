@@ -26,6 +26,33 @@ SUPPORTED_INVOCATION_MODES = {"slash_only"}
 SUPPORTED_MODEL_INVOCATIONS = {"disabled", "enabled"}
 SUPPORTED_SCRIPT_LOCATIONS = {"repo", "scaffold"}
 
+# Commands whose docs expose write-capable behavior despite not declaring Write/Edit.
+# These commands may save artifacts, update state/config, auto-queue hypotheses,
+# or run script-backed output modes, so the registry must conservatively mark them
+# as project-mutating.
+EXPECTED_MUTATING_COMMANDS = {
+    "audit",
+    "brief",
+    "card",
+    "counterfactual",
+    "diagnose",
+    "diff",
+    "doctor",
+    "flashback",
+    "frontier",
+    "lit",
+    "logbook",
+    "mode",
+    "postmortem",
+    "profile",
+    "report",
+    "review",
+    "scale",
+    "transfer",
+    "trend",
+    "whatif",
+}
+
 
 def load_registry() -> dict[str, Any]:
     data = yaml.safe_load(REGISTRY_PATH.read_text())
@@ -115,17 +142,36 @@ def test_write_capable_commands_are_marked_mutating() -> None:
         )
 
 
-def routing_table_lifecycles() -> dict[str, str]:
+def test_documented_mutating_commands_are_marked_mutating() -> None:
+    registry = load_registry()
+
+    missing = sorted(
+        command_name
+        for command_name in EXPECTED_MUTATING_COMMANDS
+        if not registry["commands"][command_name]["mutates_project"]
+    )
+
+    assert not missing, (
+        "Commands with documented write-capable behavior must set "
+        f"mutates_project: true: {missing}"
+    )
+
+
+def routing_table_lifecycles_from_lines(lines: list[str]) -> dict[str, str]:
     lifecycles: dict[str, str] = {}
-    for line in (COMMANDS_DIR / "turing.md").read_text().splitlines():
+    for line in lines:
         cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
         if len(cells) != 3 or cells[0] in {"User says...", "---"}:
             continue
         route = cells[1]
-        match = re.fullmatch(r"`/turing:([a-z]+)`", route)
+        match = re.fullmatch(r"`/turing:([a-z][a-z0-9-]*)`", route)
         if match:
             lifecycles[match.group(1)] = cells[2].lower()
     return lifecycles
+
+
+def routing_table_lifecycles() -> dict[str, str]:
+    return routing_table_lifecycles_from_lines((COMMANDS_DIR / "turing.md").read_text().splitlines())
 
 
 def split_markdown_table_row(line: str) -> list[str]:
@@ -189,6 +235,9 @@ def test_registry_lifecycle_matches_router_table() -> None:
     registry = load_registry()
     lifecycles = routing_table_lifecycles()
 
+    assert routing_table_lifecycles_from_lines(
+        ["| something | `/turing:multi-seed` | analyze |"]
+    ) == {"multi-seed": "analyze"}
     assert set(lifecycles) == set(command_files())
     for command_name, lifecycle in lifecycles.items():
         assert registry["commands"][command_name]["lifecycle"] == lifecycle, command_name
