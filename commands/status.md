@@ -10,7 +10,7 @@ Show the current state of the ML training pipeline. This is an observation-only 
 
 1. **Run metrics display:**
    ```bash
-   source .venv/bin/activate && python scripts/show_metrics.py --last 10
+   uv run python scripts/show_metrics.py --last 10
    ```
 
 2. **Summarize for the user:**

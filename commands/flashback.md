@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Come back to a project after a week and start working in 10 seconds instead of 30 minutes.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/session_flashback.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/session_flashback.py $ARGUMENTS`
 3. **Report:** current best, last session experiments, pending hypotheses, annotations, budget, suggested next action
 4. **Saved output:** `experiments/flashbacks/flashback-*.yaml`
 

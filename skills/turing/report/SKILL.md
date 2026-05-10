@@ -2,7 +2,7 @@
 name: report
 description: Generate a markdown research report from experiment history — structured for sharing, archiving, or including in documentation. More detailed than a brief, less visual than a poster.
 argument-hint: "[--since YYYY-MM-DD] [--output path]"
-allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob
+allowed-tools: Read, Bash(uv run python scripts/*:*, uv sync:*, mkdir:*), Grep, Glob
 ---
 
 Generate a structured markdown research report summarizing the experiment campaign.
@@ -14,12 +14,12 @@ Generate a structured markdown research report summarizing the experiment campai
 Use the logbook generator in markdown mode as the data backbone:
 
 ```bash
-source .venv/bin/activate && python scripts/generate_logbook.py --format markdown
+uv run python scripts/generate_logbook.py --format markdown
 ```
 
 Also gather supplementary data:
 ```bash
-source .venv/bin/activate && python scripts/generate_brief.py
+uv run python scripts/generate_brief.py
 cat experiment_state.yaml 2>/dev/null || true
 cat RESEARCH_PLAN.md 2>/dev/null || true
 ```

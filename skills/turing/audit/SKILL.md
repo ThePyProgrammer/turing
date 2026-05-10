@@ -9,9 +9,9 @@ A reviewer checklist you run before submitting. Catches methodology mistakes tha
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ A reviewer checklist you run before submitting. Catches methodology mistakes tha
 
 3. **Run methodology audit:**
    ```bash
-   python scripts/methodology_audit.py $ARGUMENTS
+   uv run python scripts/methodology_audit.py $ARGUMENTS
    ```
 
 4. **Checks performed:**

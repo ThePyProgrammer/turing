@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Simulate a conference reviewer before you submit. Each weakness links to the command that fixes it.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/simulate_review.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/simulate_review.py $ARGUMENTS`
 3. **Saved:** `experiments/reviews/`
 
 ## Examples

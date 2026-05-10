@@ -9,9 +9,9 @@ CI for your model. After any change to code, dependencies, or data, verify metri
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ CI for your model. After any change to code, dependencies, or data, verify metri
 
 3. **Run regression gate:**
    ```bash
-   python scripts/regression_gate.py $ARGUMENTS
+   uv run python scripts/regression_gate.py $ARGUMENTS
    ```
 
 4. **Report results:**

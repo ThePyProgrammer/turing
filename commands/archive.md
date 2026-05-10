@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Keep your project directory manageable after 200+ experiments.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/experiment_archive.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/experiment_archive.py $ARGUMENTS`
 3. **Protected experiments:** Pareto-optimal, current best, recent, top-N by metric
 4. **Report:** archived count, preserved count, space reclaimed
 5. **Saved output:** `experiments/archive/index.yaml`

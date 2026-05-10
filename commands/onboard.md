@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 5-minute read that replaces a 1-hour onboarding meeting.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/generate_onboarding.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/generate_onboarding.py $ARGUMENTS`
 3. **Saved:** `ONBOARDING.md`
 
 ## Examples

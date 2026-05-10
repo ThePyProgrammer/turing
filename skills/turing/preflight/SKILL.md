@@ -2,28 +2,28 @@
 name: preflight
 description: Pre-flight resource check — estimates VRAM, RAM, and disk requirements before running ML training. Compares against available system resources and issues PASS/WARN/FAIL verdict. Use before training to catch OOM errors before they happen.
 argument-hint: "[--model-type torch] [--params 10M] [--batch-size 32]"
-allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, nvidia-smi:*), Grep, Glob
+allowed-tools: Read, Bash(uv run python scripts/*:*, uv sync:*, nvidia-smi:*), Grep, Glob
 ---
 
 Check whether the current system has enough resources to run the planned experiment.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Run preflight check:**
 
    If `$ARGUMENTS` is empty (auto-detect from config.yaml):
    ```bash
-   python scripts/preflight.py
+   uv run python scripts/preflight.py
    ```
 
    If `$ARGUMENTS` contains flags:
    ```bash
-   python scripts/preflight.py $ARGUMENTS
+   uv run python scripts/preflight.py $ARGUMENTS
    ```
 
 3. **Interpret the verdict:**

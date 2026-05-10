@@ -9,9 +9,9 @@ Auto-diagnose and recover from experiment failures.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Auto-diagnose and recover from experiment failures.
 
 3. **Run smart retry:**
    ```bash
-   python scripts/smart_retry.py $ARGUMENTS
+   uv run python scripts/smart_retry.py $ARGUMENTS
    ```
 
 4. **Report results:**

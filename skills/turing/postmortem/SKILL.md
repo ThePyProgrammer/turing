@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 When experiments stop improving, find out why. Diagnoses search space exhaustion, config errors, data issues, metric ceilings, and noise floors.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/failure_postmortem.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/failure_postmortem.py $ARGUMENTS`
 3. **Saved:** `experiments/postmortems/`
 
 ## Diagnosis categories

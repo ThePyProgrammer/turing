@@ -9,15 +9,15 @@ Analyze where and why the model fails, beyond aggregate metrics.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Generate predictions if needed:**
    Check if `experiments/predictions/exp-NNN-preds.yaml` exists. If not, run:
    ```bash
-   python train.py --predict-only --output experiments/predictions/
+   uv run python train.py --predict-only --output experiments/predictions/
    ```
    The predictions file must contain `y_true`, `y_pred`, `task_type`, and optionally `features`.
 
@@ -28,7 +28,7 @@ Analyze where and why the model fails, beyond aggregate metrics.
 
 4. **Run error analysis:**
    ```bash
-   python scripts/diagnose_errors.py $ARGUMENTS
+   uv run python scripts/diagnose_errors.py $ARGUMENTS
    ```
 
 5. **Report results:**

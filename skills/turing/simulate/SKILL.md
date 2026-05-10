@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Predict outcomes before spending compute. Ranks proposed configs and recommends which to run vs skip.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/experiment_simulator.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/experiment_simulator.py $ARGUMENTS`
 3. **Saved:** `experiments/simulations/`
 
 ## How it works

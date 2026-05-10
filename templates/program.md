@@ -54,11 +54,11 @@ Update it after each experiment with:
 
 For systematic hyperparameter search:
 1. Edit `sweep_config.yaml` with parameter ranges
-2. Generate queue: `python scripts/sweep.py`
-3. Check status: `python scripts/sweep.py --status`
-4. Get next: `python scripts/sweep.py --next`
+2. Generate queue: `uv run python scripts/sweep.py`
+3. Check status: `uv run python scripts/sweep.py --status`
+4. Get next: `uv run python scripts/sweep.py --next`
 5. Apply overrides, create branch, run training
-6. Mark done: `python scripts/sweep.py --mark <name> complete|failed`
+6. Mark done: `uv run python scripts/sweep.py --mark <name> complete|failed`
 
 ## THE LOOP
 
@@ -66,8 +66,8 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
 1. **OBSERVE** — Read recent results, check hypothesis queue, research plan, and review failed diffs:
    ```bash
-   python scripts/show_metrics.py --last 5
-   python scripts/manage_hypotheses.py next 2>/dev/null || echo "No queued hypotheses"
+   uv run python scripts/show_metrics.py --last 5
+   uv run python scripts/manage_hypotheses.py next 2>/dev/null || echo "No queued hypotheses"
    cat RESEARCH_PLAN.md 2>/dev/null || true
    ```
 
@@ -88,12 +88,12 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
    **If using a queued hypothesis:**
    ```bash
-   python scripts/manage_hypotheses.py mark hyp-NNN in-progress
+   uv run python scripts/manage_hypotheses.py mark hyp-NNN in-progress
    ```
 
    **If generating your own hypothesis**, register it with structured detail:
    ```bash
-   python scripts/manage_hypotheses.py add "your hypothesis description" \
+   uv run python scripts/manage_hypotheses.py add "your hypothesis description" \
      --priority medium --source agent \
      --model-type xgboost \
      --hyperparams '{"max_depth": 8, "n_estimators": 200}' \
@@ -101,7 +101,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
      --tags "depth,estimators" \
      --parent exp-NNN \
      --expected "deeper trees should capture feature interactions"
-   python scripts/manage_hypotheses.py mark hyp-NNN in-progress
+   uv run python scripts/manage_hypotheses.py mark hyp-NNN in-progress
    ```
 
    This creates both an index entry in `hypotheses.yaml` and a detailed file at `hypotheses/hyp-NNN.yaml` with full architecture, hyperparameters, expected outcome, and lineage.
@@ -110,7 +110,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
    To read a hypothesis's full detail:
    ```bash
-   python scripts/manage_hypotheses.py show hyp-NNN
+   uv run python scripts/manage_hypotheses.py show hyp-NNN
    ```
 
 3. **PREPARE** — Modify `config.yaml` for hyperparameter changes. Only modify `train.py` for structural code changes.
@@ -122,7 +122,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
 5. **EXECUTE** training:
    ```bash
-   source .venv/bin/activate && python train.py > run.log 2>&1
+   uv run python train.py > run.log 2>&1
    ```
 
 6. **MEASURE** — Parse metrics from run.log:
@@ -144,7 +144,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
 8. **RECORD** — Log the experiment (kept or discarded):
    ```bash
-   python scripts/log_experiment.py experiments/log.jsonl exp-NNN kept|discarded \
+   uv run python scripts/log_experiment.py experiments/log.jsonl exp-NNN kept|discarded \
      '{"{{TARGET_METRIC}}": X.XX, ...}' \
      '{"model_type": "xgboost", "hyperparams": {...}}' \
      models/model.joblib "Description of hypothesis and outcome"
@@ -152,7 +152,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
    Update the hypothesis status with result metrics:
    ```bash
-   python scripts/manage_hypotheses.py mark hyp-NNN tested \
+   uv run python scripts/manage_hypotheses.py mark hyp-NNN tested \
      --result exp-NNN \
      --metrics '{"{{TARGET_METRIC}}": X.XX, ...}' \
      --notes "Brief explanation of what happened and why"
@@ -162,7 +162,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
    Then synthesize a decision packet and auto-queue follow-ups:
    ```bash
-   python scripts/synthesize_decision.py --experiment exp-NNN --auto-queue
+   uv run python scripts/synthesize_decision.py --experiment exp-NNN --auto-queue
    ```
    This produces a verdict (promote/branch_followup/abandon/fix_and_retry) and automatically queues follow-up hypotheses for `branch_followup` and `fix_and_retry` outcomes.
 
@@ -172,7 +172,7 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
    - Report final best model and recommend next steps
    - **Before declaring final results**, run a seed study to verify robustness:
      ```bash
-     python scripts/seed_runner.py --quick
+     uv run python scripts/seed_runner.py --quick
      ```
      If CV > 5%, the result is seed-sensitive — report mean ± std, not a single-seed number.
 
@@ -180,9 +180,9 @@ The autoresearch experiment loop. Each iteration is one experiment — one hypot
 
 ## Execution Rules
 
-- **ALWAYS redirect output:** `python train.py > run.log 2>&1`
+- **ALWAYS redirect output:** `uv run python train.py > run.log 2>&1`
 - **ALWAYS parse with grep:** `grep -A 10 "^---" run.log | head -10`
-- **ALWAYS activate venv:** `source .venv/bin/activate`
+- **ALWAYS run Python through uv:** `uv run python ...`
 - **NEVER install packages** without human approval
 
 ## Strategy Escalation Protocol
@@ -219,5 +219,5 @@ Starting suggestions (ordered by expected impact):
 ## Comparing Runs
 
 ```bash
-python scripts/compare_runs.py exp-001 exp-002
+uv run python scripts/compare_runs.py exp-001 exp-002
 ```

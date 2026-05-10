@@ -9,9 +9,9 @@ Deep diagnostic comparison of two experiments. Goes beyond "which metric is high
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Deep diagnostic comparison of two experiments. Goes beyond "which metric is high
 
 3. **Run deep comparison:**
    ```bash
-   python scripts/experiment_diff.py $ARGUMENTS
+   uv run python scripts/experiment_diff.py $ARGUMENTS
    ```
 
 4. **Report results — the diff includes:**

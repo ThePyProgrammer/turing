@@ -9,8 +9,8 @@ Remove redundant weights for faster inference and smaller models.
 
 ## Steps
 
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/model_pruning.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/model_pruning.py $ARGUMENTS`
 3. **Methods:** magnitude (zero small weights), structured (remove neurons), lottery (iterative with rewind)
 4. **For tree models:** progressively reduces n_estimators
 5. **Report:** sparsity sweep table, knee point, recommended sparsity

@@ -2,7 +2,7 @@
 name: suggest
 description: Literature-grounded model selection. Reads the ML task context, searches recent literature, and suggests model architectures worth trying — with citations. Suggestions are auto-queued as hypotheses.
 argument-hint: "[task description override]"
-allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob, WebSearch, WebFetch
+allowed-tools: Read, Write, Bash(uv run python scripts/*:*, uv sync:*), Grep, Glob, WebSearch, WebFetch
 ---
 
 Suggest model architectures for the current ML task. Supports two strategies:
@@ -25,7 +25,7 @@ cat config.yaml
 ```
 
 ```bash
-source .venv/bin/activate && python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
+uv run python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
 ```
 
 If `$ARGUMENTS` is provided, use that as the task description. Otherwise, infer from `config.yaml` (model type, primary metric, data source, target column).
@@ -66,7 +66,7 @@ From the literature, synthesize **3-5 concrete model architecture suggestions**.
 For each suggestion, add to the hypothesis queue:
 
 ```bash
-source .venv/bin/activate && python scripts/manage_hypotheses.py add "<model>: <rationale> (source: <citation>)" --priority medium --source literature
+uv run python scripts/manage_hypotheses.py add "<model>: <rationale> (source: <citation>)" --priority medium --source literature
 ```
 
 ### 5. Show Results
@@ -105,7 +105,7 @@ Same detection logic as the literature strategy — find `config.yaml` + `train.
 ### 2. Run Tree Search
 
 ```bash
-source .venv/bin/activate && python scripts/treequest_suggest.py \
+uv run python scripts/treequest_suggest.py \
     --log experiments/log.jsonl \
     --config config.yaml \
     --top 5 \
@@ -120,7 +120,7 @@ If TreeQuest is not installed, the script automatically falls back to greedy bes
 For each result from the tree search, queue as a hypothesis:
 
 ```bash
-source .venv/bin/activate && python scripts/manage_hypotheses.py add "<description>" --priority medium --source treequest
+uv run python scripts/manage_hypotheses.py add "<description>" --priority medium --source treequest
 ```
 
 ### 4. Show Results

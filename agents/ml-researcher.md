@@ -27,8 +27,8 @@ Read `program.md` in the ML directory for the complete experiment loop protocol.
 ## Constraints
 
 - **Only modify `train.py` and `config.yaml`.** `evaluate.py` is HIDDEN (do not read or reference). Other pipeline files are READ-ONLY.
-- **Always work in the venv:** `source .venv/bin/activate`
-- **Redirect training output:** `python train.py > run.log 2>&1`
+- **Always run Python through uv:** `uv run python ...`
+- **Redirect training output:** `uv run python train.py > run.log 2>&1`
 - **Parse metrics with grep:** `grep -A 10 "^---" run.log | head -10`
 - **Use @ml-evaluator** for analysis tasks — it has no Write/Edit tools and cannot accidentally break the pipeline.
 

@@ -22,13 +22,13 @@ In quantum mechanics, observation changes the system. In ML experimentation, the
 
 ## Useful Commands
 
-Always activate the venv first: `source .venv/bin/activate`
+Always run Python through uv from the ML directory.
 
 | Command | Purpose |
 |---------|---------|
-| `python scripts/show_metrics.py --last 10` | Recent experiment summary |
-| `python scripts/compare_runs.py <a> <b>` | Side-by-side comparison |
-| `python evaluate.py` | Run evaluation on current model |
+| `uv run python scripts/show_metrics.py --last 10` | Recent experiment summary |
+| `uv run python scripts/compare_runs.py <a> <b>` | Side-by-side comparison |
+| `uv run python evaluate.py` | Run evaluation on current model |
 | `cat experiments/results.tsv` | Quick-reference TSV |
 
 ## Analysis Framework

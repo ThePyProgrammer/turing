@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Generate presentation-ready figure specifications from experiment data in seconds.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/generate_figures.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/generate_figures.py $ARGUMENTS`
 3. **Figure types:** training, comparison, ablation, pareto, sensitivity
 4. **Styles:** light (papers), dark (demos), poster (large fonts)
 5. **Saved output:** `paper/figures/`

@@ -9,9 +9,9 @@ Draft paper sections directly from experiment data.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -20,7 +20,7 @@ Draft paper sections directly from experiment data.
 
 3. **Run paper drafting:**
    ```bash
-   python scripts/draft_paper_sections.py $ARGUMENTS
+   uv run python scripts/draft_paper_sections.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -20,7 +20,7 @@ Set the research mode for the current project. The mode determines how the novel
 
 2. **Update experiment state:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    python -c "
    import yaml
    from pathlib import Path

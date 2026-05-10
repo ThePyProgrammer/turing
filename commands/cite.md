@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Track which papers and methods influenced each experiment. Catch missing citations before submission.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/citation_manager.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/citation_manager.py $ARGUMENTS`
 3. **Operations:** add (associate citation with experiment), list (group by type), check (audit missing), bib (BibTeX)
 4. **Stored in:** `experiments/citations.yaml`
 

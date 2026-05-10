@@ -9,9 +9,9 @@ Run a multi-seed study to verify that experiment results are robust across rando
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Run a multi-seed study to verify that experiment results are robust across rando
 
 3. **Run seed study:**
    ```bash
-   python scripts/seed_runner.py $ARGUMENTS
+   uv run python scripts/seed_runner.py $ARGUMENTS
    ```
 
 4. **Report results:**

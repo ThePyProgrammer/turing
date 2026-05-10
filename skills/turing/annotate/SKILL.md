@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Add context that experiment logs can't capture. "This only worked because the data was pre-sorted."
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/experiment_annotations.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/experiment_annotations.py $ARGUMENTS`
 3. **Operations:** add (text + tags), list (per-experiment or all), search (keyword or tag)
 4. **Stored in:** `experiments/annotations.yaml`
 

@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Add new data to an existing model without starting from scratch. Detects catastrophic forgetting.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/incremental_update.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/incremental_update.py $ARGUMENTS`
 3. **Saved:** `experiments/updates/`
 
 ## Model-specific strategies

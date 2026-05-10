@@ -9,9 +9,9 @@ Manage the experiment queue for unattended batch execution.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Manage the experiment queue for unattended batch execution.
 
 3. **Run queue manager:**
    ```bash
-   python scripts/experiment_queue.py $ARGUMENTS
+   uv run python scripts/experiment_queue.py $ARGUMENTS
    ```
 
 4. **Report results by action:**

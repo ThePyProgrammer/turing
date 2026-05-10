@@ -9,9 +9,9 @@ Export a trained model to a production-ready format.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Export a trained model to a production-ready format.
 
 3. **Run export pipeline:**
    ```bash
-   python scripts/export_model.py $ARGUMENTS
+   uv run python scripts/export_model.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -9,9 +9,9 @@ Actively probe for data leakage. The #1 cause of "too good to be true" results.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Actively probe for data leakage. The #1 cause of "too good to be true" results.
 
 3. **Run leakage scan:**
    ```bash
-   python scripts/leakage_detector.py $ARGUMENTS
+   uv run python scripts/leakage_detector.py $ARGUMENTS
    ```
 
 4. **Checks performed:**

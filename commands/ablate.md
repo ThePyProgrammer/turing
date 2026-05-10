@@ -9,9 +9,9 @@ Run a systematic ablation study to measure the contribution of each model compon
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Run a systematic ablation study to measure the contribution of each model compon
 
 3. **Run ablation study:**
    ```bash
-   python scripts/ablation_study.py $ARGUMENTS
+   uv run python scripts/ablation_study.py $ARGUMENTS
    ```
 
 4. **Report results:**

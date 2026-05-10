@@ -9,9 +9,9 @@ Manage model checkpoints intelligently using Pareto dominance.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Manage model checkpoints intelligently using Pareto dominance.
 
 3. **Run checkpoint manager:**
    ```bash
-   python scripts/checkpoint_manager.py $ARGUMENTS
+   uv run python scripts/checkpoint_manager.py $ARGUMENTS
    ```
 
 4. **Report results by action:**

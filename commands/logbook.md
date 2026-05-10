@@ -2,7 +2,7 @@
 name: logbook
 description: Generate a research logbook showing the full experiment narrative — hypotheses proposed, experiments run, decisions made, and progress over time. Outputs HTML (with interactive chart) or markdown.
 argument-hint: "[--since YYYY-MM-DD] [--format html|markdown] [--output path]"
-allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob
+allowed-tools: Read, Bash(uv run python scripts/*:*, uv sync:*, mkdir:*), Grep, Glob
 ---
 
 Generate a research logbook that captures the full narrative of the experiment campaign.
@@ -11,7 +11,7 @@ Generate a research logbook that captures the full narrative of the experiment c
 
 1. **Generate the logbook:**
    ```bash
-   source .venv/bin/activate && python scripts/generate_logbook.py
+   uv run python scripts/generate_logbook.py
    ```
 
    **With options from `$ARGUMENTS`:**
@@ -22,13 +22,13 @@ Generate a research logbook that captures the full narrative of the experiment c
    **Common usage:**
    ```bash
    # HTML logbook with interactive trajectory chart
-   source .venv/bin/activate && python scripts/generate_logbook.py --output logbook.html
+   uv run python scripts/generate_logbook.py --output logbook.html
 
    # Markdown for embedding in docs or READMEs
-   source .venv/bin/activate && python scripts/generate_logbook.py --format markdown --output logbook.md
+   uv run python scripts/generate_logbook.py --format markdown --output logbook.md
 
    # Last week's activity
-   source .venv/bin/activate && python scripts/generate_logbook.py --since 2026-03-24 --output logbook.html
+   uv run python scripts/generate_logbook.py --since 2026-03-24 --output logbook.html
    ```
 
 2. **Present the result:**

@@ -9,9 +9,9 @@ Search the literature for papers, baselines, and related work.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Search the literature for papers, baselines, and related work.
 
 3. **Run literature search:**
    ```bash
-   python scripts/literature_search.py $ARGUMENTS
+   uv run python scripts/literature_search.py $ARGUMENTS
    ```
 
 4. **Report results:**

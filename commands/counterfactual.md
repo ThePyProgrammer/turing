@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 What would need to change to flip this prediction? Minimum-change counterfactual for individual predictions.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/counterfactual_explanation.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/counterfactual_explanation.py $ARGUMENTS`
 3. **Saved:** `experiments/counterfactuals/`
 
 ## Methods

@@ -2,7 +2,7 @@
 name: brief
 description: Generate a structured research intelligence report from experiment history — what's been learned, what's promising, what's exhausted, and what the human should consider next. Use --deep for literature-grounded suggestions.
 argument-hint: "[ml/project] [--deep]"
-allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob, WebSearch, WebFetch
+allowed-tools: Read, Bash(uv run python scripts/*:*, uv sync:*), Grep, Glob, WebSearch, WebFetch
 ---
 
 Generate a research briefing that a human can read in 2 minutes and immediately decide what to inject next.
@@ -23,14 +23,14 @@ Before generating the briefing, detect which project to report on:
 
 1. **Generate the briefing:**
    ```bash
-   source .venv/bin/activate && python scripts/generate_brief.py
+   uv run python scripts/generate_brief.py
    ```
 
 2. **Self-critique the briefing** before presenting. Review the generated output and check:
    - **Recommendations specificity:** Are they concrete enough to act on? "Try a different model" is bad. "Try LightGBM with leaf-wise growth because exp-004 showed depth sensitivity" is good. If vague, rewrite them with specific model/hyperparameter suggestions grounded in the experiment data.
    - **Exhausted directions coverage:** Cross-reference the "Model Types Explored" section against `experiments/log.jsonl`. Are there discarded experiments missing from the summary? If so, add them.
    - **Convergence estimate grounding:** If the briefing says "close to convergence" or "further improvement possible", verify against the actual metric trajectory. Is the claim supported by the numbers?
-   - **Metric accuracy:** Spot-check that the "Current Best" metrics match the actual log. Run `python scripts/show_metrics.py --last 1` if uncertain.
+   - **Metric accuracy:** Spot-check that the "Current Best" metrics match the actual log. Run `uv run python scripts/show_metrics.py --last 1` if uncertain.
 
    If any section fails the check, regenerate just that section. Max 1 revision round — don't over-polish.
 
@@ -75,7 +75,7 @@ When `--deep` is requested, add a 7th section: **Literature-Grounded Suggestions
 
 4. **Queue suggestions** as hypotheses:
    ```bash
-   source .venv/bin/activate && python scripts/manage_hypotheses.py add "<technique>: <rationale> (source: <citation>)" --priority medium --source literature
+   uv run python scripts/manage_hypotheses.py add "<technique>: <rationale> (source: <citation>)" --priority medium --source literature
    ```
 
 5. **Format as a section** appended to the briefing.
@@ -83,7 +83,7 @@ When `--deep` is requested, add a 7th section: **Literature-Grounded Suggestions
 ## Saving Briefs
 
 ```bash
-mkdir -p briefs && python scripts/generate_brief.py > briefs/brief-$(date +%Y-%m-%d).md
+mkdir -p briefs && uv run python scripts/generate_brief.py > briefs/brief-$(date +%Y-%m-%d).md
 ```
 
 ## When to Use

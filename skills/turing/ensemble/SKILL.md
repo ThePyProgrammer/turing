@@ -9,9 +9,9 @@ Build ensembles from your best experiments automatically. Often yields 1-3% impr
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Build ensembles from your best experiments automatically. Often yields 1-3% impr
 
 3. **Run ensemble construction:**
    ```bash
-   python scripts/build_ensemble.py $ARGUMENTS
+   uv run python scripts/build_ensemble.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -9,9 +9,9 @@ Run a battery of fast checks before committing to a full training run. Catches w
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Run a battery of fast checks before committing to a full training run. Catches w
 
 3. **Run sanity checks:**
    ```bash
-   python scripts/sanity_checks.py $ARGUMENTS
+   uv run python scripts/sanity_checks.py $ARGUMENTS
    ```
 
 4. **Checks performed:**

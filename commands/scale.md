@@ -9,9 +9,9 @@ Predict full-scale performance from a handful of small experiments. Answers "is 
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -24,11 +24,11 @@ Predict full-scale performance from a handful of small experiments. Answers "is 
 3. **Plan or analyze:**
    - **Plan mode (default):** generates scale point configs to run
      ```bash
-     python scripts/scaling_estimator.py --axis data --points 4
+     uv run python scripts/scaling_estimator.py --axis data --points 4
      ```
    - **Analyze mode:** fits power law to completed results
      ```bash
-     python scripts/scaling_estimator.py --analyze experiments/scaling/results.yaml
+     uv run python scripts/scaling_estimator.py --analyze experiments/scaling/results.yaml
      ```
 
 4. **Scaling axes:**

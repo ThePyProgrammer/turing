@@ -9,9 +9,9 @@ Compress a large model into a smaller, faster one for production. Measures the a
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Compress a large model into a smaller, faster one for production. Measures the a
 
 3. **Run distillation planner:**
    ```bash
-   python scripts/model_distiller.py $ARGUMENTS
+   uv run python scripts/model_distiller.py $ARGUMENTS
    ```
 
 4. **Report includes:**

@@ -11,7 +11,7 @@ Compare two ML experiment runs side-by-side to understand what changed and why o
 
 1. **Run comparison:**
    ```bash
-   source .venv/bin/activate && python scripts/compare_runs.py $0 $1
+   uv run python scripts/compare_runs.py $0 $1
    ```
 
 2. **Analyze the delta:**
