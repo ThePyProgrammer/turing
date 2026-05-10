@@ -25,10 +25,9 @@ if [[ ! -f "$EXPERIMENT_LOG" ]]; then
     exit 0
 fi
 
-# Activate venv and delegate to Python module
 cd "$ML_DIR"
-source .venv/bin/activate 2>/dev/null || true
+source "${SCRIPT_DIR}/turing-run-python.sh"
 
-python3 scripts/check_convergence.py \
+run_python scripts/check_convergence.py \
     --config "$CONFIG_FILE" \
     --log "$EXPERIMENT_LOG"

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import json
+import shlex
 import subprocess
 import sys
 
@@ -188,15 +189,53 @@ def test_scaffold_configures_post_tool_use_and_stop_hook_groups(tmp_path: Path, 
         setup_hooks=True,
     )
 
+    post_hook = f"bash {shlex.quote(str(tmp_path / 'ml/foo/scripts/post-train-hook.sh'))}"
+    stop_hook = f"bash {shlex.quote(str(tmp_path / 'ml/foo/scripts/stop-hook.sh'))}"
     settings = json.loads((tmp_path / ".claude" / "settings.local.json").read_text())
     assert settings["hooks"]["PostToolUse"] == [{
         "matcher": "Bash",
-        "hooks": [{"type": "command", "command": "bash ml/foo/scripts/post-train-hook.sh"}],
+        "hooks": [{"type": "command", "command": post_hook}],
     }]
     assert settings["hooks"]["Stop"] == [{
         "matcher": "",
-        "hooks": [{"type": "command", "command": "bash ml/foo/scripts/stop-hook.sh"}],
+        "hooks": [{"type": "command", "command": stop_hook}],
     }]
+
+
+def test_generated_stop_hook_command_runs_from_ml_directory(tmp_path: Path, monkeypatch):
+    templates_dir = Path(__file__).parent.parent / "templates"
+    values = scaffold.derive_values({
+        "project_name": "Foo Model!",
+        "target_metric": "accuracy",
+        "task_description": "Predict labels",
+        "ml_dir": "ml/foo",
+        "data_source": "data/foo.csv",
+        "metric_direction": "higher",
+    })
+    monkeypatch.chdir(tmp_path)
+
+    scaffold_project(
+        templates_dir=templates_dir,
+        ml_dir=values["ml_dir"],
+        values=values,
+        setup_venv=False,
+        setup_hooks=True,
+    )
+
+    settings = json.loads((tmp_path / ".claude" / "settings.local.json").read_text())
+    command = settings["hooks"]["Stop"][0]["hooks"][0]["command"]
+    result = subprocess.run(
+        command,
+        cwd=tmp_path / "ml" / "foo",
+        shell=True,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "ml/foo/ml/foo" not in result.stderr
+    assert "No log.jsonl found" in result.stderr
 
 
 # --- verify_placeholders ---
