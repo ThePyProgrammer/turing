@@ -9,7 +9,7 @@
  *   node src/install.js [--global] [--project]
  */
 
-import { readdir, copyFile, mkdir } from "fs/promises";
+import { readdir, copyFile, mkdir, cp } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { getTargetPaths } from "./paths.js";
@@ -50,7 +50,7 @@ export async function install(opts = {}) {
   console.log("");
 
   // Create directories for each sub-command + agents + config
-  for (const subDir of ["", "agents", "config", "rules", ...SUB_COMMANDS]) {
+  for (const subDir of ["", "agents", "config", "rules", "templates", ...SUB_COMMANDS]) {
     await mkdir(join(paths.commands, subDir), { recursive: true });
   }
 
@@ -102,6 +102,21 @@ export async function install(opts = {}) {
     );
   }
   console.log(`  ${CONFIG_FILES.length} config files installed`);
+
+  // Copy templates used by /turing:init
+  await cp(
+    join(PLUGIN_ROOT, "templates"),
+    join(paths.commands, "templates"),
+    {
+      recursive: true,
+      force: true,
+      filter: (src) =>
+        !src.includes("__pycache__") &&
+        !src.includes(".pytest_cache") &&
+        !src.endsWith(".pyc"),
+    },
+  );
+  console.log("  Templates installed");
 
   // Update CLAUDE.md
   await updateClaudeMd(paths.claudeMd);

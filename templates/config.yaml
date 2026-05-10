@@ -17,7 +17,7 @@ evaluation:
   metrics: ["{{TARGET_METRIC}}", "f1_weighted", "accuracy"]
   # Set to true for metrics where lower is better (mae, mse, rmse, loss)
   # Set to false for metrics where higher is better (accuracy, f1, auc)
-  lower_is_better: false  # {{METRIC_DIRECTION}} -- change to true if lower is better
+  lower_is_better: {{LOWER_IS_BETTER}}
 
   # Multi-seed configuration (Phase 10.1: /turing:seed)
   # Seeds used for seed studies — diverse values for good coverage

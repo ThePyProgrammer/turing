@@ -1,8 +1,24 @@
 #!/usr/bin/env node
 import { createRequire } from "module";
+import { realpathSync } from "fs";
+import { fileURLToPath } from "url";
 const require = createRequire(import.meta.url);
 const { Command } = require("commander");
 const pkg = require("../package.json");
+
+export function buildInitArgs(name, dir) {
+  return [name, dir].filter(Boolean);
+}
+
+function isDirectRun() {
+  if (!process.argv[1]) return false;
+
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+  } catch {
+    return false;
+  }
+}
 
 const program = new Command();
 
@@ -34,13 +50,16 @@ program
   .command("init [name] [dir]")
   .description("Scaffold ML project (CLI mode, non-Claude-Code usage)")
   .action(async (name, dir) => {
-    const { execSync } = await import("child_process");
+    const { spawnSync } = await import("child_process");
     const { dirname, join } = await import("path");
     const { fileURLToPath } = await import("url");
     const __dirname = dirname(fileURLToPath(import.meta.url));
     const script = join(__dirname, "turing-init.sh");
-    const args = [name, dir].filter(Boolean).join(" ");
-    execSync(`bash "${script}" ${args}`, { stdio: "inherit" });
+    const args = buildInitArgs(name, dir);
+    const result = spawnSync("bash", [script, ...args], { stdio: "inherit" });
+    process.exit(result.status ?? 1);
   });
 
-program.parse();
+if (isDirectRun()) {
+  program.parse();
+}

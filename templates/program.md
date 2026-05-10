@@ -43,7 +43,7 @@ git checkout -b exp/NNN-description
 
 ## Memory
 
-Read `.claude/agent-memory/ml-researcher/MEMORY.md` at the start of each session.
+Read `.claude/agent-memory/ml-researcher-{{MEMORY_DIR_NAME}}/MEMORY.md` at the start of each session.
 Update it after each experiment with:
 - Best result (if improved)
 - What was tried and why

@@ -8,9 +8,13 @@
  *   node src/verify.js [--scope global|project]
  */
 
-import { access } from "fs/promises";
-import { join } from "path";
+import { access, readdir } from "fs/promises";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { getTargetPaths } from "./paths.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PLUGIN_ROOT = join(__dirname, "..");
 
 const EXPECTED_COMMANDS = [
   "SKILL.md",
@@ -100,6 +104,27 @@ const EXPECTED_CONFIG = [
   "watch_alerts.yaml",
 ];
 
+async function templateFiles(root, relativeDir = "templates") {
+  const dir = join(root, relativeDir);
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    if (entry.name === "__pycache__" || entry.name === ".pytest_cache") {
+      continue;
+    }
+
+    const relativePath = `${relativeDir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      files.push(...await templateFiles(root, relativePath));
+    } else if (!entry.name.endsWith(".pyc")) {
+      files.push(relativePath);
+    }
+  }
+
+  return files;
+}
+
 async function fileExists(path) {
   try {
     await access(path);
@@ -111,7 +136,9 @@ async function fileExists(path) {
 
 export async function verify(opts = {}) {
   const scopes = opts.scope ? [opts.scope] : ["global", "project"];
+  const expectedTemplates = await templateFiles(PLUGIN_ROOT);
   let found = false;
+  let totalMissing = 0;
 
   for (const scope of scopes) {
     const paths = getTargetPaths(scope);
@@ -144,10 +171,18 @@ export async function verify(opts = {}) {
       if (!ok) missing++;
     }
 
+    console.log("\nTemplates:");
+    for (const template of expectedTemplates) {
+      const ok = await fileExists(join(paths.commands, template));
+      console.log(`  ${ok ? "✓" : "✗"} commands/${template}`);
+      if (!ok) missing++;
+    }
+
     // Check CLAUDE.md
     const claudeOk = await fileExists(paths.claudeMd);
     console.log(`\n  ${claudeOk ? "✓" : "✗"} CLAUDE.md`);
 
+    totalMissing += missing;
     console.log(
       `\n  ${missing === 0 ? "✓ Installation complete" : `✗ ${missing} files missing — run claude-turing install`}\n`,
     );
@@ -155,6 +190,11 @@ export async function verify(opts = {}) {
 
   if (!found) {
     console.log("\n✗ turing not found. Run: claude-turing install\n");
+    totalMissing++;
+  }
+
+  if (totalMissing > 0) {
+    process.exitCode = 1;
   }
 }
 

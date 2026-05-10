@@ -37,18 +37,36 @@ python3 <templates_dir>/scripts/scaffold.py \
 The scaffold script handles everything in a single atomic operation:
 - Copies all template files with placeholder substitution
 - Creates data/, experiments/, models/ directories
-- Sets up agent memory at `.claude/agent-memory/ml-researcher/MEMORY.md`
+- Sets up agent memory at `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md`
 - Configures Claude Code hooks in `.claude/settings.local.json`
 - Creates Python virtual environment and installs requirements
 - Verifies all placeholders were replaced (fails loudly if any remain)
 
 ## Locating Templates
 
-Find the templates directory using Glob:
+Use the installed command-pack templates directory first:
+```
+.claude/commands/turing/templates/
+~/.claude/commands/turing/templates/
+```
+Then fall back to plugin or npm locations:
 ```
 ~/.claude/plugins/*/templates/
+node_modules/claude-turing/templates/
 ```
-Or check if installed via npm by looking for `node_modules/claude-turing/templates/`.
+
+Example command:
+
+```bash
+python3 ~/.claude/commands/turing/templates/scripts/scaffold.py \
+    --project-name "<project_name>" \
+    --target-metric "<target_metric>" \
+    --metric-direction "<metric_direction>" \
+    --task-description "<task_description>" \
+    --ml-dir "<ml_dir>" \
+    --data-source "<data_source>" \
+    --templates-dir ~/.claude/commands/turing/templates
+```
 
 ## After Scaffolding
 

@@ -34,6 +34,8 @@ PLACEHOLDER_MAP = {
     "ML_DIR": "ml_dir",
     "DATA_SOURCE": "data_source",
     "METRIC_DIRECTION": "metric_direction",
+    "LOWER_IS_BETTER": "lower_is_better",
+    "MEMORY_DIR_NAME": "memory_dir_name",
 }
 
 # Files to copy from templates/ to the ML directory
@@ -223,30 +225,47 @@ SHELL_SCRIPTS = [
 
 def find_templates_dir() -> Path | None:
     """Locate the templates directory relative to this script or plugin root."""
-    # When running from a scaffolded project, templates are local
+    env_templates_dir = os.environ.get("TURING_TEMPLATES_DIR")
+    if env_templates_dir:
+        candidate = Path(env_templates_dir).expanduser()
+        if (candidate / "prepare.py").exists():
+            return candidate
+
     script_dir = Path(__file__).parent
 
-    # Check: are we inside the plugin's templates/scripts/ ?
-    candidate = script_dir.parent  # templates/
-    if (candidate / "prepare.py").exists():
-        return candidate
+    project_command_templates = [
+        path / ".claude" / "commands" / "turing" / "templates"
+        for path in [Path.cwd(), *Path.cwd().parents]
+    ]
 
-    # Check: plugin root (two levels up from scripts/)
-    plugin_root = script_dir.parent.parent
-    candidate = plugin_root / "templates"
-    if candidate.exists() and (candidate / "prepare.py").exists():
-        return candidate
-
-    # Search common plugin locations
-    home = Path.home()
-    for pattern in [
-        home / ".claude" / "plugins" / "*" / "templates",
+    for candidate in [
+        script_dir.parent,
+        script_dir.parent.parent / "templates",
+        *project_command_templates,
+        Path.home() / ".claude" / "commands" / "turing" / "templates",
+        Path.cwd() / "node_modules" / "claude-turing" / "templates",
     ]:
-        for match in sorted(pattern.parent.glob(pattern.name)):
-            if (match / "prepare.py").exists():
-                return match
+        if (candidate / "prepare.py").exists():
+            return candidate
+
+    plugins_dir = Path.home() / ".claude" / "plugins"
+    for match in sorted(plugins_dir.glob("*/templates")):
+        if (match / "prepare.py").exists():
+            return match
 
     return None
+
+
+def derive_values(values: dict[str, str]) -> dict[str, str]:
+    """Add scaffold values derived from user-provided fields."""
+    derived = dict(values)
+    derived["lower_is_better"] = (
+        "true" if derived.get("metric_direction", "").lower() == "lower" else "false"
+    )
+    derived["memory_dir_name"] = re.sub(
+        r"[^a-zA-Z0-9_.-]+", "-", derived["project_name"]
+    ).strip("-")
+    return derived
 
 
 def replace_placeholders(text: str, values: dict[str, str]) -> str:
@@ -276,6 +295,7 @@ def scaffold_project(
     Returns:
         Dict with counts: files_copied, placeholders_replaced, dirs_created.
     """
+    values = derive_values(values)
     target = Path(ml_dir)
     target.mkdir(parents=True, exist_ok=True)
 
@@ -329,7 +349,7 @@ def scaffold_project(
                 continue
 
     # Setup agent memory
-    memory_dir = Path(".claude") / "agent-memory" / "ml-researcher"
+    memory_dir = Path(".claude") / "agent-memory" / f"ml-researcher-{values['memory_dir_name']}"
     memory_dir.mkdir(parents=True, exist_ok=True)
     memory_src = templates_dir / "MEMORY.md"
     if memory_src.exists():
