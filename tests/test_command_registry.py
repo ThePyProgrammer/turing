@@ -104,6 +104,17 @@ def test_entries_have_required_metadata_and_valid_values() -> None:
             assert isinstance(entry["argument_hint"], str) and entry["argument_hint"], command_name
 
 
+def test_write_capable_commands_are_marked_mutating() -> None:
+    registry = load_registry()
+
+    for command_name, entry in registry["commands"].items():
+        mutating_tools = {"Write", "Edit"} & set(entry["tools"])
+        assert entry["mutates_project"] or not mutating_tools, (
+            f"{command_name} declares mutating tools {sorted(mutating_tools)} "
+            "but mutates_project is false"
+        )
+
+
 def routing_table_lifecycles() -> dict[str, str]:
     lifecycles: dict[str, str] = {}
     for line in (COMMANDS_DIR / "turing.md").read_text().splitlines():

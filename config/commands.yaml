@@ -260,7 +260,7 @@ commands:
     lifecycle: research
     invocation_mode: slash_only
     model_invocation: disabled
-    mutates_project: false
+    mutates_project: true
     tools:
     - Read
     - Write
@@ -736,7 +736,7 @@ commands:
     lifecycle: research
     invocation_mode: slash_only
     model_invocation: disabled
-    mutates_project: false
+    mutates_project: true
     tools:
     - Read
     - Write
