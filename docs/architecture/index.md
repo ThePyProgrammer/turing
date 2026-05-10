@@ -16,7 +16,7 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 | Config files | 11 |
 | Template scripts | 93 |
 | ADRs | 16 |
-| Tests | 2031 |
+| Tests | 2032 |
 
 ## Directory Structure
 

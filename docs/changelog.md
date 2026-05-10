@@ -1,12 +1,25 @@
 ---
 title: Changelog
-description: All notable changes to Turing, from v1.0.0 through v4.6.0. 29 phases, 84 features, 26 releases.
+description: All notable changes to Turing, from v1.0.0 through v4.7.0. 29 phases, 84 features, 27 releases.
 icon: lucide/history
 ---
 
 # Changelog
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## v4.7.0: Modern Skills Layout Mirror { #v470 }
+
+*2026-05-10: Turing now ships a modern Claude Code `skills/turing/` mirror without changing the `/turing` runtime contract.*
+
+- Added a generated `skills/turing/` mirror for modern `SKILL.md` package layout conventions
+- Added `src/sync-skills-layout.js` with write/check modes to keep the mirror synchronized from `commands/`
+- Added mirror drift tests for missing, stale, and divergent skill files
+- Tightened npm package contents to exclude generated Python cache/build artifacts while including `skills/turing/**`
+
+**2032 tests | 74 commands | 93 scripts | 5 commits**
 
 ---
 

@@ -3,6 +3,20 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.7.0] — 2026-05-10 — Modern Skills Layout Mirror
+
+### Added
+- Added a generated `skills/turing/` mirror so the npm package exposes modern Claude Code `SKILL.md` layout conventions without changing the public `/turing` command surface
+- Added `src/sync-skills-layout.js` with write and check modes to keep the modern mirror synchronized from the registry-backed `commands/` source
+- Added drift tests for mirror parity, stale mirror entries, registry-derived skill paths, and package inclusion
+
+### Fixed
+- Excluded generated Python cache and egg-info artifacts from npm package dry-runs while preserving `skills/turing/**`
+- Reconciled Python package metadata with the v4.7.0 release version
+
+**2032 tests | 74 commands | 93 scripts | 5 commits**
+
+
 ## [4.5.0] — 2026-05-10 — Release Reliability
 
 ### Added
@@ -410,6 +424,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.7.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.7.0
 [4.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.5.0
 [4.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.4.0
 [4.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.3.0
