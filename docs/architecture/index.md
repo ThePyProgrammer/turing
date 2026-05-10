@@ -22,26 +22,26 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 
 ```
 turing/
-├── commands/                  # Editable skill source -- 74 subcommands + router
-│   ├── turing.md              # Router and execution contract
-│   ├── train.md               # The experiment loop
-│   ├── try.md                 # Inject hypotheses
-│   ├── sweep.md               # Hyperparameter sweeps
-│   ├── validate.md            # Metric stability
-│   ├── seed.md                # Multi-seed studies
-│   ├── reproduce.md           # Reproducibility verification
-│   ├── status.md              # Experiment dashboard
-│   ├── compare.md             # Side-by-side comparison
-│   ├── brief.md               # Research intelligence report
-│   ├── rules/
-│   │   └── loop-protocol.md   # Safety constraints
-│   └── ...                    # 64 more commands
-│
-├── skills/                    # Modern Claude Code package mirror
+├── skills/                    # Editable skill source -- router + registered subcommands
 │   └── turing/
-│       ├── SKILL.md           # Generated mirror of commands/turing.md
-│       ├── <command>/SKILL.md # Generated mirrors of registered commands
-│       └── rules/             # Generated mirror of command rules
+│       ├── SKILL.md           # Router and execution contract
+│       ├── train/SKILL.md     # The experiment loop
+│       ├── try/SKILL.md       # Inject hypotheses
+│       ├── sweep/SKILL.md     # Hyperparameter sweeps
+│       ├── validate/SKILL.md  # Metric stability
+│       ├── seed/SKILL.md      # Multi-seed studies
+│       ├── reproduce/SKILL.md # Reproducibility verification
+│       ├── status/SKILL.md    # Experiment dashboard
+│       ├── compare/SKILL.md   # Side-by-side comparison
+│       ├── brief/SKILL.md     # Research intelligence report
+│       ├── rules/
+│       │   └── loop-protocol.md # Safety constraints
+│       └── ...                # 64 more commands
+│
+├── commands/                  # Generated legacy compatibility tree
+│   ├── turing.md              # Compatibility copy of skills/turing/SKILL.md
+│   ├── <command>.md           # Compatibility copies of registered skills
+│   └── rules/                 # Compatibility copy of command rules
 │
 ├── agents/                    # Agent layer -- 2 agents
 │   ├── ml-researcher.md       # Read/Write/Edit/Bash -- 200 turns
@@ -117,7 +117,7 @@ flowchart TD
     USER["USER / CLAUDE CODE<br/>Invokes /turing:* commands"]
     USER -- "skill invocation" --> SKILL
 
-    SKILL["SKILL LAYER (commands/ source, skills/turing/ mirror)<br/>Thin dispatchers, no business logic, no state"]
+    SKILL["SKILL LAYER (skills/turing/ source, commands/ compatibility tree)<br/>Thin dispatchers, no business logic, no state"]
     SKILL -- "spawn agent" --> AGENT
     SKILL -- "run script" --> PROJECT
 

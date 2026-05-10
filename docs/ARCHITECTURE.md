@@ -13,44 +13,46 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 ```
 turing/
 │
-├── commands/                  ← EDITABLE SKILL SOURCE (75 files)
-│   │                            Thin dispatchers. Each command is a markdown
-│   │                            skill file consumed by Claude Code. No logic
-│   │                            lives here — commands orchestrate agents and
-│   │                            shell commands. During the modern-layout
-│   │                            migration, this remains the editable source.
-│   │
-│   │  ┌─ CORE COMMANDS ──────────────────────────────────────┐
-│   ├── turing.md              │ Router. Intent detection → dispatch.         │
-│   ├── init.md                │ Project scaffolding (delegates to scaffold.py)│
-│   ├── train.md               │ Experiment loop. Delegates to @ml-researcher.│
-│   ├── status.md              │ Read-only status. Runs show_metrics.py.      │
-│   ├── compare.md             │ Side-by-side experiment comparison.          │
-│   ├── sweep.md               │ Hyperparameter sweep orchestration.          │
-│   │                          └─────────────────────────────────────────────┘
-│   │  ┌─ TASTE-LEVERAGE COMMANDS ────────────────────────────┐
-│   ├── try.md                 │ Inject hypothesis (free-text or archetype).  │
-│   ├── brief.md               │ Research intelligence report.                │
-│   ├── suggest.md             │ Literature-grounded model suggestions.       │
-│   ├── design.md              │ Structured experiment design from hypothesis.│
-│   ├── mode.md                │ Research strategy (explore/exploit/replicate).│
-│   │                          └─────────────────────────────────────────────┘
-│   │  ┌─ REPORTING COMMANDS ─────────────────────────────────┐
-│   ├── logbook.md             │ Generate HTML experiment logbook.            │
-│   ├── poster.md              │ Generate research poster.                    │
-│   ├── report.md              │ Generate research report.                    │
-│   ├── validate.md            │ Metric stability validation.                │
-│   │                          └─────────────────────────────────────────────┘
-│   └── rules/
-│       └── loop-protocol.md   Safety constraints for the experiment loop.
-│                              Contains the access control matrix (ADR-0002).
-│
-├── skills/                    ← MODERN CLAUDE CODE PACKAGE MIRROR
+├── skills/                    ← EDITABLE CLAUDE CODE SKILL SOURCE
 │   └── turing/
-│       ├── SKILL.md           Generated mirror of commands/turing.md.
-│       ├── <command>/SKILL.md Generated mirrors of registered commands.
-│       └── rules/             Generated mirror of command rule files.
-│                              Refresh with npm run sync:skills after edits.
+│       │                        Thin dispatchers. Each command is a markdown
+│       │                        skill file consumed by Claude Code. No logic
+│       │                        lives here — commands orchestrate agents and
+│       │                        shell commands.
+│       │
+│       │  ┌─ CORE COMMANDS ──────────────────────────────────────┐
+│       ├── SKILL.md           │ Router. Intent detection → dispatch.         │
+│       ├── init/SKILL.md      │ Project scaffolding (delegates to scaffold.py)│
+│       ├── train/SKILL.md     │ Experiment loop. Delegates to @ml-researcher.│
+│       ├── status/SKILL.md    │ Read-only status. Runs show_metrics.py.      │
+│       ├── compare/SKILL.md   │ Side-by-side experiment comparison.          │
+│       ├── sweep/SKILL.md     │ Hyperparameter sweep orchestration.          │
+│       │                      └─────────────────────────────────────────────┘
+│       │  ┌─ TASTE-LEVERAGE COMMANDS ────────────────────────────┐
+│       ├── try/SKILL.md       │ Inject hypothesis (free-text or archetype).  │
+│       ├── brief/SKILL.md     │ Research intelligence report.                │
+│       ├── suggest/SKILL.md   │ Literature-grounded model suggestions.       │
+│       ├── design/SKILL.md    │ Structured experiment design from hypothesis.│
+│       ├── mode/SKILL.md      │ Research strategy (explore/exploit/replicate).│
+│       │                      └─────────────────────────────────────────────┘
+│       │  ┌─ REPORTING COMMANDS ─────────────────────────────────┐
+│       ├── logbook/SKILL.md   │ Generate HTML experiment logbook.            │
+│       ├── poster/SKILL.md    │ Generate research poster.                    │
+│       ├── report/SKILL.md    │ Generate research report.                    │
+│       ├── validate/SKILL.md  │ Metric stability validation.                │
+│       │                      └─────────────────────────────────────────────┘
+│       └── rules/
+│           └── loop-protocol.md  Safety constraints for the experiment loop.
+│                                 Refresh commands/ with npm run sync:commands.
+│
+├── commands/                  ← GENERATED LEGACY COMPATIBILITY TREE
+│   │                            Generated from skills/turing/. Do not hand-edit.
+│   │                            Kept so older docs, package expectations, and
+│   │                            transition tooling can resolve legacy paths.
+│   ├── turing.md              Compatibility copy of skills/turing/SKILL.md.
+│   ├── <command>.md           Compatibility copies of skills/turing/<command>/SKILL.md.
+│   └── rules/
+│       └── loop-protocol.md   Compatibility copy of skills/turing/rules/loop-protocol.md.
 │
 ├── agents/                    ← AGENT LAYER (2 files)
 │   │
@@ -151,9 +153,10 @@ turing/
 │   │                            npm deployment machinery. See ADR-0010.
 │   ├── paths.js               Path resolution for global/project scopes.
 │   ├── claude-md.js           CLAUDE.md managed section with idempotent markers.
-│   ├── install.js             Deploys registered commands, agents, configs.
+│   ├── install.js             Deploys registered skills, agents, configs.
 │   ├── verify.js              Validates installation completeness.
-│   ├── sync-skills-layout.js  Generates/checks skills/turing mirror.
+│   ├── sync-commands-layout.js Generates/checks commands/ compatibility tree.
+│   ├── sync-skills-layout.js  Backward-compatible sync alias.
 │   └── postinstall.js         npm postinstall — setup instructions.
 │
 ├── bin/                       ← CLI LAYER (2 files)
@@ -212,7 +215,7 @@ These are the rules that must not be broken. They are documented formally in the
                          │ skill invocation
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│  SKILL LAYER  (commands/ source, skills/turing/ mirror) │
+│  SKILL LAYER (skills/turing source, commands compat)     │
 │  Thin dispatchers. Route intent → agent or script.      │
 │  No business logic. No state.                           │
 └────────────┬──────────────────────────┬─────────────────┘

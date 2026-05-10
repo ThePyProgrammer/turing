@@ -20,11 +20,11 @@ Requirements: Node.js >= 18, Python >= 3.12.
 
 ## Adding a New Command
 
-Commands are markdown skill files in `commands/`. Each command is a thin dispatcher -- no business logic, no state. The modern Claude Code package mirror in `skills/turing/` is generated from `commands/`; do not hand-edit mirrored files.
+Commands are markdown skill files in `skills/turing/`. Each command is a thin dispatcher -- no business logic, no state. The legacy `commands/` tree is generated from `skills/turing/` for compatibility with existing package/runtime expectations; do not hand-edit generated `commands/` files.
 
 ### Checklist
 
-- [ ] Create `commands/<name>.md` with required frontmatter:
+- [ ] Create `skills/turing/<name>/SKILL.md` with required frontmatter:
   ```yaml
   ---
   name: <name>
@@ -34,9 +34,9 @@ Commands are markdown skill files in `commands/`. Each command is a thin dispatc
   allowed-tools: Read, Write, Edit, Bash(...), Grep, Glob
   ---
   ```
-  See `commands/train.md` for a complete example.
+  See `skills/turing/train/SKILL.md` for a complete example.
 
-- [ ] Add routing entry to `commands/turing.md`:
+- [ ] Add routing entry to `skills/turing/SKILL.md`:
   - Add a row to the **Routing Table** with user intent phrases
   - Add a row to the **Sub-commands** table with purpose and `slash_only` invocation
 
@@ -48,9 +48,9 @@ Commands are markdown skill files in `commands/`. Each command is a thin dispatc
   - `mutates_project` must be true if the command can write files, update state, or queue work
   - `tools` must match normalized `allowed-tools` frontmatter
 
-- [ ] Run `npm run sync:skills` to refresh the generated `skills/turing/` mirror.
+- [ ] Run `npm run sync:commands` to refresh the generated `commands/` compatibility tree.
 
-- [ ] Update `docs/ARCHITECTURE.md` codemap -- add the new command under the `commands/` section with a one-line description.
+- [ ] Update `docs/ARCHITECTURE.md` codemap -- add the new command under the `skills/turing/` source section with a one-line description.
 
 ## Adding a New Script
 
