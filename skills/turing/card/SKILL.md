@@ -1,7 +1,7 @@
 ---
 name: card
 description: Generate a standardized model card documenting the trained model — type, performance, training data, limitations, intended use, and artifact contract.
-allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
+allowed-tools: Read, Bash(uv run python scripts/*:*, uv sync:*), Grep, Glob
 ---
 
 You generate a standardized model card from the experiment log, model contract, and config.
@@ -10,12 +10,12 @@ You generate a standardized model card from the experiment log, model contract, 
 
 1. **Activate the virtual environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Run the model card generator:**
    ```bash
-   python scripts/generate_model_card.py --config config.yaml --log experiments/log.jsonl --contract model_contract.md --output MODEL_CARD.md
+   uv run python scripts/generate_model_card.py --config config.yaml --log experiments/log.jsonl --contract model_contract.md --output MODEL_CARD.md
    ```
 
 3. **Read and present the generated card:**

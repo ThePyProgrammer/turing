@@ -1,3 +1,6 @@
+# Compatibility export only. pyproject.toml is canonical for dependencies.
+# Prefer: uv sync
+
 scikit-learn>=1.6
 xgboost>=3.2
 lightgbm>=4.6
@@ -8,5 +11,5 @@ pyyaml>=6.0
 pytest>=8.0
 
 # Optional: tree-search-guided hypothesis exploration
-# Install with: pip install "treequest[all]"
+# Install with: uv add "treequest[all]"
 # treequest>=0.1

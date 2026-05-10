@@ -2,7 +2,7 @@
 name: try
 description: Inject a hypothesis into the agent's experiment queue. This is how research taste reaches the agent — the human selects which coins to flip, the agent flips them.
 argument-hint: "<hypothesis description>"
-allowed-tools: Read, Write, Edit, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
+allowed-tools: Read, Write, Edit, Bash(uv run python scripts/*:*, uv sync:*), Grep, Glob
 ---
 
 Inject a human hypothesis into the experiment queue for the next `/turing:train` iteration.
@@ -15,18 +15,18 @@ This is the taste-leverage mechanism: you provide judgment about what's worth tr
 
 2. **Check for archetype syntax.** If the argument starts with `archetype:`, expand it:
    ```bash
-   source .venv/bin/activate && python scripts/manage_hypotheses.py add --archetype <name> --priority high --source human
+   uv run python scripts/manage_hypotheses.py add --archetype <name> --priority high --source human
    ```
 
    Otherwise, use the raw description:
    ```bash
-   source .venv/bin/activate && python scripts/manage_hypotheses.py add "$ARGUMENTS" --priority high --source human
+   uv run python scripts/manage_hypotheses.py add "$ARGUMENTS" --priority high --source human
    ```
 
 3. **Confirm** with the hypothesis ID and instructions:
    - "Queued as hyp-NNN (high priority, human-injected)"
    - "The agent will prioritize this on the next `/turing:train` iteration"
-   - Show current queue: `python scripts/manage_hypotheses.py list --status queued`
+   - Show current queue: `uv run python scripts/manage_hypotheses.py list --status queued`
 
 ## Examples
 

@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Design the next N experiments strategically, not randomly. Allocates budget by expected ROI.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/research_planner.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/research_planner.py $ARGUMENTS`
 3. **Saved:** `experiments/plans/`
 
 ## How it works

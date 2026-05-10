@@ -9,9 +9,9 @@ Decompose your ML pipeline into stages that can be independently varied, cached,
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Decompose your ML pipeline into stages that can be independently varied, cached,
 
 3. **Run pipeline manager:**
    ```bash
-   python scripts/pipeline_manager.py $ARGUMENTS
+   uv run python scripts/pipeline_manager.py $ARGUMENTS
    ```
 
 4. **Report results:**

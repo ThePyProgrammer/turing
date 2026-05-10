@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Find specific experiments in a large history with natural language and structured filters.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/experiment_search.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/experiment_search.py $ARGUMENTS`
 3. **Filters:** `accuracy>0.85`, `status:kept`, `family:baseline`, `date:last-week`
 4. **Report:** ranked table of matching experiments
 

@@ -9,9 +9,9 @@ Generate trivial baselines so you always know if your model is meaningfully bett
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Generate trivial baselines so you always know if your model is meaningfully bett
 
 3. **Run baseline generation:**
    ```bash
-   python scripts/generate_baselines.py $ARGUMENTS
+   uv run python scripts/generate_baselines.py $ARGUMENTS
    ```
 
 4. **Baselines generated:**

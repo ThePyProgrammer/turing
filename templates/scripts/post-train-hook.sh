@@ -18,24 +18,23 @@ EXPERIMENT_LOG="${ML_DIR}/experiments/log.jsonl"
 if [[ -f "${ML_DIR}/run.log" ]]; then
     LOG_FILE="${ML_DIR}/run.log"
 elif [[ -f "run.log" ]]; then
-    LOG_FILE="run.log"
+    LOG_FILE="$(pwd)/run.log"
 else
     echo "post-train-hook: No run.log found, skipping."
     exit 0
 fi
 
-# Activate venv and delegate to Python
 cd "$ML_DIR"
-source .venv/bin/activate 2>/dev/null || true
+source "${SCRIPT_DIR}/turing-run-python.sh"
 
 # Parse metrics using the canonical parser
-PARSED=$(python3 scripts/parse_metrics.py "$LOG_FILE" --raw 2>/dev/null) || {
+PARSED=$(run_python scripts/parse_metrics.py "$LOG_FILE" --raw 2>/dev/null) || {
     echo "post-train-hook: No metrics block found in run.log, skipping."
     exit 0
 }
 
 # Extract metrics and metadata via Python (avoids bash JSON construction)
-METRICS_JSON=$(python3 -c "
+METRICS_JSON=$(run_python -c "
 import json, sys
 data = json.loads(sys.argv[1])
 metadata_keys = {'model_type', 'train_seconds'}
@@ -43,7 +42,7 @@ metrics = {k: v for k, v in data.items() if k not in metadata_keys}
 print(json.dumps(metrics))
 " "$PARSED")
 
-CONFIG_JSON=$(python3 -c "
+CONFIG_JSON=$(run_python -c "
 import json, sys
 data = json.loads(sys.argv[1])
 metadata_keys = {'model_type', 'train_seconds'}
@@ -55,14 +54,14 @@ print(json.dumps(config))
 GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 # Get next experiment ID
-NEXT_ID=$(python3 -c "
+NEXT_ID=$(run_python -c "
 import sys; sys.path.insert(0, 'scripts')
 from log_experiment import get_next_experiment_id
 print(get_next_experiment_id('$EXPERIMENT_LOG'))
 ")
 
 # Log the experiment
-python3 scripts/log_experiment.py \
+run_python scripts/log_experiment.py \
     "$EXPERIMENT_LOG" \
     "$NEXT_ID" \
     "kept" \

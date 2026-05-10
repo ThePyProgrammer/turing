@@ -9,9 +9,9 @@ Does the order your model sees data matter? Find out systematically.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Does the order your model sees data matter? Find out systematically.
 
 3. **Run curriculum analysis:**
    ```bash
-   python scripts/curriculum_optimizer.py $ARGUMENTS
+   uv run python scripts/curriculum_optimizer.py $ARGUMENTS
    ```
 
 4. **Strategies tested:**

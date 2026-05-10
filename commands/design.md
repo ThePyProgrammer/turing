@@ -2,7 +2,7 @@
 name: design
 description: Generate a structured experiment design for a hypothesis. Reads experiment history, searches literature for methodology, produces a scored design document at experiments/designs/.
 argument-hint: "<hypothesis-id or description>"
-allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob, WebSearch, WebFetch
+allowed-tools: Read, Write, Bash(uv run python scripts/*:*, uv sync:*, mkdir:*), Grep, Glob, WebSearch, WebFetch
 ---
 
 Front-load the thinking before the coding. Given a hypothesis, produce a structured experiment design grounded in methodology from the literature.
@@ -13,7 +13,7 @@ Front-load the thinking before the coding. Given a hypothesis, produce a structu
 
 If `$ARGUMENTS` matches `hyp-NNN`, load the hypothesis:
 ```bash
-source .venv/bin/activate && python scripts/manage_hypotheses.py show $ARGUMENTS
+uv run python scripts/manage_hypotheses.py show $ARGUMENTS
 ```
 
 If freeform text, use it directly as the hypothesis description.
@@ -23,7 +23,7 @@ Read the current config and experiment state:
 cat config.yaml
 ```
 ```bash
-source .venv/bin/activate && python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
+uv run python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
 ```
 ```bash
 cat experiment_state.yaml 2>/dev/null || echo "No experiment state yet"

@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Answer "what if?" questions using existing experiment data. Routes to the right estimator automatically.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/whatif_engine.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/whatif_engine.py $ARGUMENTS`
 3. **Saved:** `experiments/whatif/`
 
 ## Supported question types

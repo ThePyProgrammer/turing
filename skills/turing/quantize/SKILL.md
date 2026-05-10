@@ -9,8 +9,8 @@ Quantize for production. Lowest-effort optimization: 2-4x speedup, 2-4x memory r
 
 ## Steps
 
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/model_quantization.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/model_quantization.py $ARGUMENTS`
 3. **Precision levels:** FP32 (baseline), FP16 (GPU), INT8 dynamic (simplest), INT8 static (best accuracy)
 4. **Report:** precision comparison table, recommended level, QAT suggestion if needed
 5. **Saved output:** `experiments/quantization/<exp-id>-quantization.yaml`

@@ -9,9 +9,9 @@ Make model probabilities trustworthy. Does 80% confidence actually mean 80% corr
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Make model probabilities trustworthy. Does 80% confidence actually mean 80% corr
 
 3. **Run calibration:**
    ```bash
-   python scripts/calibration.py $ARGUMENTS
+   uv run python scripts/calibration.py $ARGUMENTS
    ```
 
 4. **Report includes:**

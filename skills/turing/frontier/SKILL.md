@@ -9,9 +9,9 @@ Visualize the Pareto frontier across multiple objectives from experiment history
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Visualize the Pareto frontier across multiple objectives from experiment history
 
 3. **Run Pareto analysis:**
    ```bash
-   python scripts/pareto_frontier.py $ARGUMENTS
+   uv run python scripts/pareto_frontier.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -9,9 +9,9 @@ Fork an experiment into parallel branches and compare results.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Fork an experiment into parallel branches and compare results.
 
 3. **Run fork:**
    ```bash
-   python scripts/fork_experiment.py $ARGUMENTS
+   uv run python scripts/fork_experiment.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Package experiments for collaborator handoff or paper supplementary material.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/package_experiments.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/package_experiments.py $ARGUMENTS`
 3. **Saved:** `exports/packages/<name>/`
 
 ## Examples

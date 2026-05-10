@@ -2,7 +2,7 @@
 name: explore
 description: Tree-search-guided hypothesis exploration using AB-MCTS. Explores the space of experiment ideas as a search tree, scored by the critique engine. Discovers non-obvious refinement chains that linear suggestion cannot find.
 argument-hint: "[ml/project] [--iterations N] [--top N] [--strategy abmcts-a|abmcts-m|greedy]"
-allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
+allowed-tools: Read, Write, Bash(uv run python scripts/*:*, uv sync:*), Grep, Glob
 ---
 
 Explore the hypothesis space using tree search. Instead of suggesting independent ideas, this builds and searches a tree of refinement chains — each node is a hypothesis scored by novelty, feasibility, and expected impact.
@@ -31,7 +31,7 @@ Extract from `$ARGUMENTS`:
 ### 1. Assess Current State
 
 ```bash
-source .venv/bin/activate && python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
+uv run python scripts/show_metrics.py --last 10 2>/dev/null || echo "No experiments yet"
 ```
 
 Read `config.yaml` to understand the current model and metric.
@@ -39,7 +39,7 @@ Read `config.yaml` to understand the current model and metric.
 ### 2. Run Tree Search
 
 ```bash
-source .venv/bin/activate && python scripts/treequest_suggest.py \
+uv run python scripts/treequest_suggest.py \
     --log experiments/log.jsonl \
     --config config.yaml \
     --top <N> \
@@ -58,7 +58,7 @@ The script will:
 For each result, add to the hypothesis queue:
 
 ```bash
-source .venv/bin/activate && python scripts/manage_hypotheses.py add "<description>" \
+uv run python scripts/manage_hypotheses.py add "<description>" \
     --priority medium --source treequest
 ```
 

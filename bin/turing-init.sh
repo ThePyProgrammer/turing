@@ -33,8 +33,8 @@ echo ""
 if [[ $# -eq 0 ]] || [[ "${1:-}" == "--interactive" ]]; then
     python3 "$SCAFFOLD_SCRIPT" --interactive --templates-dir "$TEMPLATES_DIR" --no-venv
     echo ""
-    echo "  To set up the virtual environment:"
-    echo "    cd <ml_dir> && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
+    echo "  To set up the uv environment:"
+    echo "    cd <ml_dir> && uv sync"
     exit 0
 fi
 

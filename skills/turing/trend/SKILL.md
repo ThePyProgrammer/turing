@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 See the arc of your research, not just the latest results. Strategic view over 100+ experiments.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/trend_analysis.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/trend_analysis.py $ARGUMENTS`
 3. **Report:** improvement velocity over time windows, family ROI ranking, diminishing returns prediction, phase transitions
 4. **Saved output:** `experiments/trends/trend-*.yaml`
 

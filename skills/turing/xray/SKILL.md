@@ -9,9 +9,9 @@ See inside the model. When it underperforms, the fix depends on *why*.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ See inside the model. When it underperforms, the fix depends on *why*.
 
 3. **Run model diagnostics:**
    ```bash
-   python scripts/model_xray.py $ARGUMENTS
+   uv run python scripts/model_xray.py $ARGUMENTS
    ```
 
 4. **Diagnostics by model type:**

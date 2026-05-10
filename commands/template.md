@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Turn your best experiment configs into reusable recipes that persist across projects.
 
 ## Steps
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/experiment_templates.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/experiment_templates.py $ARGUMENTS`
 3. **Operations:** save (from experiment), list (all templates), apply (to current project), share (export)
 4. **Stored at:** `~/.turing/templates/` (cross-project)
 

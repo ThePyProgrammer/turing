@@ -210,7 +210,7 @@ def format_onboarding_report(config, experiments, families, best, decisions,
         "5. `/turing:try \"your hypothesis\"` — inject ideas",
         "6. `/turing:train` — run next experiment",
     ], "engineer": [
-        "1. `pip install -r requirements.txt`",
+        "1. `uv sync`",
         "2. Review `config.yaml` for data paths",
         "3. `/turing:status` — where things stand",
         "4. Check `train.py` for current model",

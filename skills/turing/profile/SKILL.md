@@ -9,9 +9,9 @@ Profile a training run to identify performance bottlenecks.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -20,7 +20,7 @@ Profile a training run to identify performance bottlenecks.
 
 3. **Run profiling:**
    ```bash
-   python scripts/profile_training.py $ARGUMENTS
+   uv run python scripts/profile_training.py $ARGUMENTS
    ```
 
 4. **Report results:**

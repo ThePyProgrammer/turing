@@ -9,9 +9,9 @@ Which hyperparameters actually matter? Stop wasting time on the ones that don't.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Which hyperparameters actually matter? Stop wasting time on the ones that don't.
 
 3. **Run sensitivity analysis:**
    ```bash
-   python scripts/sensitivity_analysis.py $ARGUMENTS
+   uv run python scripts/sensitivity_analysis.py $ARGUMENTS
    ```
 
 4. **Report includes:**

@@ -9,9 +9,9 @@ Find similar prior projects and surface what worked. "Last time you had tabular 
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Find similar prior projects and surface what worked. "Last time you had tabular 
 
 3. **Run knowledge transfer:**
    ```bash
-   python scripts/knowledge_transfer.py $ARGUMENTS
+   uv run python scripts/knowledge_transfer.py $ARGUMENTS
    ```
 
 4. **Report includes:**

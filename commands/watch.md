@@ -9,9 +9,9 @@ Stream metrics during training with early-warning alerts. Catches problems mid-r
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,13 +23,13 @@ Stream metrics during training with early-warning alerts. Catches problems mid-r
 
 3. **For post-hoc analysis:**
    ```bash
-   python scripts/training_monitor.py --analyze run.log
+   uv run python scripts/training_monitor.py --analyze run.log
    ```
 
 4. **For live monitoring (inform user):**
    Live monitoring requires a running training process. Suggest the user run in a separate terminal:
    ```bash
-   python scripts/training_monitor.py --log run.log --interval 10
+   uv run python scripts/training_monitor.py --log run.log --interval 10
    ```
 
 5. **Alert types:**

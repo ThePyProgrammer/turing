@@ -21,23 +21,21 @@ This separation is the invariant that makes experiment comparisons valid.
 
 ```bash
 # 1. Set up the environment
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+uv sync
 
 # 2. Add your training data to {{DATA_SOURCE}}
 
 # 3. Create train/val/test splits
-python prepare.py
+uv run python prepare.py
 
 # 4. Run training
-python train.py > run.log 2>&1
+uv run python train.py > run.log 2>&1
 
 # 5. Check results
 grep -A 10 "^---" run.log
 
 # 6. View experiment history
-python scripts/show_metrics.py
+uv run python scripts/show_metrics.py
 ```
 
 ## Using the Autoresearch Agent
@@ -88,6 +86,5 @@ For hands-off mode: `/loop 5m /turing:train`
 ## Running Tests
 
 ```bash
-source .venv/bin/activate
-python -m pytest tests/ -v
+uv run pytest tests/ -v
 ```

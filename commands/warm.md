@@ -9,9 +9,9 @@ Take a trained checkpoint and use it as initialization for a new experiment. Aut
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -23,7 +23,7 @@ Take a trained checkpoint and use it as initialization for a new experiment. Aut
 
 3. **Run warm-start planner:**
    ```bash
-   python scripts/warm_start.py $ARGUMENTS
+   uv run python scripts/warm_start.py $ARGUMENTS
    ```
 
 4. **Report results:**

@@ -9,9 +9,9 @@ Systematically evaluate which features matter and which are noise.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -21,7 +21,7 @@ Systematically evaluate which features matter and which are noise.
 
 3. **Run feature analysis:**
    ```bash
-   python scripts/feature_intelligence.py $ARGUMENTS
+   uv run python scripts/feature_intelligence.py $ARGUMENTS
    ```
 
 4. **Report includes:**

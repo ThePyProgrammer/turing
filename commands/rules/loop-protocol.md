@@ -16,9 +16,9 @@ The autoresearch harness enforces a strict separation between the **hypothesis s
 
 ## Execution Rules
 
-- **ALWAYS redirect training output:** `python train.py > run.log 2>&1`
+- **ALWAYS redirect training output:** `uv run python train.py > run.log 2>&1`
 - **ALWAYS parse metrics with grep** between `---` delimiters: `grep -A 10 "^---" run.log | head -10`
-- **ALWAYS activate the venv first:** `source .venv/bin/activate`
+- **ALWAYS run Python through uv:** `uv run python ...`
 - **NEVER install new packages** without human approval
 
 ## Git Discipline
@@ -40,16 +40,16 @@ The autoresearch harness enforces a strict separation between the **hypothesis s
 
 ## Sweep Workflow
 
-1. Generate queue: `python scripts/sweep.py`
-2. Check status: `python scripts/sweep.py --status`
-3. Get next: `python scripts/sweep.py --next`
+1. Generate queue: `uv run python scripts/sweep.py`
+2. Check status: `uv run python scripts/sweep.py --status`
+3. Get next: `uv run python scripts/sweep.py --next`
 4. Apply overrides, create branch, run training
-5. Mark: `python scripts/sweep.py --mark <name> complete|failed`
+5. Mark: `uv run python scripts/sweep.py --mark <name> complete|failed`
 6. Repeat until queue is empty
 
 ## Logging Rules
 
-- **Log every experiment** to `experiments/log.jsonl` via `python scripts/log_experiment.py` — kept and discarded alike.
+- **Log every experiment** to `experiments/log.jsonl` via `uv run python scripts/log_experiment.py` — kept and discarded alike.
 - **Include all metrics, config, and description** of the hypothesis and its outcome.
 
 ## Convergence Rules
@@ -64,11 +64,11 @@ The researcher agent's Bash access is restricted to a whitelist of necessary com
 
 | Allowed Pattern | Purpose |
 |-----------------|---------|
-| `python train.py:*` | Execute training |
-| `python scripts/*:*` | Run utility scripts (logging, metrics, sweep) |
+| `uv run python train.py:*` | Execute training |
+| `uv run python scripts/*:*` | Run utility scripts (logging, metrics, sweep) |
 | `git:*` | Branch, commit, merge, reset operations |
-| `source .venv/bin/activate:*` | Virtual environment activation |
-| `pip:*` | Package installation (requires human approval) |
+| `uv sync:*` | Virtual environment activation |
+| `uv add:*` | Package installation (requires human approval) |
 
 **Blocked by omission:** `cat`, `head`, `tail`, `less` (prevents reading hidden files via shell), `curl`, `wget` (prevents data exfiltration), arbitrary command execution.
 

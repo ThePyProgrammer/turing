@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Is Turing healthy? Check everything and get a score.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/harness_doctor.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/harness_doctor.py $ARGUMENTS`
 3. **Saved:** `experiments/doctor/`
 
 ## Checks

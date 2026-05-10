@@ -332,7 +332,7 @@ commands:
     - Glob
     argument_hint: '[--metrics "accuracy,train_seconds,n_params"] [--ascii]'
   init:
-    description: "Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure \u2014 immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan."
+    description: "Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure \u2014 immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a uv-managed Python environment. Use --plan to generate a research plan."
     lifecycle: setup
     invocation_mode: slash_only
     model_invocation: enabled

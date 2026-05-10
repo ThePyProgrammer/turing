@@ -2,7 +2,7 @@
 name: poster
 description: Generate a single-page HTML research poster summarizing the experiment campaign — best result, trajectory, key findings, and methodology. Adapted from posterskill's self-contained HTML architecture.
 argument-hint: "[title override]"
-allowed-tools: Read, Write, Edit, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*, open:*), Grep, Glob
+allowed-tools: Read, Write, Edit, Bash(uv run python scripts/*:*, uv sync:*, mkdir:*, open:*), Grep, Glob
 ---
 
 Generate a research poster summarizing the experiment campaign as a single self-contained HTML file. Adapted from [posterskill](https://github.com/ethanweber/posterskill)'s architecture — no build step, works when opened as `file://`.
@@ -15,8 +15,8 @@ Read the experiment history and project context:
 
 ```bash
 cat config.yaml
-source .venv/bin/activate && python scripts/generate_brief.py
-source .venv/bin/activate && python scripts/show_metrics.py --last 20
+uv run python scripts/generate_brief.py
+uv run python scripts/show_metrics.py --last 20
 cat experiment_state.yaml 2>/dev/null || true
 cat RESEARCH_PLAN.md 2>/dev/null || true
 ```

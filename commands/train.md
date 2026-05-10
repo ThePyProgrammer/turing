@@ -2,7 +2,7 @@
 name: train
 description: Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides — keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback.
 argument-hint: "[max_iterations]"
-allowed-tools: Read, Write, Edit, Bash(python train.py:*, python scripts/*:*, git:*, source .venv/bin/activate:*, pip:*), Grep, Glob
+allowed-tools: Read, Write, Edit, Bash(uv run python train.py:*, uv run python scripts/*:*, git:*, uv sync:*, uv add:*), Grep, Glob
 ---
 
 You are an autonomous ML researcher. Your goal: iteratively improve a model by following the experiment loop protocol — the scientific method applied to machine learning.
@@ -26,9 +26,9 @@ Read `program.md` in the ML project directory for the complete protocol. Follow 
 
 1. **Restore memory:** Read `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md` for prior observations and best results.
 2. **Read protocol:** Read `program.md` completely — it defines the experiment loop, constraints, and output format.
-3. **Bootstrap data:** Check for training data at `config.yaml` → `data.source`. If no splits exist, run `python prepare.py`.
-4. **Bootstrap venv:** `test -d .venv || (python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt)`
-5. **Assess state:** `source .venv/bin/activate && python scripts/show_metrics.py --last 5`
+3. **Bootstrap data:** Check for training data at `config.yaml` → `data.source`. If no splits exist, run `uv run python prepare.py`.
+4. **Bootstrap uv environment:** `uv sync`
+5. **Assess state:** `uv run python scripts/show_metrics.py --last 5`
 6. **Begin the loop** from program.md.
 
 ## The Loop
@@ -47,7 +47,7 @@ Use `@ml-evaluator` for analysis tasks. It is read-only (no Write/Edit) and cann
 
 ## Context Management
 
-- Redirect all training output: `python train.py > run.log 2>&1`
+- Redirect all training output: `uv run python train.py > run.log 2>&1`
 - Parse metrics with grep, never read full output
 - Persist observations to MEMORY.md after each experiment
 

@@ -8,8 +8,8 @@ allowed-tools: Read, Bash(*), Grep, Glob
 Track which model is production, staging, candidate, or archived. Promotion requires passing gates.
 
 ## Steps
-1. `source .venv/bin/activate`
-2. `python scripts/model_lifecycle.py $ARGUMENTS`
+1. `uv sync`
+2. `uv run python scripts/model_lifecycle.py $ARGUMENTS`
 3. **Registry:** `experiments/registry.yaml`
 
 ## Promotion gates

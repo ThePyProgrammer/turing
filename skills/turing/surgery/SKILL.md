@@ -9,8 +9,8 @@ Programmatic architecture changes with auto warm-start from existing weights.
 
 ## Steps
 
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/architecture_surgery.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/architecture_surgery.py $ARGUMENTS`
 3. **Operations:** add-layer, remove-layer, widen, narrow, swap-activation, add-skip, add-norm, deepen, swap-objective
 4. **For tree models:** deepen (increase max_depth), widen (more estimators), swap-objective
 5. **Report:** operation details, config changes, parameter count delta, warm-start source

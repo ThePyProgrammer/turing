@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -64,6 +65,7 @@ TEMPLATE_DIRS = {
         "sweep.py",
         "post-train-hook.sh",
         "stop-hook.sh",
+        "turing-run-python.sh",
         "check_convergence.py",
         "verify_placeholders.py",
         "manage_hypotheses.py",
@@ -220,6 +222,7 @@ DIRECTORIES_TO_CREATE = [
 SHELL_SCRIPTS = [
     "scripts/post-train-hook.sh",
     "scripts/stop-hook.sh",
+    "scripts/turing-run-python.sh",
 ]
 
 
@@ -289,7 +292,7 @@ def scaffold_project(
         templates_dir: Path to the templates/ directory.
         ml_dir: Target ML directory (relative to cwd).
         values: Dict mapping arg names to values for placeholder substitution.
-        setup_venv: Whether to create and populate a Python venv.
+        setup_venv: Whether to create and populate the uv environment.
         setup_hooks: Whether to configure Claude Code hooks.
 
     Returns:
@@ -361,9 +364,9 @@ def scaffold_project(
     if setup_hooks:
         _setup_hooks(ml_dir)
 
-    # Setup venv
+    # Setup Python environment
     if setup_venv:
-        _setup_venv(target)
+        _setup_environment(target)
 
     return stats
 
@@ -390,16 +393,18 @@ def _setup_hooks(ml_dir: str) -> None:
 
     hooks = settings.get("hooks", {})
 
+    target = Path(ml_dir).resolve()
+
     # PostToolUse hook for auto-logging
     post_hooks = hooks.get("PostToolUse", [])
-    post_hook_cmd = f"bash {ml_dir}/scripts/post-train-hook.sh"
+    post_hook_cmd = f"bash {shlex.quote(str(target / 'scripts' / 'post-train-hook.sh'))}"
     if not any(post_hook_cmd in str(h) for h in post_hooks):
         post_hooks.append(make_command_hook_group(post_hook_cmd, matcher="Bash"))
     hooks["PostToolUse"] = post_hooks
 
     # Stop hook for convergence
     stop_hooks = hooks.get("Stop", [])
-    stop_hook_cmd = f"bash {ml_dir}/scripts/stop-hook.sh"
+    stop_hook_cmd = f"bash {shlex.quote(str(target / 'scripts' / 'stop-hook.sh'))}"
     if not any(stop_hook_cmd in str(h) for h in stop_hooks):
         stop_hooks.append(make_command_hook_group(stop_hook_cmd))
     hooks["Stop"] = stop_hooks
@@ -408,29 +413,22 @@ def _setup_hooks(ml_dir: str) -> None:
     settings_path.write_text(json.dumps(settings, indent=2))
 
 
-def _setup_venv(target: Path) -> None:
-    """Create Python venv and install requirements."""
-    venv_path = target / ".venv"
-    if venv_path.exists():
-        print("  Venv already exists, skipping creation.", file=sys.stderr)
+def _setup_environment(target: Path) -> None:
+    """Create the uv-managed Python environment."""
+    if shutil.which("uv") is None:
+        print("  Warning: uv not found; run `uv sync` from the ML directory after installing uv.", file=sys.stderr)
         return
 
-    print("  Creating virtual environment...", file=sys.stderr)
+    print("  Syncing uv environment...", file=sys.stderr)
     try:
         subprocess.run(
-            [sys.executable, "-m", "venv", str(venv_path)],
-            check=True, capture_output=True,
+            ["uv", "sync"],
+            cwd=target,
+            check=True,
+            capture_output=True,
         )
-        pip = str(venv_path / "bin" / "pip")
-        req = str(target / "requirements.txt")
-        if Path(req).exists():
-            print("  Installing requirements...", file=sys.stderr)
-            subprocess.run(
-                [pip, "install", "-r", req],
-                check=True, capture_output=True,
-            )
     except subprocess.CalledProcessError as e:
-        print(f"  Warning: venv setup failed: {e}", file=sys.stderr)
+        print(f"  Warning: uv environment setup failed: {e}", file=sys.stderr)
 
 
 def verify_placeholders(ml_dir: str) -> list[tuple[str, int, str]]:
@@ -487,7 +485,7 @@ def main() -> None:
     parser.add_argument("--task-description", default=None)
     parser.add_argument("--ml-dir", default=None)
     parser.add_argument("--data-source", default=None)
-    parser.add_argument("--no-venv", action="store_true", help="Skip venv creation")
+    parser.add_argument("--no-venv", action="store_true", help="Skip uv environment setup")
     parser.add_argument("--no-hooks", action="store_true", help="Skip hook configuration")
     parser.add_argument("--templates-dir", default=None, help="Override templates directory")
     args = parser.parse_args()
@@ -546,9 +544,9 @@ def main() -> None:
 
     print(f"\nNext steps:")
     print(f"  1. Add training data to {values['data_source']}")
-    print(f"  2. cd {ml_dir} && source .venv/bin/activate")
-    print(f"  3. python prepare.py")
-    print(f"  4. /turing:train  (or: python train.py > run.log 2>&1)")
+    print(f"  2. cd {ml_dir} && uv sync")
+    print(f"  3. uv run python prepare.py")
+    print(f"  4. /turing:train  (or: uv run python train.py > run.log 2>&1)")
 
 
 if __name__ == "__main__":

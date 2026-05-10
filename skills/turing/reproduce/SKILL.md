@@ -9,9 +9,9 @@ Verify that a logged experiment can be reproduced with consistent results.
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Verify that a logged experiment can be reproduced with consistent results.
 
 3. **Run reproducibility verification:**
    ```bash
-   python scripts/reproduce_experiment.py $ARGUMENTS
+   uv run python scripts/reproduce_experiment.py $ARGUMENTS
    ```
 
 4. **Report results:**

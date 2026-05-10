@@ -1,6 +1,6 @@
 ---
 name: init
-description: Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure — immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan.
+description: Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure — immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a uv-managed Python environment. Use --plan to generate a research plan.
 argument-hint: "[project_name] [--plan]"
 allowed-tools: Read, Write, Edit, Bash(*), Grep, Glob, WebSearch, WebFetch
 ---
@@ -23,7 +23,7 @@ Ask the user for the following (or accept from `$ARGUMENTS` if provided as JSON)
 Once you have all 6 values, delegate to the unified scaffolding script:
 
 ```bash
-python3 <templates_dir>/scripts/scaffold.py \
+uv run python <templates_dir>/scripts/scaffold.py \
     --project-name "<project_name>" \
     --target-metric "<target_metric>" \
     --metric-direction "<metric_direction>" \
@@ -38,7 +38,7 @@ The scaffold script handles everything in a single atomic operation:
 - Creates data/, experiments/, models/ directories
 - Sets up agent memory at `.claude/agent-memory/ml-researcher-{project_name}/MEMORY.md`
 - Configures Claude Code hooks in `.claude/settings.local.json`
-- Creates Python virtual environment and installs requirements
+- Runs `uv sync` from the ML directory when uv is available
 - Verifies all placeholders were replaced (fails loudly if any remain)
 
 ## Locating Templates
@@ -57,7 +57,7 @@ node_modules/claude-turing/templates/
 Example command:
 
 ```bash
-python3 ~/.claude/commands/turing/templates/scripts/scaffold.py \
+uv run python ~/.claude/commands/turing/templates/scripts/scaffold.py \
     --project-name "<project_name>" \
     --target-metric "<target_metric>" \
     --metric-direction "<metric_direction>" \
@@ -71,7 +71,7 @@ python3 ~/.claude/commands/turing/templates/scripts/scaffold.py \
 
 Report what was created:
 - The separation: READ-ONLY (`prepare.py`, `evaluate.py`) vs AGENT-EDITABLE (`train.py`)
-- Next steps: add data to the configured data source path, run `python prepare.py`, then `/turing:train`
+- Next steps: add data to the configured data source path, run `uv run python prepare.py`, then `/turing:train`
 - The taste-leverage loop: `/turing:try` to inject hypotheses, `/turing:brief` for intelligence reports
 
 ## Research Plan Generation (--plan flag)

@@ -9,19 +9,19 @@ Validate the stability of the current ML pipeline by running it multiple times a
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Run stability check:**
    ```bash
-   python scripts/validate_stability.py
+   uv run python scripts/validate_stability.py
    ```
 
 3. **If `$ARGUMENTS` contains `--auto`:**
    ```bash
-   python scripts/validate_stability.py --auto
+   uv run python scripts/validate_stability.py --auto
    ```
    This auto-writes `evaluation.n_runs: 3` to `config.yaml` if CV > 5%.
 

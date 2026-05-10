@@ -9,8 +9,8 @@ Combine model weights (not predictions) into a single, better model with no late
 
 ## Steps
 
-1. **Activate environment:** `source .venv/bin/activate`
-2. **Run:** `python scripts/model_merger.py $ARGUMENTS`
+1. **Sync environment:** `uv sync`
+2. **Run:** `uv run python scripts/model_merger.py $ARGUMENTS`
 3. **Methods:** uniform soup (simple average), greedy soup (include only if improves), TIES (trim+elect+merge), DARE (drop+rescale)
 4. **Report:** compatibility check, per-model metrics, method comparison, improvement delta
 5. **Saved output:** `experiments/merges/merge-*.yaml`

@@ -9,9 +9,9 @@ Set a compute ceiling and let the system optimize within it. Prevents runaway ex
 
 ## Steps
 
-1. **Activate environment:**
+1. **Sync environment:**
    ```bash
-   source .venv/bin/activate
+   uv sync
    ```
 
 2. **Parse arguments from `$ARGUMENTS`:**
@@ -22,7 +22,7 @@ Set a compute ceiling and let the system optimize within it. Prevents runaway ex
 
 3. **Run budget manager:**
    ```bash
-   python scripts/budget_manager.py $ARGUMENTS
+   uv run python scripts/budget_manager.py $ARGUMENTS
    ```
 
 4. **Actions:**
