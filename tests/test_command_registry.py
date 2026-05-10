@@ -10,7 +10,7 @@ import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-COMMANDS_DIR = REPO_ROOT / "commands"
+SKILLS_DIR = REPO_ROOT / "skills" / "turing"
 CONFIG_DIR = REPO_ROOT / "config"
 REGISTRY_PATH = CONFIG_DIR / "commands.yaml"
 
@@ -63,9 +63,9 @@ def load_registry() -> dict[str, Any]:
 
 def command_files() -> dict[str, Path]:
     return {
-        path.stem: path
-        for path in sorted(COMMANDS_DIR.glob("*.md"))
-        if path.name != "turing.md"
+        path.parent.name: path
+        for path in sorted(SKILLS_DIR.glob("*/SKILL.md"))
+        if path.parent.name != "rules"
     }
 
 
@@ -171,7 +171,7 @@ def routing_table_lifecycles_from_lines(lines: list[str]) -> dict[str, str]:
 
 
 def routing_table_lifecycles() -> dict[str, str]:
-    return routing_table_lifecycles_from_lines((COMMANDS_DIR / "turing.md").read_text().splitlines())
+    return routing_table_lifecycles_from_lines((SKILLS_DIR / "SKILL.md").read_text().splitlines())
 
 
 def split_markdown_table_row(line: str) -> list[str]:
@@ -210,7 +210,7 @@ def subcommand_table_invocation_modes_from_lines(lines: list[str]) -> dict[str, 
 
 
 def subcommand_table_invocation_modes() -> dict[str, str]:
-    return subcommand_table_invocation_modes_from_lines((COMMANDS_DIR / "turing.md").read_text().splitlines())
+    return subcommand_table_invocation_modes_from_lines((SKILLS_DIR / "SKILL.md").read_text().splitlines())
 
 
 def test_subcommand_table_invocation_modes_match_registry() -> None:
@@ -244,7 +244,7 @@ def test_registry_lifecycle_matches_router_table() -> None:
 
 
 def test_router_describes_execution_contract_not_model_dispatch() -> None:
-    router = (COMMANDS_DIR / "turing.md").read_text()
+    router = (SKILLS_DIR / "SKILL.md").read_text()
 
     forbidden_phrases = [
         "dispatches to focused sub-commands",
@@ -326,15 +326,17 @@ def test_node_registry_loader_exports_sorted_manifests() -> None:
             getConfigFiles,
             getExpectedCommandPaths,
             getExpectedSkillSourcePaths,
+            getExpectedLegacyCommandCompatPaths,
         } from './src/command-registry.js';
 
-        const [names, configs, paths, skillPaths] = await Promise.all([
+        const [names, configs, paths, skillPaths, compatPaths] = await Promise.all([
             getCommandNames(),
             getConfigFiles(),
             getExpectedCommandPaths(),
             getExpectedSkillSourcePaths(),
+            getExpectedLegacyCommandCompatPaths(),
         ]);
-        console.log(JSON.stringify({ names, configs, paths, skillPaths }));
+        console.log(JSON.stringify({ names, configs, paths, skillPaths, compatPaths }));
     """
 
     result = subprocess.run(
@@ -357,6 +359,14 @@ def test_node_registry_loader_exports_sorted_manifests() -> None:
             for command_name in sorted(registry["commands"])
         ],
         "skills/turing/rules/loop-protocol.md",
+    ]
+    assert manifest["compatPaths"] == [
+        "commands/turing.md",
+        *[
+            f"commands/{command_name}.md"
+            for command_name in sorted(registry["commands"])
+        ],
+        "commands/rules/loop-protocol.md",
     ]
     assert manifest["configs"] == sorted(registry["config_files"])
 

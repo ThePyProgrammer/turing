@@ -140,17 +140,29 @@ export async function getCommandNames(registryPath) {
   return registry.commandNames;
 }
 
+// Installed public layout under .claude/commands/turing.
 export async function getExpectedCommandPaths(registryPath) {
   const names = await getCommandNames(registryPath);
   return ['SKILL.md', ...names.map((name) => `${name}/SKILL.md`)];
 }
 
+// Editable repository source layout.
 export async function getExpectedSkillSourcePaths(registryPath) {
   const names = await getCommandNames(registryPath);
   return [
     'skills/turing/SKILL.md',
     ...names.map((name) => `skills/turing/${name}/SKILL.md`),
     'skills/turing/rules/loop-protocol.md',
+  ];
+}
+
+// Generated repository compatibility layout.
+export async function getExpectedLegacyCommandCompatPaths(registryPath) {
+  const names = await getCommandNames(registryPath);
+  return [
+    'commands/turing.md',
+    ...names.map((name) => `commands/${name}.md`),
+    'commands/rules/loop-protocol.md',
   ];
 }
 

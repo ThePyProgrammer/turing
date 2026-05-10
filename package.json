@@ -9,7 +9,8 @@
   },
   "scripts": {
     "postinstall": "node src/postinstall.js",
-    "sync:skills": "node src/sync-skills-layout.js"
+    "sync:commands": "node src/sync-commands-layout.js",
+    "sync:skills": "node src/sync-commands-layout.js"
   },
   "files": [
     "bin/",

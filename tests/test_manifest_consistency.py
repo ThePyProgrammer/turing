@@ -18,6 +18,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).parent.parent
 COMMANDS_DIR = REPO_ROOT / "commands"
+SKILLS_DIR = REPO_ROOT / "skills" / "turing"
 CONFIG_DIR = REPO_ROOT / "config"
 INSTALL_JS = REPO_ROOT / "src" / "install.js"
 VERIFY_JS = REPO_ROOT / "src" / "verify.js"
@@ -33,13 +34,12 @@ def _registry() -> dict:
 
 
 def _get_command_files() -> set[str]:
-    """Get all command .md files (excluding router and rules/)."""
-    files = set()
-    for f in COMMANDS_DIR.glob("*.md"):
-        name = f.stem
-        if name != "turing":  # router is separate
-            files.add(name)
-    return files
+    """Get all skill source command names from skills/turing/."""
+    return {
+        path.parent.name
+        for path in SKILLS_DIR.glob("*/SKILL.md")
+        if path.parent.name != "rules"
+    }
 
 
 def _get_config_files() -> set[str]:
@@ -67,11 +67,20 @@ def _scaffold_template_files() -> set[str]:
 EXPECTED_TEMPLATE_FILES = _scaffold_template_files()
 
 
-def test_package_includes_modern_skills_layout():
-    """npm package allowlist must include the modern skills mirror."""
+def test_package_includes_skill_source_and_command_compat_layout():
+    """npm package allowlist must include skill source and command compatibility tree."""
     package = json.loads(PACKAGE_JSON.read_text())
 
     assert "skills/" in package["files"]
+    assert "commands/" in package["files"]
+
+
+def test_package_exposes_command_sync_script():
+    """npm scripts should name the source-to-compat sync direction."""
+    package = json.loads(PACKAGE_JSON.read_text())
+
+    assert package["scripts"]["sync:commands"] == "node src/sync-commands-layout.js"
+    assert package["scripts"]["sync:skills"] == "node src/sync-commands-layout.js"
 
 
 def test_installer_copies_templates(tmp_path: Path):
@@ -113,10 +122,21 @@ def test_project_installer_copies_templates(tmp_path: Path):
 
 
 def test_registry_commands_match_filesystem():
-    """Every registered command must match command files on disk."""
+    """Every registered command must match skill source files on disk."""
     registered = set(_registry()["commands"])
     on_disk = _get_command_files()
     assert registered == on_disk
+
+
+def test_commands_compat_tree_matches_registry():
+    """Generated legacy commands/ files must match registered command names."""
+    registered = set(_registry()["commands"])
+    compat_files = {
+        f.stem
+        for f in COMMANDS_DIR.glob("*.md")
+        if f.name != "turing.md"
+    }
+    assert registered == compat_files
 
 
 def test_registry_configs_match_filesystem():
@@ -155,6 +175,30 @@ def test_installer_copies_registered_commands_and_configs(tmp_path: Path):
         assert (install_root / command / "SKILL.md").exists(), f"missing {command}/SKILL.md"
     for config_file in registry["config_files"]:
         assert (install_root / "config" / config_file).exists(), f"missing config/{config_file}"
+
+
+def test_installer_installs_from_skill_sources(tmp_path: Path):
+    """Installer deploys public .claude/commands/turing layout from skills/turing sources."""
+    env = os.environ.copy()
+    env["HOME"] = str(tmp_path)
+
+    result = subprocess.run(
+        ["node", str(INSTALL_JS), "--global"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    install_root = tmp_path / ".claude" / "commands" / "turing"
+    assert (install_root / "SKILL.md").read_text() == (SKILLS_DIR / "SKILL.md").read_text()
+    assert (install_root / "suggest" / "SKILL.md").read_text() == (
+        SKILLS_DIR / "suggest" / "SKILL.md"
+    ).read_text()
+    assert (install_root / "rules" / "loop-protocol.md").read_text() == (
+        SKILLS_DIR / "rules" / "loop-protocol.md"
+    ).read_text()
 
 
 # --- Verify manifest ---
@@ -275,7 +319,7 @@ def test_verify_fails_when_templates_missing(tmp_path: Path):
 
 def test_init_docs_mention_installed_template_location():
     """/turing:init should document project and global installed template paths."""
-    content = (COMMANDS_DIR / "init.md").read_text()
+    content = (SKILLS_DIR / "init" / "SKILL.md").read_text()
     assert ".claude/commands/turing/templates" in content
     assert "~/.claude/commands/turing/templates" in content
 
