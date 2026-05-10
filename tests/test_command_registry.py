@@ -260,7 +260,7 @@ def test_router_describes_execution_contract_with_model_invocation() -> None:
         "slash_only",
         "allow model invocation",
         "route to the focused sub-command skill",
-        "Claude Code runtime handles that slash command",
+        "handle that focused sub-command directly",
     ]
     for phrase in required_phrases:
         assert phrase in router
