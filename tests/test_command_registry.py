@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -175,3 +177,36 @@ def test_suggest_registry_contract() -> None:
         "path": "scripts/suggest_next.py",
         "location": "scaffold",
     }
+
+
+def test_node_registry_loader_exports_sorted_manifests() -> None:
+    registry = load_registry()
+    script = """
+        import {
+            getCommandNames,
+            getConfigFiles,
+            getExpectedCommandPaths,
+        } from './src/command-registry.js';
+
+        const [names, configs, paths] = await Promise.all([
+            getCommandNames(),
+            getConfigFiles(),
+            getExpectedCommandPaths(),
+        ]);
+        console.log(JSON.stringify({ names, configs, paths }));
+    """
+
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e", script],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    manifest = json.loads(result.stdout)
+    assert manifest["names"] == sorted(registry["commands"])
+    assert manifest["paths"][0] == "SKILL.md"
+    assert "suggest/SKILL.md" in manifest["paths"]
+    assert set(manifest["configs"]) == set(registry["config_files"])
