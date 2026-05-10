@@ -51,12 +51,19 @@ function requireEnum(value, allowed, label) {
 }
 
 function validateEquivalentScript(value, commandName) {
-  const script = requireRecord(value, `commands.${commandName}.equivalent_script`);
-  requireNonEmptyString(script.path, `commands.${commandName}.equivalent_script.path`);
+  const label = `commands.${commandName}.equivalent_script`;
+  const script = requireRecord(value, label);
+  const keys = Object.keys(script).sort();
+  const expectedKeys = ['location', 'path'];
+  if (keys.length !== expectedKeys.length || keys.some((key, index) => key !== expectedKeys[index])) {
+    throw new Error(`${label} must contain exactly: ${expectedKeys.join(', ')}`);
+  }
+
+  requireNonEmptyString(script.path, `${label}.path`);
   requireEnum(
     script.location,
     SCRIPT_LOCATIONS,
-    `commands.${commandName}.equivalent_script.location`,
+    `${label}.location`,
   );
 }
 

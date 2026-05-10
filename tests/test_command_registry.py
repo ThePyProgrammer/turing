@@ -209,4 +209,34 @@ def test_node_registry_loader_exports_sorted_manifests() -> None:
     assert manifest["names"] == sorted(registry["commands"])
     assert manifest["paths"][0] == "SKILL.md"
     assert "suggest/SKILL.md" in manifest["paths"]
-    assert set(manifest["configs"]) == set(registry["config_files"])
+    assert manifest["configs"] == sorted(registry["config_files"])
+
+
+def test_node_registry_loader_rejects_extra_equivalent_script_keys(tmp_path: Path) -> None:
+    registry = load_registry()
+    registry["commands"]["suggest"]["equivalent_script"]["extra"] = "unexpected"
+    registry_path = tmp_path / "commands.yaml"
+    registry_path.write_text(yaml.safe_dump(registry))
+
+    script = """
+        import { loadCommandRegistry } from './src/command-registry.js';
+
+        try {
+            await loadCommandRegistry(process.argv[1]);
+            console.error('expected registry validation to fail');
+            process.exit(1);
+        } catch (error) {
+            console.log(error.message);
+        }
+    """
+
+    result = subprocess.run(
+        ["node", "--input-type=module", "-e", script, str(registry_path)],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "commands.suggest.equivalent_script must contain exactly: location, path" in result.stdout
