@@ -13,16 +13,17 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 |-----------|-------|
 | Commands | 74 |
 | Agents | 2 |
-| Config files | 10 |
+| Config files | 11 |
 | Template scripts | 93 |
 | ADRs | 16 |
-| Tests | 2010 |
+| Tests | 2031 |
 
 ## Directory Structure
 
 ```
 turing/
-├── commands/                  # Skill layer -- 74 markdown skill files
+├── commands/                  # Editable skill source -- 74 subcommands + router
+│   ├── turing.md              # Router and execution contract
 │   ├── train.md               # The experiment loop
 │   ├── try.md                 # Inject hypotheses
 │   ├── sweep.md               # Hyperparameter sweeps
@@ -36,11 +37,17 @@ turing/
 │   │   └── loop-protocol.md   # Safety constraints
 │   └── ...                    # 64 more commands
 │
+├── skills/                    # Modern Claude Code package mirror
+│   └── turing/
+│       ├── SKILL.md           # Generated mirror of commands/turing.md
+│       ├── <command>/SKILL.md # Generated mirrors of registered commands
+│       └── rules/             # Generated mirror of command rules
+│
 ├── agents/                    # Agent layer -- 2 agents
 │   ├── ml-researcher.md       # Read/Write/Edit/Bash -- 200 turns
 │   └── ml-evaluator.md        # Read/Bash only -- 50 turns
 │
-├── config/                    # Domain knowledge layer -- 10 files
+├── config/                    # Domain knowledge + command registry -- 11 files
 │   ├── defaults.yaml          # Fallback hyperparameters
 │   ├── lifecycle.toml         # Experiment state machine
 │   ├── taxonomy.toml          # Experiment type classification
@@ -110,7 +117,7 @@ flowchart TD
     USER["USER / CLAUDE CODE<br/>Invokes /turing:* commands"]
     USER -- "skill invocation" --> SKILL
 
-    SKILL["SKILL LAYER (commands/)<br/>Thin dispatchers, no business logic, no state"]
+    SKILL["SKILL LAYER (commands/ source, skills/turing/ mirror)<br/>Thin dispatchers, no business logic, no state"]
     SKILL -- "spawn agent" --> AGENT
     SKILL -- "run script" --> PROJECT
 

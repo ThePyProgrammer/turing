@@ -20,7 +20,7 @@ Requirements: Node.js >= 18, Python >= 3.12.
 
 ## Adding a New Command
 
-Commands are markdown skill files in `commands/`. Each command is a thin dispatcher -- no business logic, no state.
+Commands are markdown skill files in `commands/`. Each command is a thin dispatcher -- no business logic, no state. The modern Claude Code package mirror in `skills/turing/` is generated from `commands/`; do not hand-edit mirrored files.
 
 ### Checklist
 
@@ -47,6 +47,8 @@ Commands are markdown skill files in `commands/`. Each command is a thin dispatc
   - `model_invocation` must match `disable-model-invocation`
   - `mutates_project` must be true if the command can write files, update state, or queue work
   - `tools` must match normalized `allowed-tools` frontmatter
+
+- [ ] Run `npm run sync:skills` to refresh the generated `skills/turing/` mirror.
 
 - [ ] Update `docs/ARCHITECTURE.md` codemap -- add the new command under the `commands/` section with a one-line description.
 

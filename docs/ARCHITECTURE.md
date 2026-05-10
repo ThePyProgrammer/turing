@@ -13,11 +13,12 @@ Turing is a Claude Code plugin that scaffolds ML experiment infrastructure into 
 ```
 turing/
 │
-├── commands/                  ← SKILL LAYER (15 files)
+├── commands/                  ← EDITABLE SKILL SOURCE (75 files)
 │   │                            Thin dispatchers. Each command is a markdown
 │   │                            skill file consumed by Claude Code. No logic
 │   │                            lives here — commands orchestrate agents and
-│   │                            shell commands.
+│   │                            shell commands. During the modern-layout
+│   │                            migration, this remains the editable source.
 │   │
 │   │  ┌─ CORE COMMANDS ──────────────────────────────────────┐
 │   ├── turing.md              │ Router. Intent detection → dispatch.         │
@@ -43,6 +44,13 @@ turing/
 │   └── rules/
 │       └── loop-protocol.md   Safety constraints for the experiment loop.
 │                              Contains the access control matrix (ADR-0002).
+│
+├── skills/                    ← MODERN CLAUDE CODE PACKAGE MIRROR
+│   └── turing/
+│       ├── SKILL.md           Generated mirror of commands/turing.md.
+│       ├── <command>/SKILL.md Generated mirrors of registered commands.
+│       └── rules/             Generated mirror of command rule files.
+│                              Refresh with npm run sync:skills after edits.
 │
 ├── agents/                    ← AGENT LAYER (2 files)
 │   │
@@ -143,8 +151,9 @@ turing/
 │   │                            npm deployment machinery. See ADR-0010.
 │   ├── paths.js               Path resolution for global/project scopes.
 │   ├── claude-md.js           CLAUDE.md managed section with idempotent markers.
-│   ├── install.js             Deploys 14 commands, 2 agents, 8 configs.
+│   ├── install.js             Deploys registered commands, agents, configs.
 │   ├── verify.js              Validates installation completeness.
+│   ├── sync-skills-layout.js  Generates/checks skills/turing mirror.
 │   └── postinstall.js         npm postinstall — setup instructions.
 │
 ├── bin/                       ← CLI LAYER (2 files)
@@ -159,7 +168,7 @@ turing/
 │       └── 0001-0016-*.md     Individual decisions.
 │
 ├── .claude-plugin/
-│   └── plugin.json            Plugin registration (14 commands, 2 agents).
+│   └── plugin.json            Plugin marketplace metadata.
 │
 ├── package.json               npm package definition.
 ├── CONTRIBUTING.md            Command/script/config authoring conventions.
@@ -203,7 +212,7 @@ These are the rules that must not be broken. They are documented formally in the
                          │ skill invocation
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│  SKILL LAYER  (commands/)                               │
+│  SKILL LAYER  (commands/ source, skills/turing/ mirror) │
 │  Thin dispatchers. Route intent → agent or script.      │
 │  No business logic. No state.                           │
 └────────────┬──────────────────────────┬─────────────────┘
