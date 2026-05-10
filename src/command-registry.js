@@ -145,6 +145,15 @@ export async function getExpectedCommandPaths(registryPath) {
   return ['SKILL.md', ...names.map((name) => `${name}/SKILL.md`)];
 }
 
+export async function getExpectedSkillSourcePaths(registryPath) {
+  const names = await getCommandNames(registryPath);
+  return [
+    'skills/turing/SKILL.md',
+    ...names.map((name) => `skills/turing/${name}/SKILL.md`),
+    'skills/turing/rules/loop-protocol.md',
+  ];
+}
+
 export async function getConfigFiles(registryPath) {
   const registry = await loadCommandRegistry(registryPath);
   return registry.configFiles;
