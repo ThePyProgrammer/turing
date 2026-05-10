@@ -126,6 +126,28 @@ def test_registry_lifecycle_matches_router_table() -> None:
         assert registry["commands"][command_name]["lifecycle"] == lifecycle, command_name
 
 
+def test_router_describes_execution_contract_not_model_dispatch() -> None:
+    router = (COMMANDS_DIR / "turing.md").read_text()
+
+    forbidden_phrases = [
+        "dispatches to focused sub-commands",
+        "dispatch to focused sub-commands",
+        "dispatch to the focused skill",
+        "Do not attempt to handle ML tasks directly",
+    ]
+    for phrase in forbidden_phrases:
+        assert phrase not in router
+
+    required_phrases = [
+        "## Execution Contract",
+        "slash_only",
+        "disable-model-invocation",
+        "Claude Code runtime handles that slash command",
+    ]
+    for phrase in required_phrases:
+        assert phrase in router
+
+
 def test_registry_matches_command_frontmatter() -> None:
     registry = load_registry()
 
