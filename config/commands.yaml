@@ -10,7 +10,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: '[exp-id] [--components \"X,Y\"] [--seeds 3] [--latex]'
+    argument_hint: '[exp-id] [--components "X,Y"] [--seeds 3] [--latex]'
   annotate:
     description: "Retrospective experiment annotations \u2014 add human notes, tags, and context that automated metrics can't capture."
     lifecycle: record
@@ -22,7 +22,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: <exp-id> \"note\" [--tag fragile] | --list | --search \"keyword\
+    argument_hint: '<exp-id> "note" [--tag fragile] | --list | --search "keyword"'
   archive:
     description: "Experiment lifecycle cleanup \u2014 compress old artifacts, prune checkpoints, create queryable summary index. Reclaim disk space."
     lifecycle: manage
@@ -318,7 +318,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: <exp-id> --branches \"approach A\" \"approach B\" [--auto-promote]
+    argument_hint: '<exp-id> --branches "approach A" "approach B" [--auto-promote]'
   frontier:
     description: "Visualize Pareto frontier across multiple objectives \u2014 answers \"which model is actually best?\" when there are tradeoffs."
     lifecycle: analyze
@@ -330,7 +330,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: '[--metrics \"accuracy,train_seconds,n_params\"] [--ascii]'
+    argument_hint: '[--metrics "accuracy,train_seconds,n_params"] [--ascii]'
   init:
     description: "Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure \u2014 immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan."
     lifecycle: setup
@@ -441,7 +441,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: '[--budget 20] [--goal \"maximize F1 for production\"]'
+    argument_hint: '[--budget 20] [--goal "maximize F1 for production"]'
   poster:
     description: "Generate a single-page HTML research poster summarizing the experiment campaign \u2014 best result, trajectory, key findings, and methodology. Adapted from posterskill's self-contained HTML architecture."
     lifecycle: document
@@ -659,7 +659,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: <query> [--filter \"accuracy>0.85\"] [--limit 10]
+    argument_hint: '<query> [--filter "accuracy>0.85"] [--limit 10]'
   seed:
     description: Run multi-seed study on an experiment to compute mean/std/CI and flag seed-sensitive results. Prevents publishing lucky seeds.
     lifecycle: validate
@@ -901,7 +901,7 @@ commands:
     - Bash
     - Grep
     - Glob
-    argument_hint: \"<question>\" [--json]
+    argument_hint: '"<question>" [--json]'
   xray:
     description: "Internal model diagnostics \u2014 gradient flow, dead neurons, activation stats, weight distributions, tree depth analysis."
     lifecycle: analyze

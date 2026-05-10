@@ -44,19 +44,8 @@ def parse_frontmatter(path: Path) -> dict[str, Any]:
     lines = path.read_text().splitlines()
     assert lines[0] == "---"
     end = lines.index("---", 1)
-    frontmatter: dict[str, Any] = {}
-    for line in lines[1:end]:
-        if not line.strip():
-            continue
-        key, value = line.split(":", 1)
-        value = value.strip()
-        if value == "true":
-            parsed_value: Any = True
-        elif value == "false":
-            parsed_value = False
-        else:
-            parsed_value = value.strip('"')
-        frontmatter[key.strip()] = parsed_value
+    frontmatter = yaml.safe_load("\n".join(lines[1:end]))
+    assert isinstance(frontmatter, dict)
     return frontmatter
 
 
