@@ -45,7 +45,7 @@ claude-turing verify
 Expected output:
 
 ```
-Turing ML Research Harness v4.5.0
+Turing ML Research Harness v4.6.0
 ==================================
 
 Commands .................. 74/74 registered

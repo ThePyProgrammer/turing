@@ -1,12 +1,25 @@
 ---
 title: Changelog
-description: All notable changes to Turing, from v1.0.0 through v4.5.0. 29 phases, 84 features, 25 releases.
+description: All notable changes to Turing, from v1.0.0 through v4.6.0. 29 phases, 84 features, 26 releases.
 icon: lucide/history
 ---
 
 # Changelog
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## v4.6.0: Command Registry Contract { #v460 }
+
+*2026-05-10: Command semantics are now explicit instead of implied by scattered manifests.*
+
+- Added `config/commands.yaml` as the canonical command and config-file registry
+- Moved installer and verifier command manifests to registry-derived loading
+- Clarified `/turing` router behavior for `slash_only` and `disable-model-invocation` commands
+- Added registry/frontmatter/router/install/verify drift tests, including mutation semantics checks
+
+**28 registry/manifest tests | 74 commands | 11 config files | 10 commits**
 
 ---
 

@@ -38,19 +38,15 @@ Commands are markdown skill files in `commands/`. Each command is a thin dispatc
 
 - [ ] Add routing entry to `commands/turing.md`:
   - Add a row to the **Routing Table** with user intent phrases
-  - Add a row to the **Sub-commands** table with purpose and agent
+  - Add a row to the **Sub-commands** table with purpose and `slash_only` invocation
 
-- [ ] Add to `src/install.js` `SUB_COMMANDS` array (line ~22):
-  ```js
-  const SUB_COMMANDS = [
-    "init", "train", ..., "<name>",
-  ];
-  ```
-
-- [ ] Add to `src/verify.js` `EXPECTED_COMMANDS` array (line ~15):
-  ```js
-  "<name>/SKILL.md",
-  ```
+- [ ] Add a matching entry to `config/commands.yaml`:
+  - `description` must match command frontmatter
+  - `lifecycle` must match the router table
+  - `invocation_mode` is currently `slash_only`
+  - `model_invocation` must match `disable-model-invocation`
+  - `mutates_project` must be true if the command can write files, update state, or queue work
+  - `tools` must match normalized `allowed-tools` frontmatter
 
 - [ ] Update `docs/ARCHITECTURE.md` codemap -- add the new command under the `commands/` section with a one-line description.
 
@@ -117,16 +113,7 @@ Config format is governed by [ADR-0004](docs/adr/0004-toml-config-dsl-for-domain
 ### Checklist
 
 - [ ] Create `config/<name>.toml` or `config/<name>.yaml` per the format rules above
-- [ ] Add to `src/install.js` `CONFIG_FILES` array (line ~75):
-  ```js
-  const CONFIG_FILES = [
-    "defaults.yaml", "lifecycle.toml", ..., "<name>.toml",
-  ];
-  ```
-- [ ] Add to `src/verify.js` `EXPECTED_CONFIG` array (line ~35):
-  ```js
-  "<name>.toml",
-  ```
+- [ ] Add the file name to `config/commands.yaml` `config_files`
 - [ ] Update `docs/ARCHITECTURE.md` codemap under `config/`
 
 ## Testing
