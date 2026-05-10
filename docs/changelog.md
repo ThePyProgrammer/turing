@@ -1,12 +1,25 @@
 ---
 title: Changelog
-description: All notable changes to Turing, from v1.0.0 through v4.4.0. 29 phases, 84 features, 24 releases.
+description: All notable changes to Turing, from v1.0.0 through v4.5.0. 29 phases, 84 features, 25 releases.
 icon: lucide/history
 ---
 
 # Changelog
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## v4.5.0: Release Reliability { #v450 }
+
+*2026-05-10: The docs got a public home and the installer/doctor path got boring in the best way.*
+
+- Published the documentation site: homepage, getting started, architecture, command reference, changelog, and philosophy sections
+- Hardened `turing-init` template discovery and scaffold verification across installed layouts
+- Fixed Claude Stop hook generation and added `/turing:doctor --fix` migration for legacy hook settings
+- Polished README/docs prose, diagrams, homepage layout, and visual styling
+
+**2010 tests | 74 commands | 93 scripts | 68 commits**
 
 ---
 

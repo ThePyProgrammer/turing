@@ -60,7 +60,7 @@ Read more in [The Taste-Leverage Loop](philosophy/taste-leverage.md).
 |---|---|
 | **74 commands** | Core loop, taste-leverage interface, reporting, validation, exploration, model surgery, experiment archaeology, research communication, and more |
 | **2 agents** | `@ml-researcher` (read/write) and `@ml-evaluator` (read-only), strict capability boundary |
-| **1986 tests** | Unit, integration, anti-pattern, and manifest coverage |
+| **2010 tests** | Unit, integration, anti-pattern, and manifest coverage |
 | **29 phases** | Complete development roadmap, fully delivered |
 
 ---

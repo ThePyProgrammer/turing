@@ -3,6 +3,22 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.5.0] — 2026-05-10 — Release Reliability
+
+### Added
+- Published the new documentation site with homepage, getting-started pages, architecture docs, complete command reference, changelog page, and philosophy section
+- Added Zensical documentation configuration and deployment workflow
+
+### Fixed
+- `turing-init` now installs and verifies templates reliably across npm, global command-pack, project, plugin, and node_modules layouts
+- Scaffolding now documents derived placeholders and verifies generated projects without false missing-value failures
+- Stop hooks now use Claude Code hook groups instead of legacy bare command objects
+- `/turing:doctor --fix` now detects and safely migrates legacy bare command hooks with backups
+- Documentation polish for README, philosophy pages, homepage layout, diagrams, and visual styling
+
+**2010 tests | 74 commands | 93 scripts | 68 commits**
+
+
 ## [4.4.0] — 2026-04-02 — Operational Intelligence
 
 *The final phase. All 29 phases (84 features, v1.0.0 through v4.4.0) are now complete.*
@@ -394,8 +410,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
-[4.1.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.1.0
-[4.0.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.0.0
+[4.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.5.0
 [4.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.4.0
 [4.3.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.3.0
 [4.2.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.2.0
