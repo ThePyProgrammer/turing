@@ -368,6 +368,14 @@ def scaffold_project(
     return stats
 
 
+def make_command_hook_group(command: str, matcher: str = "") -> dict:
+    """Build a Claude Code command hook group."""
+    return {
+        "matcher": matcher,
+        "hooks": [{"type": "command", "command": command}],
+    }
+
+
 def _setup_hooks(ml_dir: str) -> None:
     """Configure Claude Code hooks in .claude/settings.local.json."""
     settings_path = Path(".claude") / "settings.local.json"
@@ -386,20 +394,14 @@ def _setup_hooks(ml_dir: str) -> None:
     post_hooks = hooks.get("PostToolUse", [])
     post_hook_cmd = f"bash {ml_dir}/scripts/post-train-hook.sh"
     if not any(post_hook_cmd in str(h) for h in post_hooks):
-        post_hooks.append({
-            "matcher": "Bash",
-            "hooks": [{"type": "command", "command": post_hook_cmd}],
-        })
+        post_hooks.append(make_command_hook_group(post_hook_cmd, matcher="Bash"))
     hooks["PostToolUse"] = post_hooks
 
     # Stop hook for convergence
     stop_hooks = hooks.get("Stop", [])
     stop_hook_cmd = f"bash {ml_dir}/scripts/stop-hook.sh"
     if not any(stop_hook_cmd in str(h) for h in stop_hooks):
-        stop_hooks.append({
-            "type": "command",
-            "command": stop_hook_cmd,
-        })
+        stop_hooks.append(make_command_hook_group(stop_hook_cmd))
     hooks["Stop"] = stop_hooks
 
     settings["hooks"] = hooks

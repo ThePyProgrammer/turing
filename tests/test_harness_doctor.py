@@ -17,6 +17,8 @@ from scripts.harness_doctor import (
     check_scripts,
     check_disk_space,
     check_git_state,
+    check_claude_hooks,
+    fix_claude_hooks,
     fix_corrupt_log,
     run_doctor,
     format_doctor_report,
@@ -135,6 +137,87 @@ def test_git_state():
     assert result["status"] in ("PASS", "WARN")
 
 
+# --- check_claude_hooks ---
+
+
+def test_claude_hooks_valid(tmp_path):
+    settings = tmp_path / "settings.local.json"
+    settings.write_text(json.dumps({
+        "hooks": {
+            "PostToolUse": [{
+                "matcher": "Bash",
+                "hooks": [{"type": "command", "command": "bash ml/demo/scripts/post-train-hook.sh"}],
+            }],
+            "Stop": [{
+                "matcher": "",
+                "hooks": [{"type": "command", "command": "bash ml/demo/scripts/stop-hook.sh"}],
+            }],
+        }
+    }))
+
+    result = check_claude_hooks(str(settings))
+
+    assert result["status"] == "PASS"
+    assert result["fixable"] is False
+
+
+def test_claude_hooks_legacy_bare_command_is_fixable(tmp_path):
+    settings = tmp_path / "settings.local.json"
+    settings.write_text(json.dumps({
+        "hooks": {
+            "Stop": [{"type": "command", "command": "bash ml/demo/scripts/stop-hook.sh"}],
+        }
+    }))
+
+    result = check_claude_hooks(str(settings))
+
+    assert result["status"] == "FAIL"
+    assert result["fixable"] is True
+    assert "legacy bare command hook shape" in result["issues"][0]
+
+
+def test_fix_claude_hooks_migrates_legacy_shape_and_preserves_valid_hooks(tmp_path):
+    settings = tmp_path / "settings.local.json"
+    settings.write_text(json.dumps({
+        "hooks": {
+            "PostToolUse": [{
+                "matcher": "Bash",
+                "hooks": [{"type": "command", "command": "bash ml/demo/scripts/post-train-hook.sh"}],
+            }],
+            "Stop": [{"type": "command", "command": "bash ml/demo/scripts/stop-hook.sh"}],
+        }
+    }))
+
+    result = fix_claude_hooks(str(settings))
+    updated = json.loads(settings.read_text())
+
+    assert result["fixed"] is True
+    assert result["migrated"] == 1
+    assert settings.with_suffix(".json.bak").exists()
+    assert updated["hooks"]["PostToolUse"] == [{
+        "matcher": "Bash",
+        "hooks": [{"type": "command", "command": "bash ml/demo/scripts/post-train-hook.sh"}],
+    }]
+    assert updated["hooks"]["Stop"] == [{
+        "matcher": "",
+        "hooks": [{"type": "command", "command": "bash ml/demo/scripts/stop-hook.sh"}],
+    }]
+    assert check_claude_hooks(str(settings))["status"] == "PASS"
+
+
+def test_claude_hooks_invalid_json_reports_failure_without_mutation(tmp_path):
+    settings = tmp_path / "settings.local.json"
+    settings.write_text("{")
+
+    check = check_claude_hooks(str(settings))
+    result = fix_claude_hooks(str(settings))
+
+    assert check["status"] == "FAIL"
+    assert result["fixed"] is False
+    assert settings.read_text() == "{"
+    assert not settings.with_suffix(".json.bak").exists()
+
+
 # --- fix_corrupt_log ---
 
 def test_fix_removes_corrupt(tmp_path):
@@ -171,7 +254,7 @@ def test_doctor_basic(tmp_path):
     report = run_doctor(config_path=str(config), log_path=str(log))
     assert "checks" in report
     assert "score" in report
-    assert report["score"]["total"] == 7
+    assert report["score"]["total"] == 8
 
 def test_doctor_with_fix(tmp_path):
     config = tmp_path / "config.yaml"

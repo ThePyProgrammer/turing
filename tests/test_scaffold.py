@@ -7,6 +7,7 @@ ADR-0016: Verifies the single scaffolding implementation that both
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import subprocess
 import sys
 
@@ -17,6 +18,7 @@ from scripts.scaffold import (
     replace_placeholders,
     scaffold_project,
     verify_placeholders,
+    make_command_hook_group,
     PLACEHOLDER_MAP,
 )
 
@@ -155,6 +157,46 @@ def test_scaffolded_program_points_at_scoped_memory(tmp_path: Path, monkeypatch)
     program = (tmp_path / "ml" / "foo" / "program.md").read_text()
     assert ".claude/agent-memory/ml-researcher-Foo-Model/MEMORY.md" in program
     assert ".claude/agent-memory/ml-researcher/MEMORY.md" not in program
+
+
+def test_make_command_hook_group():
+    group = make_command_hook_group("bash ml/demo/scripts/stop-hook.sh")
+
+    assert group == {
+        "matcher": "",
+        "hooks": [{"type": "command", "command": "bash ml/demo/scripts/stop-hook.sh"}],
+    }
+
+
+def test_scaffold_configures_post_tool_use_and_stop_hook_groups(tmp_path: Path, monkeypatch):
+    templates_dir = Path(__file__).parent.parent / "templates"
+    values = scaffold.derive_values({
+        "project_name": "Foo Model!",
+        "target_metric": "accuracy",
+        "task_description": "Predict labels",
+        "ml_dir": "ml/foo",
+        "data_source": "data/foo.csv",
+        "metric_direction": "higher",
+    })
+    monkeypatch.chdir(tmp_path)
+
+    scaffold_project(
+        templates_dir=templates_dir,
+        ml_dir=values["ml_dir"],
+        values=values,
+        setup_venv=False,
+        setup_hooks=True,
+    )
+
+    settings = json.loads((tmp_path / ".claude" / "settings.local.json").read_text())
+    assert settings["hooks"]["PostToolUse"] == [{
+        "matcher": "Bash",
+        "hooks": [{"type": "command", "command": "bash ml/foo/scripts/post-train-hook.sh"}],
+    }]
+    assert settings["hooks"]["Stop"] == [{
+        "matcher": "",
+        "hooks": [{"type": "command", "command": "bash ml/foo/scripts/stop-hook.sh"}],
+    }]
 
 
 # --- verify_placeholders ---

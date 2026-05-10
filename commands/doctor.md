@@ -21,6 +21,7 @@ Is Turing healthy? Check everything and get a score.
 - **Scripts:** train.py, prepare.py, evaluate.py exist and parse
 - **Disk space:** warn if <1GB free
 - **Git state:** uncommitted changes to critical files
+- **Claude hooks:** `.claude/settings.local.json` hook group schema; `--fix` migrates legacy bare command hooks
 
 ## Examples
 ```

@@ -32,7 +32,7 @@ REQUIRED_SCRIPTS = ["train.py", "prepare.py", "evaluate.py"]
 REQUIRED_CONFIG_FIELDS = ["evaluation"]
 
 CHECK_CATEGORIES = ["environment", "dependencies", "config", "experiment_log",
-                     "scripts", "disk_space", "git_state"]
+                     "scripts", "disk_space", "git_state", "claude_hooks"]
 
 
 # --- Individual Checks ---
@@ -288,7 +288,134 @@ def check_git_state(project_dir: str = ".") -> dict:
         }
 
 
+def check_claude_hooks(settings_path: str = ".claude/settings.local.json") -> dict:
+    """Check Claude Code project hook schema."""
+    path = Path(settings_path)
+    if not path.exists():
+        return {
+            "name": "Claude hooks",
+            "status": "WARN",
+            "detail": f"{settings_path} not found",
+            "issues": [],
+        }
+
+    try:
+        settings = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return {
+            "name": "Claude hooks",
+            "status": "FAIL",
+            "detail": f"{settings_path} has JSON parse error",
+            "issues": [str(e)],
+            "fixable": False,
+        }
+
+    hooks = settings.get("hooks", {})
+    if not isinstance(hooks, dict):
+        return {
+            "name": "Claude hooks",
+            "status": "FAIL",
+            "detail": "hooks must be a JSON object",
+            "issues": ["hooks must map event names to hook group arrays"],
+            "fixable": False,
+        }
+
+    issues = []
+    fixable = False
+    group_count = 0
+
+    for event, entries in hooks.items():
+        if not isinstance(entries, list):
+            issues.append(f"hooks.{event} must be an array")
+            continue
+
+        for index, entry in enumerate(entries):
+            if not isinstance(entry, dict):
+                issues.append(f"hooks.{event}[{index}] must be an object")
+                continue
+
+            if (
+                set(entry.keys()) == {"type", "command"}
+                and entry["type"] == "command"
+                and isinstance(entry["command"], str)
+            ):
+                issues.append(f"hooks.{event}[{index}] uses legacy bare command hook shape")
+                fixable = True
+                continue
+
+            nested_hooks = entry.get("hooks")
+            if not isinstance(nested_hooks, list):
+                issues.append(f"hooks.{event}[{index}].hooks must be an array")
+                continue
+
+            group_count += 1
+            for hook_index, hook in enumerate(nested_hooks):
+                if not isinstance(hook, dict):
+                    issues.append(f"hooks.{event}[{index}].hooks[{hook_index}] must be an object")
+                    continue
+                if hook.get("type") == "command" and not hook.get("command"):
+                    issues.append(f"hooks.{event}[{index}].hooks[{hook_index}] command hook missing command")
+
+    status = "FAIL" if issues else "PASS"
+    result = {
+        "name": "Claude hooks",
+        "status": status,
+        "detail": f"{group_count} hook groups valid" if not issues else f"{len(issues)} hook schema issue(s)",
+        "issues": issues,
+        "fixable": fixable,
+    }
+    if fixable:
+        result["fix"] = "Run /turing:doctor --fix to migrate legacy bare command hooks"
+    return result
+
+
 # --- Fix Operations ---
+
+
+def fix_claude_hooks(settings_path: str = ".claude/settings.local.json") -> dict:
+    """Migrate legacy bare command hooks into Claude Code hook groups."""
+    path = Path(settings_path)
+    if not path.exists():
+        return {"fixed": False, "reason": "Settings file not found"}
+
+    try:
+        settings = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"fixed": False, "reason": "Settings file has invalid JSON"}
+
+    hooks = settings.get("hooks")
+    if not isinstance(hooks, dict):
+        return {"fixed": False, "reason": "hooks is not a JSON object"}
+
+    migrated = 0
+    for event, entries in hooks.items():
+        if not isinstance(entries, list):
+            continue
+
+        fixed_entries = []
+        for entry in entries:
+            if (
+                isinstance(entry, dict)
+                and set(entry.keys()) == {"type", "command"}
+                and entry["type"] == "command"
+                and isinstance(entry["command"], str)
+            ):
+                fixed_entries.append({
+                    "matcher": "",
+                    "hooks": [{"type": "command", "command": entry["command"]}],
+                })
+                migrated += 1
+            else:
+                fixed_entries.append(entry)
+        hooks[event] = fixed_entries
+
+    if not migrated:
+        return {"fixed": False, "reason": "No legacy bare command hooks found"}
+
+    backup = path.with_suffix(path.suffix + ".bak")
+    shutil.copy2(path, backup)
+    path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    return {"fixed": True, "migrated": migrated, "backup": str(backup)}
 
 
 def fix_corrupt_log(log_path: str = DEFAULT_LOG_PATH) -> dict:
@@ -328,6 +455,7 @@ def fix_corrupt_log(log_path: str = DEFAULT_LOG_PATH) -> dict:
 def run_doctor(
     config_path: str = "config.yaml",
     log_path: str = DEFAULT_LOG_PATH,
+    hooks_path: str = ".claude/settings.local.json",
     fix: bool = False,
     verbose: bool = False,
 ) -> dict:
@@ -336,6 +464,7 @@ def run_doctor(
     Args:
         config_path: Path to config.yaml.
         log_path: Path to experiment log.
+        hooks_path: Path to Claude Code project settings.
         fix: If True, auto-fix safe issues.
         verbose: Include detailed info.
 
@@ -350,6 +479,7 @@ def run_doctor(
         check_scripts(),
         check_disk_space(),
         check_git_state(),
+        check_claude_hooks(hooks_path),
     ]
 
     # Apply fixes if requested
@@ -364,6 +494,18 @@ def run_doctor(
                 for i, c in enumerate(checks):
                     if c["name"] == "Experiment log":
                         checks[i] = check_experiment_log(log_path)
+                        break
+
+        hooks_check = next((c for c in checks if c["name"] == "Claude hooks"), None)
+        if hooks_check and hooks_check.get("fixable"):
+            fix_result = fix_claude_hooks(hooks_path)
+            if fix_result.get("fixed"):
+                fixes_applied.append(
+                    f"Migrated {fix_result['migrated']} legacy Claude hook entries (backup: {fix_result['backup']})"
+                )
+                for i, c in enumerate(checks):
+                    if c["name"] == "Claude hooks":
+                        checks[i] = check_claude_hooks(hooks_path)
                         break
 
     # Compute score
@@ -441,6 +583,7 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Show detailed info")
     parser.add_argument("--config", default="config.yaml", help="Path to config.yaml")
     parser.add_argument("--log", default=DEFAULT_LOG_PATH, help="Path to experiment log")
+    parser.add_argument("--hooks", default=".claude/settings.local.json", help="Path to Claude Code settings")
     parser.add_argument("--json", action="store_true", help="Output raw JSON")
 
     args = parser.parse_args()
@@ -448,6 +591,7 @@ def main():
     report = run_doctor(
         config_path=args.config,
         log_path=args.log,
+        hooks_path=args.hooks,
         fix=args.fix,
         verbose=args.verbose,
     )

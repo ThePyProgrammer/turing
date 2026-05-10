@@ -96,7 +96,7 @@ def test_doctor_all_missing(tmp_path):
         config_path=str(tmp_path / "missing.yaml"),
         log_path=str(tmp_path / "missing.jsonl"),
     )
-    assert report["score"]["total"] == 7
+    assert report["score"]["total"] == 8
     assert report["score"]["failed"] >= 1
 
 def test_doctor_score_healthy(tmp_path):

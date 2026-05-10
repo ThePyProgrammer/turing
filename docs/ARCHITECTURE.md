@@ -259,7 +259,16 @@ Two Claude Code hooks bridge the plugin into the runtime:
 - **PostToolUse** → `scripts/post-train-hook.sh`: auto-logs metrics after training
 - **Stop** → `scripts/stop-hook.sh`: convergence detection, exit code 2 halts `/loop`
 
-Both hooks are configured in `.claude/settings.local.json` during `/turing:init`.
+Both hooks are configured in `.claude/settings.local.json` during `/turing:init` as hook groups:
+
+```json
+{
+  "matcher": "",
+  "hooks": [{"type": "command", "command": "bash ml/project/scripts/stop-hook.sh"}]
+}
+```
+
+`PostToolUse` uses `matcher: "Bash"`; `Stop` uses an empty matcher.
 
 ### Agent Memory
 
