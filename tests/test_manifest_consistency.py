@@ -24,6 +24,7 @@ VERIFY_JS = REPO_ROOT / "src" / "verify.js"
 CLI_JS = REPO_ROOT / "bin" / "cli.js"
 SCAFFOLD_PY = REPO_ROOT / "templates" / "scripts" / "scaffold.py"
 TEMPLATES_DIR = REPO_ROOT / "templates"
+PACKAGE_JSON = REPO_ROOT / "package.json"
 
 
 def _registry() -> dict:
@@ -64,6 +65,13 @@ def _scaffold_template_files() -> set[str]:
 
 
 EXPECTED_TEMPLATE_FILES = _scaffold_template_files()
+
+
+def test_package_includes_modern_skills_layout():
+    """npm package allowlist must include the modern skills mirror."""
+    package = json.loads(PACKAGE_JSON.read_text())
+
+    assert "skills/" in package["files"]
 
 
 def test_installer_copies_templates(tmp_path: Path):

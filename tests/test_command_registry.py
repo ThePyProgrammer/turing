@@ -325,14 +325,16 @@ def test_node_registry_loader_exports_sorted_manifests() -> None:
             getCommandNames,
             getConfigFiles,
             getExpectedCommandPaths,
+            getExpectedSkillSourcePaths,
         } from './src/command-registry.js';
 
-        const [names, configs, paths] = await Promise.all([
+        const [names, configs, paths, skillPaths] = await Promise.all([
             getCommandNames(),
             getConfigFiles(),
             getExpectedCommandPaths(),
+            getExpectedSkillSourcePaths(),
         ]);
-        console.log(JSON.stringify({ names, configs, paths }));
+        console.log(JSON.stringify({ names, configs, paths, skillPaths }));
     """
 
     result = subprocess.run(
@@ -348,6 +350,14 @@ def test_node_registry_loader_exports_sorted_manifests() -> None:
     assert manifest["names"] == sorted(registry["commands"])
     assert manifest["paths"][0] == "SKILL.md"
     assert "suggest/SKILL.md" in manifest["paths"]
+    assert manifest["skillPaths"] == [
+        "skills/turing/SKILL.md",
+        *[
+            f"skills/turing/{command_name}/SKILL.md"
+            for command_name in sorted(registry["commands"])
+        ],
+        "skills/turing/rules/loop-protocol.md",
+    ]
     assert manifest["configs"] == sorted(registry["config_files"])
 
 
