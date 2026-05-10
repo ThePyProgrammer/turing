@@ -14,43 +14,24 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { getTargetPaths } from "./paths.js";
 import { updateClaudeMd } from "./claude-md.js";
+import { getCommandNames, getConfigFiles } from "./command-registry.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, "..");
 
-// Single source of truth for sub-commands (DRY — used for dirs and file copy)
-const SUB_COMMANDS = [
-  "init", "train", "status", "compare", "sweep", "validate",
-  "try", "brief", "suggest", "explore", "design", "logbook", "poster",
-  "report", "mode", "preflight", "card", "seed", "reproduce",
-  "diagnose", "ablate", "frontier", "profile", "checkpoint", "export",
-  "lit", "paper", "queue", "retry", "fork",
-  "diff", "watch", "regress",
-  "ensemble", "stitch", "warm",
-  "scale", "budget", "distill",
-  "transfer", "audit",
-  "sanity", "baseline", "leak",
-  "xray", "sensitivity", "calibrate",
-  "feature", "curriculum",
-  "prune", "quantize", "merge", "surgery",
-  "trend", "flashback", "archive", "annotate", "search", "template", "replay",
-  "cite", "present", "changelog",
-  "onboard", "share", "review",
-  "whatif", "counterfactual", "simulate",
-  "update", "registry",
-  "postmortem", "doctor", "plan",
-];
 
 export async function install(opts = {}) {
   const scope = opts.global ? "global" : opts.project ? "project" : "global";
   const paths = getTargetPaths(scope);
+  const subCommands = await getCommandNames();
+  const configFiles = await getConfigFiles();
 
   console.log("Turing ML Research Harness — Installer");
   console.log(`Target: ${paths.commands} (${scope})`);
   console.log("");
 
   // Create directories for each sub-command + agents + config
-  for (const subDir of ["", "agents", "config", "rules", "templates", ...SUB_COMMANDS]) {
+  for (const subDir of ["", "agents", "config", "rules", "templates", ...subCommands]) {
     await mkdir(join(paths.commands, subDir), { recursive: true });
   }
 
@@ -62,13 +43,13 @@ export async function install(opts = {}) {
   console.log("  Router -> SKILL.md");
 
   // Copy sub-commands as <name>/SKILL.md
-  for (const cmd of SUB_COMMANDS) {
+  for (const cmd of subCommands) {
     await copyFile(
       join(PLUGIN_ROOT, "commands", `${cmd}.md`),
       join(paths.commands, cmd, "SKILL.md"),
     );
   }
-  console.log(`  ${SUB_COMMANDS.length} commands installed`);
+  console.log(`  ${subCommands.length} commands installed`);
 
   // Copy rules
   await copyFile(
@@ -88,20 +69,13 @@ export async function install(opts = {}) {
   console.log(`  ${agentFiles.length} agents installed`);
 
   // Copy config (static schema files only)
-  const CONFIG_FILES = [
-    "defaults.yaml", "lifecycle.toml", "taxonomy.toml",
-    "experiment_archetypes.yaml", "novelty_aliases.yaml",
-    "relationships.toml", "state.toml", "task_taxonomy.yaml",
-    "failure_modes.yaml",
-    "watch_alerts.yaml",
-  ];
-  for (const file of CONFIG_FILES) {
+  for (const file of configFiles) {
     await copyFile(
       join(PLUGIN_ROOT, "config", file),
       join(paths.config, file),
     );
   }
-  console.log(`  ${CONFIG_FILES.length} config files installed`);
+  console.log(`  ${configFiles.length} config files installed`);
 
   // Copy templates used by /turing:init
   await cp(
