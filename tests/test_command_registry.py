@@ -117,6 +117,63 @@ def routing_table_lifecycles() -> dict[str, str]:
     return lifecycles
 
 
+def split_markdown_table_row(line: str) -> list[str]:
+    cells: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for char in line.strip().strip("|"):
+        if char == "|" and not escaped:
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+        escaped = char == "\\" and not escaped
+    cells.append("".join(current).strip())
+    return cells
+
+
+def subcommand_table_invocation_modes_from_lines(lines: list[str]) -> dict[str, str]:
+    modes: dict[str, str] = {}
+    in_table = False
+    for line in lines:
+        if line == "## Sub-commands":
+            in_table = True
+            continue
+        if in_table and line.startswith("## "):
+            break
+        if not in_table:
+            continue
+        cells = split_markdown_table_row(line)
+        if len(cells) != 3 or cells[0] in {"Command", "---"}:
+            continue
+        match = re.fullmatch(r"`/turing:([a-z][a-z0-9-]*)(?:\s+[^`]*)?`", cells[0])
+        if match:
+            modes[match.group(1)] = cells[2]
+    return modes
+
+
+def subcommand_table_invocation_modes() -> dict[str, str]:
+    return subcommand_table_invocation_modes_from_lines((COMMANDS_DIR / "turing.md").read_text().splitlines())
+
+
+def test_subcommand_table_invocation_modes_match_registry() -> None:
+    registry = load_registry()
+    invocation_modes = subcommand_table_invocation_modes()
+
+    assert set(invocation_modes) == set(registry["commands"])
+    assert "multi-seed" in subcommand_table_invocation_modes_from_lines(
+        [
+            "## Sub-commands",
+            "",
+            "| Command | Purpose | Invocation |",
+            "|---|---|---|",
+            "| `/turing:multi-seed [N]` | Run multi-seed experiments | slash_only |",
+        ]
+    )
+    for command_name, invocation_mode in invocation_modes.items():
+        assert registry["commands"][command_name]["invocation_mode"] == invocation_mode, command_name
+
+
 def test_registry_lifecycle_matches_router_table() -> None:
     registry = load_registry()
     lifecycles = routing_table_lifecycles()
