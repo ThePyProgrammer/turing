@@ -18,6 +18,7 @@ import { getCommandNames, getConfigFiles } from "./command-registry.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = join(__dirname, "..");
+const SKILL_SOURCE_ROOT = join(PLUGIN_ROOT, "skills", "turing");
 
 
 export async function install(opts = {}) {
@@ -37,7 +38,7 @@ export async function install(opts = {}) {
 
   // Copy root command (router) as SKILL.md
   await copyFile(
-    join(PLUGIN_ROOT, "commands", "turing.md"),
+    join(SKILL_SOURCE_ROOT, "SKILL.md"),
     join(paths.commands, "SKILL.md"),
   );
   console.log("  Router -> SKILL.md");
@@ -45,7 +46,7 @@ export async function install(opts = {}) {
   // Copy sub-commands as <name>/SKILL.md
   for (const cmd of subCommands) {
     await copyFile(
-      join(PLUGIN_ROOT, "commands", `${cmd}.md`),
+      join(SKILL_SOURCE_ROOT, cmd, "SKILL.md"),
       join(paths.commands, cmd, "SKILL.md"),
     );
   }
@@ -53,7 +54,7 @@ export async function install(opts = {}) {
 
   // Copy rules
   await copyFile(
-    join(PLUGIN_ROOT, "commands", "rules", "loop-protocol.md"),
+    join(SKILL_SOURCE_ROOT, "rules", "loop-protocol.md"),
     join(paths.commands, "rules", "loop-protocol.md"),
   );
   console.log("  Rules installed");
