@@ -35,6 +35,8 @@ placeholders:
   ML_DIR: "Directory for ML files relative to project root"
   DATA_SOURCE: "Path to training data file"
   METRIC_DIRECTION: "lower or higher — which direction is better"
+  LOWER_IS_BETTER: "Boolean derived from METRIC_DIRECTION for generated config.yaml"
+  MEMORY_DIR_NAME: "Filesystem-safe project name used for scoped agent memory"
 
 # Agent configuration
 agents:
