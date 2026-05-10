@@ -1,0 +1,928 @@
+commands:
+  ablate:
+    description: "Run systematic ablation study \u2014 remove components one at a time, measure impact, produce publication-ready table with dead-weight flagging."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--components \"X,Y\"] [--seeds 3] [--latex]'
+  annotate:
+    description: "Retrospective experiment annotations \u2014 add human notes, tags, and context that automated metrics can't capture."
+    lifecycle: record
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> \"note\" [--tag fragile] | --list | --search \"keyword\
+  archive:
+    description: "Experiment lifecycle cleanup \u2014 compress old artifacts, prune checkpoints, create queryable summary index. Reclaim disk space."
+    lifecycle: manage
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--older-than 30d] [--keep-best 10] [--dry-run]'
+  audit:
+    description: "Pre-submission methodology audit \u2014 catch data leakage, missing baselines, cherry-picked seeds, and incomplete ablations before a reviewer does."
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--strict] [--checklist neurips]'
+  baseline:
+    description: "Automatic baseline generation \u2014 random, majority/mean, linear, k-NN baselines in 60 seconds. Every experiment needs a \"is this better than dumb?\" reference."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--methods all|simple|linear] [--data data.npz]'
+  brief:
+    description: "Generate a structured research intelligence report from experiment history \u2014 what's been learned, what's promising, what's exhausted, and what the human should consider next. Use --deep for literature-grounded suggestions."
+    lifecycle: report
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    - WebSearch
+    - WebFetch
+    argument_hint: '[ml/project] [--deep]'
+  budget:
+    description: "Compute budget manager \u2014 set experiment/time limits, track allocation across explore/exploit phases, auto-shift modes, hard stop."
+    lifecycle: manage
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <set|status|reset> [--experiments 50] [--hours 8]
+  calibrate:
+    description: "Probability calibration \u2014 measure ECE, plot reliability diagrams, apply Platt scaling or isotonic regression."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--method platt|isotonic|temperature|auto]'
+  card:
+    description: "Generate a standardized model card documenting the trained model \u2014 type, performance, training data, limitations, intended use, and artifact contract."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+  changelog:
+    description: "Model changelog generation \u2014 auto-generate human-readable progress narrative from experiment history for stakeholders."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--since exp-id|date] [--audience technical|stakeholder]'
+  checkpoint:
+    description: "Smart checkpoint management \u2014 list, prune (Pareto-based), average top-K, resume from any point, disk usage stats."
+    lifecycle: check
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <list|prune|average|resume|stats> [exp-id] [--top 3] [--dry-run]
+  cite:
+    description: "Citation & attribution manager \u2014 track papers, datasets, methods. Audit for missing citations, generate BibTeX."
+    lifecycle: record
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <add|list|check|bib> [--key Chen2016 --title XGBoost --url ...]
+  compare:
+    description: "Compare two ML experiment runs side-by-side \u2014 metrics, configuration deltas, and a verdict on which approach is more promising."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id-1> <exp-id-2>
+  counterfactual:
+    description: "Input-level counterfactual explanations \u2014 find the smallest input change to flip a prediction."
+    lifecycle: explain
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> --sample <index> [--target <class>]
+  curriculum:
+    description: "Training curriculum optimization \u2014 order data by difficulty, compare easy-to-hard vs hard-to-easy vs self-paced strategies."
+    lifecycle: optimize
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--strategies easy-to-hard,random]'
+  design:
+    description: Generate a structured experiment design for a hypothesis. Reads experiment history, searches literature for methodology, produces a scored design document at experiments/designs/.
+    lifecycle: design
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Bash
+    - Grep
+    - Glob
+    - WebSearch
+    - WebFetch
+    argument_hint: <hypothesis-id or description>
+  diagnose:
+    description: "Error analysis \u2014 cluster failure cases, identify systematic failure modes, and suggest targeted fixes with auto-queued hypotheses."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--auto-queue] [--top 5]'
+  diff:
+    description: "Deep experiment comparison \u2014 config diffs, metric significance, per-class regressions, training curve divergence, feature importance shifts."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-a> <exp-b> [--code]
+  distill:
+    description: "Model compression via distillation \u2014 train a smaller student model to match a larger teacher's predictions."
+    lifecycle: deploy
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <teacher-exp-id> [--compression 4] [--method soft-labels]
+  doctor:
+    description: "Harness self-diagnosis \u2014 check environment, project, resources, and git state. Auto-fix common issues."
+    lifecycle: check
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--fix] [--verbose]'
+  ensemble:
+    description: "Automated ensemble construction \u2014 combines top-K models via voting, stacking, and blending for zero-cost improvement."
+    lifecycle: compose
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--top-k 5] [--methods voting,stacking,blending]'
+  explore:
+    description: Tree-search-guided hypothesis exploration using AB-MCTS. Explores the space of experiment ideas as a search tree, scored by the critique engine. Discovers non-obvious refinement chains that linear suggestion cannot find.
+    lifecycle: research
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Write
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[ml/project] [--iterations N] [--top N] [--strategy abmcts-a|abmcts-m|greedy]'
+    equivalent_script:
+      path: scripts/treequest_suggest.py
+      location: scaffold
+  export:
+    description: Export model to production format with equivalence verification, latency benchmarking, and deployment model card.
+    lifecycle: deploy
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--format joblib|xgboost_json|onnx|torchscript|tflite]'
+  feature:
+    description: "Automated feature selection \u2014 multi-method importance consensus, redundancy detection, and interaction feature generation."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--method all|importance] [--top-k 20]'
+  flashback:
+    description: "Session context restoration \u2014 \"where was I?\" summary after days away. Current best, pending hypotheses, last session, annotations."
+    lifecycle: recall
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--days 7] [--last 10]'
+  fork:
+    description: "Branch an experiment into parallel tracks \u2014 run both A and B, report the winner."
+    lifecycle: orchestrate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> --branches \"approach A\" \"approach B\" [--auto-promote]
+  frontier:
+    description: "Visualize Pareto frontier across multiple objectives \u2014 answers \"which model is actually best?\" when there are tradeoffs."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--metrics \"accuracy,train_seconds,n_params\"] [--ascii]'
+  init:
+    description: "Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure \u2014 immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan."
+    lifecycle: setup
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Edit
+    - Bash
+    - Grep
+    - Glob
+    - WebSearch
+    - WebFetch
+    argument_hint: '[project_name] [--plan]'
+  leak:
+    description: "Targeted leakage detection \u2014 probe for data leakage with single-feature tests, correlation checks, and train/test overlap detection."
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--deep] [--features feature_1,feature_2]'
+  lit:
+    description: "Literature search scoped to the current experiment domain \u2014 find papers, SOTA baselines, and related work without leaving the terminal."
+    lifecycle: research
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    - WebSearch
+    argument_hint: <query> | --baseline | --related <exp-id>
+  logbook:
+    description: "Generate a research logbook showing the full experiment narrative \u2014 hypotheses proposed, experiments run, decisions made, and progress over time. Outputs HTML (with interactive chart) or markdown."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--since YYYY-MM-DD] [--format html|markdown] [--output path]'
+  merge:
+    description: "Model merging \u2014 average weights from multiple checkpoints into a single model (soups, TIES, DARE). Free accuracy, zero latency cost."
+    lifecycle: compose
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-ids...> [--method uniform|greedy|ties|dare]
+  mode:
+    description: "Set the research strategy mode \u2014 explore (try new things), exploit (refine what works), or replicate (verify results). Drives novelty guard policy and agent behavior."
+    lifecycle: strategy
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    argument_hint: <explore|exploit|replicate>
+  onboard:
+    description: "Project onboarding \u2014 generate a walkthrough for new collaborators. Task, history, decisions, next steps."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--audience researcher|engineer|stakeholder] [--depth brief|full]'
+  paper:
+    description: Draft mechanical paper sections (setup, results, ablation, hyperparameters) from experiment logs. LaTeX and markdown output.
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--sections setup,results,ablation] [--format latex|markdown]'
+  plan:
+    description: "Research planning assistant \u2014 design a strategic experiment campaign with budget-aware ROI allocation."
+    lifecycle: plan
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--budget 20] [--goal \"maximize F1 for production\"]'
+  poster:
+    description: "Generate a single-page HTML research poster summarizing the experiment campaign \u2014 best result, trajectory, key findings, and methodology. Adapted from posterskill's self-contained HTML architecture."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Edit
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[title override]'
+  postmortem:
+    description: "Failure postmortem \u2014 diagnose why experiments stopped improving and get actionable next steps."
+    lifecycle: diagnose
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--window 10] [--auto-trigger 5]'
+  preflight:
+    description: "Pre-flight resource check \u2014 estimates VRAM, RAM, and disk requirements before running ML training. Compares against available system resources and issues PASS/WARN/FAIL verdict. Use before training to catch OOM errors before they happen."
+    lifecycle: check
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--model-type torch] [--params 10M] [--batch-size 32]'
+  present:
+    description: "Presentation figure generation \u2014 training curves, comparison charts, ablation tables, Pareto plots, sensitivity heatmaps."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--figures training,comparison] [--style light|dark|poster]'
+  profile:
+    description: "Profile a training run \u2014 timing breakdown, memory usage, throughput, bottleneck detection with actionable recommendations."
+    lifecycle: check
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--seed 42]'
+  prune:
+    description: "Weight pruning \u2014 measure accuracy at different sparsity levels, find the knee point, produce a smaller/faster model."
+    lifecycle: optimize
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--sparsity 0.5,0.75,0.9] [--method magnitude|structured|lottery]
+  quantize:
+    description: "Post-training quantization \u2014 FP32\u2192INT8/FP16, measure accuracy loss, 2-4x speedup with <0.5% accuracy loss."
+    lifecycle: optimize
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--precision int8|fp16|dynamic]
+  queue:
+    description: Queue experiments for batch execution with priority ordering and dependency chains. Load the queue, walk away, read the summary.
+    lifecycle: orchestrate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <add|list|run|pause|clear> [description] [--priority high] [--after q-001]
+  registry:
+    description: "Model registry \u2014 track, promote, and govern the model lifecycle from candidate to production."
+    lifecycle: govern
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[list|register|promote|demote|archive|history] [exp-id] [stage]'
+  regress:
+    description: "Performance regression gate \u2014 re-run best experiment after code/dependency changes and verify metrics haven't degraded."
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--tolerance 0.01] [--against exp-id] [--quick]'
+  replay:
+    description: "Experiment replay \u2014 re-run a historical experiment with current infrastructure to test if old approaches do better now."
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--with-current-data] [--with-current-preprocessing]
+  report:
+    description: "Generate a markdown research report from experiment history \u2014 structured for sharing, archiving, or including in documentation. More detailed than a brief, less visual than a poster."
+    lifecycle: document
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--since YYYY-MM-DD] [--output path]'
+  reproduce:
+    description: Verify reproducibility of a specific experiment by re-running from logged config and checking metrics fall within tolerance.
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--tolerance 0.02] [--strict] [--runs 3]
+  retry:
+    description: "Smart failure recovery \u2014 auto-diagnose crash type and retry with targeted fix. OOM \u2192 halve batch. NaN \u2192 add clipping."
+    lifecycle: orchestrate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--max-attempts 3]
+  review:
+    description: "Peer review simulation \u2014 generate likely reviewer objections with severity ratings and fix commands."
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--venue neurips|icml|general] [--harsh]'
+  sanity:
+    description: "Pre-training sanity checks \u2014 catch broken data loaders, misconfigured losses, and dead gradients in 30 seconds before wasting hours."
+    lifecycle: check
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--quick] [--verbose]'
+  scale:
+    description: "Scaling law estimator \u2014 run small experiments at different sizes, fit a power law, and predict full-scale performance before committing compute."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--axis data|compute|params] [--points 4] [--analyze results.yaml]'
+  search:
+    description: "Natural language experiment search \u2014 query with text + structured filters over 200+ experiments."
+    lifecycle: query
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <query> [--filter \"accuracy>0.85\"] [--limit 10]
+  seed:
+    description: Run multi-seed study on an experiment to compute mean/std/CI and flag seed-sensitive results. Prevents publishing lucky seeds.
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[N] [--quick] [--exp-id <id>]'
+  sensitivity:
+    description: "Hyperparameter sensitivity analysis \u2014 rank parameters by impact, identify which matter and which are noise."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--params learning_rate,max_depth]'
+  share:
+    description: "Experiment packaging \u2014 portable archive with config, metrics, seed study, annotations, reproduction instructions."
+    lifecycle: share
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-ids...> [--include model,figures,code]
+  simulate:
+    description: "Experiment outcome prediction \u2014 predict which configs will beat the current best before running them."
+    lifecycle: predict
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--configs configs.yaml] [--top-k 5] [--threshold 0.001]'
+  status:
+    description: "Show current ML experiment status \u2014 best model, recent experiments, convergence state, and trend analysis. Delegates to @ml-evaluator for read-only safety."
+    lifecycle: observe
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+  stitch:
+    description: "Pipeline composition \u2014 decompose ML pipelines into swappable stages. Show, swap, cache, and run stages independently."
+    lifecycle: compose
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <show|swap|cache|run> [stage] [--from exp-id]
+  suggest:
+    description: "Literature-grounded model selection. Reads the ML task context, searches recent literature, and suggests model architectures worth trying \u2014 with citations. Suggestions are auto-queued as hypotheses."
+    lifecycle: research
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Write
+    - Bash
+    - Grep
+    - Glob
+    - WebSearch
+    - WebFetch
+    argument_hint: '[task description override]'
+    equivalent_script:
+      path: scripts/suggest_next.py
+      location: scaffold
+  surgery:
+    description: "Architecture modification \u2014 add/remove layers, widen/narrow, swap activations, inject skip connections. Specify what to change, system handles how."
+    lifecycle: modify
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> --op <operation> [args...]
+  sweep:
+    description: Generate and run a systematic hyperparameter sweep. Computes the cartesian product of configured parameter ranges and processes the queue sequentially with full experiment logging.
+    lifecycle: explore
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Edit
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[sweep_config.yaml]'
+  template:
+    description: "Experiment template library \u2014 save winning configs as reusable templates, apply to new projects."
+    lifecycle: manage
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <save|list|apply|share> [--name name] [--from exp-id]
+  train:
+    description: "Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides \u2014 keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback."
+    lifecycle: execute
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Edit
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[max_iterations]'
+  transfer:
+    description: "Cross-project knowledge transfer \u2014 find similar prior projects and surface what worked. Builds institutional ML memory."
+    lifecycle: research
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--from project-path] [--auto]'
+  trend:
+    description: "Long-term trend analysis \u2014 improvement velocity, family ROI, diminishing returns detection, strategic research direction."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--window 30d] [--metric accuracy]'
+  try:
+    description: "Inject a hypothesis into the agent's experiment queue. This is how research taste reaches the agent \u2014 the human selects which coins to flip, the agent flips them."
+    lifecycle: steer
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Write
+    - Edit
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <hypothesis description>
+    equivalent_script:
+      path: scripts/manage_hypotheses.py
+      location: scaffold
+  update:
+    description: "Incremental model update \u2014 add new data without full retraining, with forgetting detection."
+    lifecycle: update
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> --new-data <path> [--replay-ratio 0.1] [--tolerance 0.005]
+  validate:
+    description: Run stability validation on the current experiment configuration. Executes N runs to measure metric variance and auto-configures multi-run evaluation if variance is too high.
+    lifecycle: validate
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--auto]'
+  warm:
+    description: "Warm-start from a prior model \u2014 load checkpoint, optionally freeze layers, adjust learning rate, and continue training."
+    lifecycle: compose
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: <exp-id> [--freeze-layers encoder] [--unfreeze-after 5]
+  watch:
+    description: Live training monitor with early-warning alerts for loss spikes, NaN, overfitting, and metric plateaus.
+    lifecycle: monitor
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[--alerts] [--interval 10] [--analyze run.log]'
+  whatif:
+    description: "What-if analysis \u2014 answer hypotheticals from existing experiment data without running new experiments."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: false
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: \"<question>\" [--json]
+  xray:
+    description: "Internal model diagnostics \u2014 gradient flow, dead neurons, activation stats, weight distributions, tree depth analysis."
+    lifecycle: analyze
+    invocation_mode: slash_only
+    model_invocation: disabled
+    mutates_project: true
+    tools:
+    - Read
+    - Bash
+    - Grep
+    - Glob
+    argument_hint: '[exp-id] [--layer encoder.layer.2] [--compare exp-a exp-b]'
+config_files:
+- commands.yaml
+- defaults.yaml
+- experiment_archetypes.yaml
+- failure_modes.yaml
+- lifecycle.toml
+- novelty_aliases.yaml
+- relationships.toml
+- state.toml
+- task_taxonomy.yaml
+- taxonomy.toml
+- watch_alerts.yaml
