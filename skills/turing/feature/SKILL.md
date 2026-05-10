@@ -1,7 +1,6 @@
 ---
 name: feature
 description: Automated feature selection — multi-method importance consensus, redundancy detection, and interaction feature generation.
-disable-model-invocation: true
 argument-hint: "[--method all|importance] [--top-k 20]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

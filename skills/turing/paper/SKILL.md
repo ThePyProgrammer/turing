@@ -1,7 +1,6 @@
 ---
 name: paper
 description: Draft mechanical paper sections (setup, results, ablation, hyperparameters) from experiment logs. LaTeX and markdown output.
-disable-model-invocation: true
 argument-hint: "[--sections setup,results,ablation] [--format latex|markdown]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

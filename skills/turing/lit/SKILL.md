@@ -1,7 +1,6 @@
 ---
 name: lit
 description: Literature search scoped to the current experiment domain — find papers, SOTA baselines, and related work without leaving the terminal.
-disable-model-invocation: true
 argument-hint: "<query> | --baseline | --related <exp-id>"
 allowed-tools: Read, Bash(*), Grep, Glob, WebSearch
 ---

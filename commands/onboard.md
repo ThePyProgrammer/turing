@@ -1,7 +1,6 @@
 ---
 name: onboard
 description: Project onboarding — generate a walkthrough for new collaborators. Task, history, decisions, next steps.
-disable-model-invocation: true
 argument-hint: "[--audience researcher|engineer|stakeholder] [--depth brief|full]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

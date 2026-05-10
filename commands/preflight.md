@@ -1,7 +1,6 @@
 ---
 name: preflight
 description: Pre-flight resource check — estimates VRAM, RAM, and disk requirements before running ML training. Compares against available system resources and issues PASS/WARN/FAIL verdict. Use before training to catch OOM errors before they happen.
-disable-model-invocation: true
 argument-hint: "[--model-type torch] [--params 10M] [--batch-size 32]"
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, nvidia-smi:*), Grep, Glob
 ---

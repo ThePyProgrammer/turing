@@ -1,7 +1,6 @@
 ---
 name: export
 description: Export model to production format with equivalence verification, latency benchmarking, and deployment model card.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--format joblib|xgboost_json|onnx|torchscript|tflite]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

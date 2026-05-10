@@ -1,7 +1,6 @@
 ---
 name: seed
 description: Run multi-seed study on an experiment to compute mean/std/CI and flag seed-sensitive results. Prevents publishing lucky seeds.
-disable-model-invocation: true
 argument-hint: "[N] [--quick] [--exp-id <id>]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

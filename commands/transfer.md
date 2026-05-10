@@ -1,7 +1,6 @@
 ---
 name: transfer
 description: Cross-project knowledge transfer — find similar prior projects and surface what worked. Builds institutional ML memory.
-disable-model-invocation: true
 argument-hint: "[--from project-path] [--auto]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: regress
 description: Performance regression gate — re-run best experiment after code/dependency changes and verify metrics haven't degraded.
-disable-model-invocation: true
 argument-hint: "[--tolerance 0.01] [--against exp-id] [--quick]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

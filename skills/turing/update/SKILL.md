@@ -1,7 +1,6 @@
 ---
 name: update
 description: Incremental model update — add new data without full retraining, with forgetting detection.
-disable-model-invocation: true
 argument-hint: "<exp-id> --new-data <path> [--replay-ratio 0.1] [--tolerance 0.005]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

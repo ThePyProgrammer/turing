@@ -1,7 +1,6 @@
 ---
 name: counterfactual
 description: Input-level counterfactual explanations — find the smallest input change to flip a prediction.
-disable-model-invocation: true
 argument-hint: "<exp-id> --sample <index> [--target <class>]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

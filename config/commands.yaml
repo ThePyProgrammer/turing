@@ -3,7 +3,7 @@ commands:
     description: "Run systematic ablation study \u2014 remove components one at a time, measure impact, produce publication-ready table with dead-weight flagging."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -15,7 +15,7 @@ commands:
     description: "Retrospective experiment annotations \u2014 add human notes, tags, and context that automated metrics can't capture."
     lifecycle: record
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -27,7 +27,7 @@ commands:
     description: "Experiment lifecycle cleanup \u2014 compress old artifacts, prune checkpoints, create queryable summary index. Reclaim disk space."
     lifecycle: manage
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -39,7 +39,7 @@ commands:
     description: "Pre-submission methodology audit \u2014 catch data leakage, missing baselines, cherry-picked seeds, and incomplete ablations before a reviewer does."
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -51,7 +51,7 @@ commands:
     description: "Automatic baseline generation \u2014 random, majority/mean, linear, k-NN baselines in 60 seconds. Every experiment needs a \"is this better than dumb?\" reference."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -63,7 +63,7 @@ commands:
     description: "Generate a structured research intelligence report from experiment history \u2014 what's been learned, what's promising, what's exhausted, and what the human should consider next. Use --deep for literature-grounded suggestions."
     lifecycle: report
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -77,7 +77,7 @@ commands:
     description: "Compute budget manager \u2014 set experiment/time limits, track allocation across explore/exploit phases, auto-shift modes, hard stop."
     lifecycle: manage
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -89,7 +89,7 @@ commands:
     description: "Probability calibration \u2014 measure ECE, plot reliability diagrams, apply Platt scaling or isotonic regression."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -101,7 +101,7 @@ commands:
     description: "Generate a standardized model card documenting the trained model \u2014 type, performance, training data, limitations, intended use, and artifact contract."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -112,7 +112,7 @@ commands:
     description: "Model changelog generation \u2014 auto-generate human-readable progress narrative from experiment history for stakeholders."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -124,7 +124,7 @@ commands:
     description: "Smart checkpoint management \u2014 list, prune (Pareto-based), average top-K, resume from any point, disk usage stats."
     lifecycle: check
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -136,7 +136,7 @@ commands:
     description: "Citation & attribution manager \u2014 track papers, datasets, methods. Audit for missing citations, generate BibTeX."
     lifecycle: record
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -148,7 +148,7 @@ commands:
     description: "Compare two ML experiment runs side-by-side \u2014 metrics, configuration deltas, and a verdict on which approach is more promising."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: false
     tools:
     - Read
@@ -160,7 +160,7 @@ commands:
     description: "Input-level counterfactual explanations \u2014 find the smallest input change to flip a prediction."
     lifecycle: explain
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -172,7 +172,7 @@ commands:
     description: "Training curriculum optimization \u2014 order data by difficulty, compare easy-to-hard vs hard-to-easy vs self-paced strategies."
     lifecycle: optimize
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -184,7 +184,7 @@ commands:
     description: Generate a structured experiment design for a hypothesis. Reads experiment history, searches literature for methodology, produces a scored design document at experiments/designs/.
     lifecycle: design
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -199,7 +199,7 @@ commands:
     description: "Error analysis \u2014 cluster failure cases, identify systematic failure modes, and suggest targeted fixes with auto-queued hypotheses."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -211,7 +211,7 @@ commands:
     description: "Deep experiment comparison \u2014 config diffs, metric significance, per-class regressions, training curve divergence, feature importance shifts."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -223,7 +223,7 @@ commands:
     description: "Model compression via distillation \u2014 train a smaller student model to match a larger teacher's predictions."
     lifecycle: deploy
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -235,7 +235,7 @@ commands:
     description: "Harness self-diagnosis \u2014 check environment, project, resources, and git state. Auto-fix common issues."
     lifecycle: check
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -247,7 +247,7 @@ commands:
     description: "Automated ensemble construction \u2014 combines top-K models via voting, stacking, and blending for zero-cost improvement."
     lifecycle: compose
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -259,7 +259,7 @@ commands:
     description: Tree-search-guided hypothesis exploration using AB-MCTS. Explores the space of experiment ideas as a search tree, scored by the critique engine. Discovers non-obvious refinement chains that linear suggestion cannot find.
     lifecycle: research
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -275,7 +275,7 @@ commands:
     description: Export model to production format with equivalence verification, latency benchmarking, and deployment model card.
     lifecycle: deploy
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -287,7 +287,7 @@ commands:
     description: "Automated feature selection \u2014 multi-method importance consensus, redundancy detection, and interaction feature generation."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -299,7 +299,7 @@ commands:
     description: "Session context restoration \u2014 \"where was I?\" summary after days away. Current best, pending hypotheses, last session, annotations."
     lifecycle: recall
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -311,7 +311,7 @@ commands:
     description: "Branch an experiment into parallel tracks \u2014 run both A and B, report the winner."
     lifecycle: orchestrate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -323,7 +323,7 @@ commands:
     description: "Visualize Pareto frontier across multiple objectives \u2014 answers \"which model is actually best?\" when there are tradeoffs."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -335,7 +335,7 @@ commands:
     description: "Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure \u2014 immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan."
     lifecycle: setup
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -351,7 +351,7 @@ commands:
     description: "Targeted leakage detection \u2014 probe for data leakage with single-feature tests, correlation checks, and train/test overlap detection."
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -363,7 +363,7 @@ commands:
     description: "Literature search scoped to the current experiment domain \u2014 find papers, SOTA baselines, and related work without leaving the terminal."
     lifecycle: research
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -376,7 +376,7 @@ commands:
     description: "Generate a research logbook showing the full experiment narrative \u2014 hypotheses proposed, experiments run, decisions made, and progress over time. Outputs HTML (with interactive chart) or markdown."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -388,7 +388,7 @@ commands:
     description: "Model merging \u2014 average weights from multiple checkpoints into a single model (soups, TIES, DARE). Free accuracy, zero latency cost."
     lifecycle: compose
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -400,7 +400,7 @@ commands:
     description: "Set the research strategy mode \u2014 explore (try new things), exploit (refine what works), or replicate (verify results). Drives novelty guard policy and agent behavior."
     lifecycle: strategy
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -410,7 +410,7 @@ commands:
     description: "Project onboarding \u2014 generate a walkthrough for new collaborators. Task, history, decisions, next steps."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -422,7 +422,7 @@ commands:
     description: Draft mechanical paper sections (setup, results, ablation, hyperparameters) from experiment logs. LaTeX and markdown output.
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -434,7 +434,7 @@ commands:
     description: "Research planning assistant \u2014 design a strategic experiment campaign with budget-aware ROI allocation."
     lifecycle: plan
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -446,7 +446,7 @@ commands:
     description: "Generate a single-page HTML research poster summarizing the experiment campaign \u2014 best result, trajectory, key findings, and methodology. Adapted from posterskill's self-contained HTML architecture."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -460,7 +460,7 @@ commands:
     description: "Failure postmortem \u2014 diagnose why experiments stopped improving and get actionable next steps."
     lifecycle: diagnose
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -472,7 +472,7 @@ commands:
     description: "Pre-flight resource check \u2014 estimates VRAM, RAM, and disk requirements before running ML training. Compares against available system resources and issues PASS/WARN/FAIL verdict. Use before training to catch OOM errors before they happen."
     lifecycle: check
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: false
     tools:
     - Read
@@ -484,7 +484,7 @@ commands:
     description: "Presentation figure generation \u2014 training curves, comparison charts, ablation tables, Pareto plots, sensitivity heatmaps."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -496,7 +496,7 @@ commands:
     description: "Profile a training run \u2014 timing breakdown, memory usage, throughput, bottleneck detection with actionable recommendations."
     lifecycle: check
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -508,7 +508,7 @@ commands:
     description: "Weight pruning \u2014 measure accuracy at different sparsity levels, find the knee point, produce a smaller/faster model."
     lifecycle: optimize
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -520,7 +520,7 @@ commands:
     description: "Post-training quantization \u2014 FP32\u2192INT8/FP16, measure accuracy loss, 2-4x speedup with <0.5% accuracy loss."
     lifecycle: optimize
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -532,7 +532,7 @@ commands:
     description: Queue experiments for batch execution with priority ordering and dependency chains. Load the queue, walk away, read the summary.
     lifecycle: orchestrate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -544,7 +544,7 @@ commands:
     description: "Model registry \u2014 track, promote, and govern the model lifecycle from candidate to production."
     lifecycle: govern
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -556,7 +556,7 @@ commands:
     description: "Performance regression gate \u2014 re-run best experiment after code/dependency changes and verify metrics haven't degraded."
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -568,7 +568,7 @@ commands:
     description: "Experiment replay \u2014 re-run a historical experiment with current infrastructure to test if old approaches do better now."
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -580,7 +580,7 @@ commands:
     description: "Generate a markdown research report from experiment history \u2014 structured for sharing, archiving, or including in documentation. More detailed than a brief, less visual than a poster."
     lifecycle: document
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -592,7 +592,7 @@ commands:
     description: Verify reproducibility of a specific experiment by re-running from logged config and checking metrics fall within tolerance.
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -604,7 +604,7 @@ commands:
     description: "Smart failure recovery \u2014 auto-diagnose crash type and retry with targeted fix. OOM \u2192 halve batch. NaN \u2192 add clipping."
     lifecycle: orchestrate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -616,7 +616,7 @@ commands:
     description: "Peer review simulation \u2014 generate likely reviewer objections with severity ratings and fix commands."
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -628,7 +628,7 @@ commands:
     description: "Pre-training sanity checks \u2014 catch broken data loaders, misconfigured losses, and dead gradients in 30 seconds before wasting hours."
     lifecycle: check
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -640,7 +640,7 @@ commands:
     description: "Scaling law estimator \u2014 run small experiments at different sizes, fit a power law, and predict full-scale performance before committing compute."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -652,7 +652,7 @@ commands:
     description: "Natural language experiment search \u2014 query with text + structured filters over 200+ experiments."
     lifecycle: query
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: false
     tools:
     - Read
@@ -664,7 +664,7 @@ commands:
     description: Run multi-seed study on an experiment to compute mean/std/CI and flag seed-sensitive results. Prevents publishing lucky seeds.
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -676,7 +676,7 @@ commands:
     description: "Hyperparameter sensitivity analysis \u2014 rank parameters by impact, identify which matter and which are noise."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -688,7 +688,7 @@ commands:
     description: "Experiment packaging \u2014 portable archive with config, metrics, seed study, annotations, reproduction instructions."
     lifecycle: share
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -700,7 +700,7 @@ commands:
     description: "Experiment outcome prediction \u2014 predict which configs will beat the current best before running them."
     lifecycle: predict
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -712,7 +712,7 @@ commands:
     description: "Show current ML experiment status \u2014 best model, recent experiments, convergence state, and trend analysis. Delegates to @ml-evaluator for read-only safety."
     lifecycle: observe
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: false
     tools:
     - Read
@@ -723,7 +723,7 @@ commands:
     description: "Pipeline composition \u2014 decompose ML pipelines into swappable stages. Show, swap, cache, and run stages independently."
     lifecycle: compose
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -735,7 +735,7 @@ commands:
     description: "Literature-grounded model selection. Reads the ML task context, searches recent literature, and suggests model architectures worth trying \u2014 with citations. Suggestions are auto-queued as hypotheses."
     lifecycle: research
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -753,7 +753,7 @@ commands:
     description: "Architecture modification \u2014 add/remove layers, widen/narrow, swap activations, inject skip connections. Specify what to change, system handles how."
     lifecycle: modify
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -765,7 +765,7 @@ commands:
     description: Generate and run a systematic hyperparameter sweep. Computes the cartesian product of configured parameter ranges and processes the queue sequentially with full experiment logging.
     lifecycle: explore
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -779,7 +779,7 @@ commands:
     description: "Experiment template library \u2014 save winning configs as reusable templates, apply to new projects."
     lifecycle: manage
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -791,7 +791,7 @@ commands:
     description: "Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides \u2014 keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback."
     lifecycle: execute
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -805,7 +805,7 @@ commands:
     description: "Cross-project knowledge transfer \u2014 find similar prior projects and surface what worked. Builds institutional ML memory."
     lifecycle: research
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -817,7 +817,7 @@ commands:
     description: "Long-term trend analysis \u2014 improvement velocity, family ROI, diminishing returns detection, strategic research direction."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -829,7 +829,7 @@ commands:
     description: "Inject a hypothesis into the agent's experiment queue. This is how research taste reaches the agent \u2014 the human selects which coins to flip, the agent flips them."
     lifecycle: steer
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -846,7 +846,7 @@ commands:
     description: "Incremental model update \u2014 add new data without full retraining, with forgetting detection."
     lifecycle: update
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -858,7 +858,7 @@ commands:
     description: Run stability validation on the current experiment configuration. Executes N runs to measure metric variance and auto-configures multi-run evaluation if variance is too high.
     lifecycle: validate
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -870,7 +870,7 @@ commands:
     description: "Warm-start from a prior model \u2014 load checkpoint, optionally freeze layers, adjust learning rate, and continue training."
     lifecycle: compose
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -882,7 +882,7 @@ commands:
     description: Live training monitor with early-warning alerts for loss spikes, NaN, overfitting, and metric plateaus.
     lifecycle: monitor
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -894,7 +894,7 @@ commands:
     description: "What-if analysis \u2014 answer hypotheticals from existing experiment data without running new experiments."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read
@@ -906,7 +906,7 @@ commands:
     description: "Internal model diagnostics \u2014 gradient flow, dead neurons, activation stats, weight distributions, tree depth analysis."
     lifecycle: analyze
     invocation_mode: slash_only
-    model_invocation: disabled
+    model_invocation: enabled
     mutates_project: true
     tools:
     - Read

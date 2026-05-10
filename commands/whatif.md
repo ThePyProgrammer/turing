@@ -1,7 +1,6 @@
 ---
 name: whatif
 description: What-if analysis — answer hypotheticals from existing experiment data without running new experiments.
-disable-model-invocation: true
 argument-hint: "\"<question>\" [--json]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

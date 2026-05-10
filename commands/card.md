@@ -1,7 +1,6 @@
 ---
 name: card
 description: Generate a standardized model card documenting the trained model — type, performance, training data, limitations, intended use, and artifact contract.
-disable-model-invocation: true
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
 ---
 

@@ -1,7 +1,6 @@
 ---
 name: template
 description: Experiment template library — save winning configs as reusable templates, apply to new projects.
-disable-model-invocation: true
 argument-hint: "<save|list|apply|share> [--name name] [--from exp-id]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

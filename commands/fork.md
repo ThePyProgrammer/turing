@@ -1,7 +1,6 @@
 ---
 name: fork
 description: Branch an experiment into parallel tracks — run both A and B, report the winner.
-disable-model-invocation: true
 argument-hint: "<exp-id> --branches \"approach A\" \"approach B\" [--auto-promote]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

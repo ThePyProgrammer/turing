@@ -1,7 +1,6 @@
 ---
 name: suggest
 description: Literature-grounded model selection. Reads the ML task context, searches recent literature, and suggests model architectures worth trying — with citations. Suggestions are auto-queued as hypotheses.
-disable-model-invocation: true
 argument-hint: "[task description override]"
 allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob, WebSearch, WebFetch
 ---

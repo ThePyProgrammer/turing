@@ -1,7 +1,6 @@
 ---
 name: simulate
 description: Experiment outcome prediction — predict which configs will beat the current best before running them.
-disable-model-invocation: true
 argument-hint: "[--configs configs.yaml] [--top-k 5] [--threshold 0.001]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

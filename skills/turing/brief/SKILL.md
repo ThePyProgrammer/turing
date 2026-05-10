@@ -1,7 +1,6 @@
 ---
 name: brief
 description: Generate a structured research intelligence report from experiment history — what's been learned, what's promising, what's exhausted, and what the human should consider next. Use --deep for literature-grounded suggestions.
-disable-model-invocation: true
 argument-hint: "[ml/project] [--deep]"
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob, WebSearch, WebFetch
 ---

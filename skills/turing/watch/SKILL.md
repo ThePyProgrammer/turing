@@ -1,7 +1,6 @@
 ---
 name: watch
 description: Live training monitor with early-warning alerts for loss spikes, NaN, overfitting, and metric plateaus.
-disable-model-invocation: true
 argument-hint: "[--alerts] [--interval 10] [--analyze run.log]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

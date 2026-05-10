@@ -1,7 +1,6 @@
 ---
 name: annotate
 description: Retrospective experiment annotations — add human notes, tags, and context that automated metrics can't capture.
-disable-model-invocation: true
 argument-hint: "<exp-id> \"note\" [--tag fragile] | --list | --search \"keyword\""
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

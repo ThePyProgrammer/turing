@@ -1,7 +1,6 @@
 ---
 name: ablate
 description: Run systematic ablation study — remove components one at a time, measure impact, produce publication-ready table with dead-weight flagging.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--components \"X,Y\"] [--seeds 3] [--latex]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

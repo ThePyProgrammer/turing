@@ -1,7 +1,6 @@
 ---
 name: distill
 description: Model compression via distillation — train a smaller student model to match a larger teacher's predictions.
-disable-model-invocation: true
 argument-hint: "<teacher-exp-id> [--compression 4] [--method soft-labels]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

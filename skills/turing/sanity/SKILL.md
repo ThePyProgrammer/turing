@@ -1,7 +1,6 @@
 ---
 name: sanity
 description: Pre-training sanity checks — catch broken data loaders, misconfigured losses, and dead gradients in 30 seconds before wasting hours.
-disable-model-invocation: true
 argument-hint: "[--quick] [--verbose]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

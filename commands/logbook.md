@@ -1,7 +1,6 @@
 ---
 name: logbook
 description: Generate a research logbook showing the full experiment narrative — hypotheses proposed, experiments run, decisions made, and progress over time. Outputs HTML (with interactive chart) or markdown.
-disable-model-invocation: true
 argument-hint: "[--since YYYY-MM-DD] [--format html|markdown] [--output path]"
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: flashback
 description: Session context restoration — "where was I?" summary after days away. Current best, pending hypotheses, last session, annotations.
-disable-model-invocation: true
 argument-hint: "[--days 7] [--last 10]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

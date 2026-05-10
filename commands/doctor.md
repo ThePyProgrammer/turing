@@ -1,7 +1,6 @@
 ---
 name: doctor
 description: Harness self-diagnosis — check environment, project, resources, and git state. Auto-fix common issues.
-disable-model-invocation: true
 argument-hint: "[--fix] [--verbose]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

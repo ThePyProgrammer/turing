@@ -1,7 +1,6 @@
 ---
 name: report
 description: Generate a markdown research report from experiment history — structured for sharing, archiving, or including in documentation. More detailed than a brief, less visual than a poster.
-disable-model-invocation: true
 argument-hint: "[--since YYYY-MM-DD] [--output path]"
 allowed-tools: Read, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob
 ---

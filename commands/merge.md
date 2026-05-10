@@ -1,7 +1,6 @@
 ---
 name: merge
 description: Model merging — average weights from multiple checkpoints into a single model (soups, TIES, DARE). Free accuracy, zero latency cost.
-disable-model-invocation: true
 argument-hint: "<exp-ids...> [--method uniform|greedy|ties|dare]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

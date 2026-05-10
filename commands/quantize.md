@@ -1,7 +1,6 @@
 ---
 name: quantize
 description: Post-training quantization — FP32→INT8/FP16, measure accuracy loss, 2-4x speedup with <0.5% accuracy loss.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--precision int8|fp16|dynamic]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

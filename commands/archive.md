@@ -1,7 +1,6 @@
 ---
 name: archive
 description: Experiment lifecycle cleanup — compress old artifacts, prune checkpoints, create queryable summary index. Reclaim disk space.
-disable-model-invocation: true
 argument-hint: "[--older-than 30d] [--keep-best 10] [--dry-run]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

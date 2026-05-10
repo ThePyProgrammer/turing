@@ -1,7 +1,6 @@
 ---
 name: queue
 description: Queue experiments for batch execution with priority ordering and dependency chains. Load the queue, walk away, read the summary.
-disable-model-invocation: true
 argument-hint: "<add|list|run|pause|clear> [description] [--priority high] [--after q-001]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

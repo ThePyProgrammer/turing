@@ -1,7 +1,6 @@
 ---
 name: prune
 description: Weight pruning — measure accuracy at different sparsity levels, find the knee point, produce a smaller/faster model.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--sparsity 0.5,0.75,0.9] [--method magnitude|structured|lottery]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

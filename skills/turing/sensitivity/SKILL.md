@@ -1,7 +1,6 @@
 ---
 name: sensitivity
 description: Hyperparameter sensitivity analysis — rank parameters by impact, identify which matter and which are noise.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--params learning_rate,max_depth]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

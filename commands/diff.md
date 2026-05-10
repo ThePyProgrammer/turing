@@ -1,7 +1,6 @@
 ---
 name: diff
 description: Deep experiment comparison — config diffs, metric significance, per-class regressions, training curve divergence, feature importance shifts.
-disable-model-invocation: true
 argument-hint: "<exp-a> <exp-b> [--code]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: share
 description: Experiment packaging — portable archive with config, metrics, seed study, annotations, reproduction instructions.
-disable-model-invocation: true
 argument-hint: "<exp-ids...> [--include model,figures,code]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: diagnose
 description: Error analysis — cluster failure cases, identify systematic failure modes, and suggest targeted fixes with auto-queued hypotheses.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--auto-queue] [--top 5]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

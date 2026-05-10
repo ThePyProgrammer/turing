@@ -1,7 +1,6 @@
 ---
 name: scale
 description: Scaling law estimator — run small experiments at different sizes, fit a power law, and predict full-scale performance before committing compute.
-disable-model-invocation: true
 argument-hint: "[--axis data|compute|params] [--points 4] [--analyze results.yaml]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

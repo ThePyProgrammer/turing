@@ -1,7 +1,6 @@
 ---
 name: audit
 description: Pre-submission methodology audit — catch data leakage, missing baselines, cherry-picked seeds, and incomplete ablations before a reviewer does.
-disable-model-invocation: true
 argument-hint: "[--strict] [--checklist neurips]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

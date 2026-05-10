@@ -7,10 +7,10 @@ You are the Turing ML research router. Detect the user's intent and identify the
 
 ## Execution Contract
 
-Turing sub-commands are explicit slash-command skills. Current sub-commands are `slash_only` and use `disable-model-invocation: true`, so router handling must not claim model dispatch into those skills.
+Turing sub-commands are slash-command skills that allow model invocation, so router handling may select the focused skill when the user's intent matches a sub-command.
 
 - If the user explicitly invokes `/turing:<cmd>`, Claude Code runtime handles that slash command.
-- If the user invokes `/turing` as a router and the detected command is `slash_only`, give the exact slash command to run.
+- If the user invokes `/turing` as a router and the detected command is `slash_only`, route to the focused sub-command skill when appropriate.
 - If a command has a documented safe equivalent script, the assistant may execute those documented steps inline when safe and appropriate.
 
 ## Routing Table

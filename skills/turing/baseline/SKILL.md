@@ -1,7 +1,6 @@
 ---
 name: baseline
 description: Automatic baseline generation — random, majority/mean, linear, k-NN baselines in 60 seconds. Every experiment needs a "is this better than dumb?" reference.
-disable-model-invocation: true
 argument-hint: "[--methods all|simple|linear] [--data data.npz]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: changelog
 description: Model changelog generation — auto-generate human-readable progress narrative from experiment history for stakeholders.
-disable-model-invocation: true
 argument-hint: "[--since exp-id|date] [--audience technical|stakeholder]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

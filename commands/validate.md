@@ -1,7 +1,6 @@
 ---
 name: validate
 description: Run stability validation on the current experiment configuration. Executes N runs to measure metric variance and auto-configures multi-run evaluation if variance is too high.
-disable-model-invocation: true
 argument-hint: "[--auto]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

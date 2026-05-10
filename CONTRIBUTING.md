@@ -29,7 +29,6 @@ Commands are markdown skill files in `skills/turing/`. Each command is a thin di
   ---
   name: <name>
   description: One-line description of what this command does.
-  disable-model-invocation: true
   argument-hint: "[args]"
   allowed-tools: Read, Write, Edit, Bash(...), Grep, Glob
   ---
@@ -44,7 +43,7 @@ Commands are markdown skill files in `skills/turing/`. Each command is a thin di
   - `description` must match command frontmatter
   - `lifecycle` must match the router table
   - `invocation_mode` is currently `slash_only`
-  - `model_invocation` must match `disable-model-invocation`
+  - `model_invocation` is currently `enabled`
   - `mutates_project` must be true if the command can write files, update state, or queue work
   - `tools` must match normalized `allowed-tools` frontmatter
 

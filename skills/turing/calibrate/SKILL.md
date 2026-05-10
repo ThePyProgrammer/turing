@@ -1,7 +1,6 @@
 ---
 name: calibrate
 description: Probability calibration — measure ECE, plot reliability diagrams, apply Platt scaling or isotonic regression.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--method platt|isotonic|temperature|auto]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

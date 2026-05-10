@@ -1,7 +1,6 @@
 ---
 name: postmortem
 description: Failure postmortem — diagnose why experiments stopped improving and get actionable next steps.
-disable-model-invocation: true
 argument-hint: "[--window 10] [--auto-trigger 5]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: design
 description: Generate a structured experiment design for a hypothesis. Reads experiment history, searches literature for methodology, produces a scored design document at experiments/designs/.
-disable-model-invocation: true
 argument-hint: "<hypothesis-id or description>"
 allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*), Grep, Glob, WebSearch, WebFetch
 ---

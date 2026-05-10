@@ -1,7 +1,6 @@
 ---
 name: init
 description: Initialize a new ML project with the Turing autoresearch harness. Scaffolds the full experiment infrastructure — immutable evaluation pipeline, agent-editable training code, structured logging, convergence detection hooks, and a Python virtual environment. Use --plan to generate a research plan.
-disable-model-invocation: true
 argument-hint: "[project_name] [--plan]"
 allowed-tools: Read, Write, Edit, Bash(*), Grep, Glob, WebSearch, WebFetch
 ---

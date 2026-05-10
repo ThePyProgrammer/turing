@@ -1,7 +1,6 @@
 ---
 name: retry
 description: Smart failure recovery — auto-diagnose crash type and retry with targeted fix. OOM → halve batch. NaN → add clipping.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--max-attempts 3]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

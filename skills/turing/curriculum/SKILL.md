@@ -1,7 +1,6 @@
 ---
 name: curriculum
 description: Training curriculum optimization — order data by difficulty, compare easy-to-hard vs hard-to-easy vs self-paced strategies.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--strategies easy-to-hard,random]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: profile
 description: Profile a training run — timing breakdown, memory usage, throughput, bottleneck detection with actionable recommendations.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--seed 42]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

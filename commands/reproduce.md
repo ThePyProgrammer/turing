@@ -1,7 +1,6 @@
 ---
 name: reproduce
 description: Verify reproducibility of a specific experiment by re-running from logged config and checking metrics fall within tolerance.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--tolerance 0.02] [--strict] [--runs 3]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

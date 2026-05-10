@@ -1,7 +1,6 @@
 ---
 name: train
 description: Run the autonomous ML experiment loop. Iteratively hypothesizes, trains, evaluates, and decides — keeping only improvements. Implements the autoresearch pattern with formal convergence detection and git-disciplined rollback.
-disable-model-invocation: true
 argument-hint: "[max_iterations]"
 allowed-tools: Read, Write, Edit, Bash(python train.py:*, python scripts/*:*, git:*, source .venv/bin/activate:*, pip:*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: leak
 description: Targeted leakage detection — probe for data leakage with single-feature tests, correlation checks, and train/test overlap detection.
-disable-model-invocation: true
 argument-hint: "[--deep] [--features feature_1,feature_2]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: explore
 description: Tree-search-guided hypothesis exploration using AB-MCTS. Explores the space of experiment ideas as a search tree, scored by the critique engine. Discovers non-obvious refinement chains that linear suggestion cannot find.
-disable-model-invocation: true
 argument-hint: "[ml/project] [--iterations N] [--top N] [--strategy abmcts-a|abmcts-m|greedy]"
 allowed-tools: Read, Write, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
 ---

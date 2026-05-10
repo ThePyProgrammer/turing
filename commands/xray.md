@@ -1,7 +1,6 @@
 ---
 name: xray
 description: Internal model diagnostics — gradient flow, dead neurons, activation stats, weight distributions, tree depth analysis.
-disable-model-invocation: true
 argument-hint: "[exp-id] [--layer encoder.layer.2] [--compare exp-a exp-b]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

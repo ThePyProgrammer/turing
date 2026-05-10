@@ -1,7 +1,6 @@
 ---
 name: search
 description: Natural language experiment search — query with text + structured filters over 200+ experiments.
-disable-model-invocation: true
 argument-hint: "<query> [--filter \"accuracy>0.85\"] [--limit 10]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

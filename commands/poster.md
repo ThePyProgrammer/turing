@@ -1,7 +1,6 @@
 ---
 name: poster
 description: Generate a single-page HTML research poster summarizing the experiment campaign — best result, trajectory, key findings, and methodology. Adapted from posterskill's self-contained HTML architecture.
-disable-model-invocation: true
 argument-hint: "[title override]"
 allowed-tools: Read, Write, Edit, Bash(python scripts/*:*, source .venv/bin/activate:*, mkdir:*, open:*), Grep, Glob
 ---

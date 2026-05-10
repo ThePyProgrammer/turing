@@ -1,7 +1,6 @@
 ---
 name: budget
 description: Compute budget manager — set experiment/time limits, track allocation across explore/exploit phases, auto-shift modes, hard stop.
-disable-model-invocation: true
 argument-hint: "<set|status|reset> [--experiments 50] [--hours 8]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

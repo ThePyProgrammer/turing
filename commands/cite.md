@@ -1,7 +1,6 @@
 ---
 name: cite
 description: Citation & attribution manager — track papers, datasets, methods. Audit for missing citations, generate BibTeX.
-disable-model-invocation: true
 argument-hint: "<add|list|check|bib> [--key Chen2016 --title XGBoost --url ...]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

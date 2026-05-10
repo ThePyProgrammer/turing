@@ -29,7 +29,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 - Added `config/commands.yaml` as the canonical command and config-file registry
 - Moved installer and verifier command manifests to registry-derived loading
-- Clarified `/turing` router behavior for `slash_only` and `disable-model-invocation` commands
+- Clarified `/turing` router behavior for slash-only commands and model-invocation metadata
 - Added registry/frontmatter/router/install/verify drift tests, including mutation semantics checks
 
 **28 registry/manifest tests | 74 commands | 11 config files | 10 commits**

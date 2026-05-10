@@ -243,13 +243,13 @@ def test_registry_lifecycle_matches_router_table() -> None:
         assert registry["commands"][command_name]["lifecycle"] == lifecycle, command_name
 
 
-def test_router_describes_execution_contract_not_model_dispatch() -> None:
+def test_router_describes_execution_contract_with_model_invocation() -> None:
     router = (SKILLS_DIR / "SKILL.md").read_text()
 
     forbidden_phrases = [
-        "dispatches to focused sub-commands",
-        "dispatch to focused sub-commands",
-        "dispatch to the focused skill",
+        "disable-model-invocation",
+        "give the exact slash command to run",
+        "Claude Code runtime handles that slash command",
         "Do not attempt to handle ML tasks directly",
     ]
     for phrase in forbidden_phrases:
@@ -258,11 +258,18 @@ def test_router_describes_execution_contract_not_model_dispatch() -> None:
     required_phrases = [
         "## Execution Contract",
         "slash_only",
-        "disable-model-invocation",
+        "allow model invocation",
+        "route to the focused sub-command skill",
         "Claude Code runtime handles that slash command",
     ]
     for phrase in required_phrases:
         assert phrase in router
+
+
+def test_command_frontmatter_allows_model_invocation() -> None:
+    for command_name, path in command_files().items():
+        frontmatter = parse_frontmatter(path)
+        assert "disable-model-invocation" not in frontmatter, command_name
 
 
 def test_registry_matches_command_frontmatter() -> None:
@@ -273,10 +280,7 @@ def test_registry_matches_command_frontmatter() -> None:
         frontmatter = parse_frontmatter(path)
         assert frontmatter["name"] == command_name
         assert entry["description"] == frontmatter["description"], command_name
-        expected_model_invocation = (
-            "disabled" if frontmatter.get("disable-model-invocation") is True else "enabled"
-        )
-        assert entry["model_invocation"] == expected_model_invocation, command_name
+        assert entry["model_invocation"] == "enabled", command_name
         if "argument-hint" in frontmatter:
             assert entry.get("argument_hint") == frontmatter["argument-hint"], command_name
         else:
@@ -311,7 +315,7 @@ def test_suggest_registry_contract() -> None:
 
     suggest = registry["commands"]["suggest"]
     assert suggest["invocation_mode"] == "slash_only"
-    assert suggest["model_invocation"] == "disabled"
+    assert suggest["model_invocation"] == "enabled"
     assert suggest["equivalent_script"] == {
         "path": "scripts/suggest_next.py",
         "location": "scaffold",

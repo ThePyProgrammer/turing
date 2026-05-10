@@ -1,7 +1,6 @@
 ---
 name: replay
 description: Experiment replay — re-run a historical experiment with current infrastructure to test if old approaches do better now.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--with-current-data] [--with-current-preprocessing]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: stitch
 description: Pipeline composition — decompose ML pipelines into swappable stages. Show, swap, cache, and run stages independently.
-disable-model-invocation: true
 argument-hint: "<show|swap|cache|run> [stage] [--from exp-id]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

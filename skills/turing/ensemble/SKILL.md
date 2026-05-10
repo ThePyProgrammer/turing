@@ -1,7 +1,6 @@
 ---
 name: ensemble
 description: Automated ensemble construction — combines top-K models via voting, stacking, and blending for zero-cost improvement.
-disable-model-invocation: true
 argument-hint: "[--top-k 5] [--methods voting,stacking,blending]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

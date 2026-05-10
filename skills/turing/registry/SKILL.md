@@ -1,7 +1,6 @@
 ---
 name: registry
 description: Model registry — track, promote, and govern the model lifecycle from candidate to production.
-disable-model-invocation: true
 argument-hint: "[list|register|promote|demote|archive|history] [exp-id] [stage]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

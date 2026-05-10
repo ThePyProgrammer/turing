@@ -1,7 +1,6 @@
 ---
 name: trend
 description: Long-term trend analysis — improvement velocity, family ROI, diminishing returns detection, strategic research direction.
-disable-model-invocation: true
 argument-hint: "[--window 30d] [--metric accuracy]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

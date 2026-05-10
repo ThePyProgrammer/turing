@@ -1,7 +1,6 @@
 ---
 name: surgery
 description: Architecture modification — add/remove layers, widen/narrow, swap activations, inject skip connections. Specify what to change, system handles how.
-disable-model-invocation: true
 argument-hint: "<exp-id> --op <operation> [args...]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: mode
 description: Set the research strategy mode — explore (try new things), exploit (refine what works), or replicate (verify results). Drives novelty guard policy and agent behavior.
-disable-model-invocation: true
 argument-hint: "<explore|exploit|replicate>"
 ---
 

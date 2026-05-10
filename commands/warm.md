@@ -1,7 +1,6 @@
 ---
 name: warm
 description: Warm-start from a prior model — load checkpoint, optionally freeze layers, adjust learning rate, and continue training.
-disable-model-invocation: true
 argument-hint: "<exp-id> [--freeze-layers encoder] [--unfreeze-after 5]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

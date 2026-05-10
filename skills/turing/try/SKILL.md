@@ -1,7 +1,6 @@
 ---
 name: try
 description: Inject a hypothesis into the agent's experiment queue. This is how research taste reaches the agent — the human selects which coins to flip, the agent flips them.
-disable-model-invocation: true
 argument-hint: "<hypothesis description>"
 allowed-tools: Read, Write, Edit, Bash(python scripts/*:*, source .venv/bin/activate:*), Grep, Glob
 ---

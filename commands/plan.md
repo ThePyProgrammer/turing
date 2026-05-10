@@ -1,7 +1,6 @@
 ---
 name: plan
 description: Research planning assistant — design a strategic experiment campaign with budget-aware ROI allocation.
-disable-model-invocation: true
 argument-hint: "[--budget 20] [--goal \"maximize F1 for production\"]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

@@ -1,7 +1,6 @@
 ---
 name: frontier
 description: Visualize Pareto frontier across multiple objectives — answers "which model is actually best?" when there are tradeoffs.
-disable-model-invocation: true
 argument-hint: "[--metrics \"accuracy,train_seconds,n_params\"] [--ascii]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

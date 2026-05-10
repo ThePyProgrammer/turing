@@ -1,7 +1,6 @@
 ---
 name: review
 description: Peer review simulation — generate likely reviewer objections with severity ratings and fix commands.
-disable-model-invocation: true
 argument-hint: "[--venue neurips|icml|general] [--harsh]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---

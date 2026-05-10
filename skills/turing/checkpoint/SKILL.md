@@ -1,7 +1,6 @@
 ---
 name: checkpoint
 description: Smart checkpoint management — list, prune (Pareto-based), average top-K, resume from any point, disk usage stats.
-disable-model-invocation: true
 argument-hint: "<list|prune|average|resume|stats> [exp-id] [--top 3] [--dry-run]"
 allowed-tools: Read, Bash(*), Grep, Glob
 ---
