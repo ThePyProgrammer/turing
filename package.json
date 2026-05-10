@@ -8,16 +8,22 @@
     "claude-turing": "./bin/cli.js"
   },
   "scripts": {
-    "postinstall": "node src/postinstall.js"
+    "postinstall": "node src/postinstall.js",
+    "sync:skills": "node src/sync-skills-layout.js"
   },
   "files": [
     "bin/",
     "src/",
     ".claude-plugin/",
     "commands/",
+    "skills/",
     "agents/",
     "templates/",
-    "config/"
+    "config/",
+    "!src/**/*.egg-info/**",
+    "!templates/**/__pycache__/**",
+    "!templates/**/*.pyc",
+    "!templates/**/.pytest_cache/**"
   ],
   "keywords": [
     "ml",

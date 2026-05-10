@@ -1,6 +1,6 @@
 # Everything is excluded by default.
 # The "files" field in package.json is the allowlist:
-#   bin/, src/, .claude-plugin/, commands/, agents/, templates/, config/
+#   bin/, src/, .claude-plugin/, commands/, skills/, agents/, templates/, config/
 #
 # This file exists as a safety net and to document intent.
 
