@@ -3,7 +3,7 @@
 *The research assistant that can't fool itself.*
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.7.0-ffb74d?style=flat-square&labelColor=1a1a2e" alt="Version" /> 
+  <img src="https://img.shields.io/badge/version-4.8.0-ffb74d?style=flat-square&labelColor=1a1a2e" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="License" /> 
   <img src="https://img.shields.io/badge/Claude_Code-plugin-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Claude Code" /> 
   <img src="https://img.shields.io/badge/Node.js-20%2B-ff4d4d?style=flat-square&labelColor=1a1a2e" alt="Node.js" />

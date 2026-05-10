@@ -3,6 +3,19 @@
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 
+## [4.8.0] — 2026-05-10 — Skills as Command Source
+
+### Changed
+- Made `skills/turing/` the editable command source and generate the legacy `commands/` compatibility tree from it
+- Updated the installer to deploy public `.claude/commands/turing` runtime files from skill sources while preserving installed paths
+- Enabled model invocation for command skills and aligned the router/registry tests with direct sub-command handling
+
+### Added
+- Added `src/sync-commands-layout.js` as the primary source-to-compatibility sync script, with `sync:skills` retained as a compatibility alias
+
+**2037 tests | 74 commands | 93 scripts | 5 commits**
+
+
 ## [4.7.0] — 2026-05-10 — Modern Skills Layout Mirror
 
 ### Added
@@ -424,6 +437,7 @@ All notable changes to Turing are documented here. Format follows [Keep a Change
 
 **257 tests | 14 commands | 23 scripts | 193 commits**
 
+[4.8.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.8.0
 [4.7.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.7.0
 [4.5.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.5.0
 [4.4.0]: https://github.com/ThePyProgrammer/turing/releases/tag/v4.4.0

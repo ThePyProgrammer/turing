@@ -1,12 +1,25 @@
 ---
 title: Changelog
-description: All notable changes to Turing, from v1.0.0 through v4.7.0. 29 phases, 84 features, 27 releases.
+description: All notable changes to Turing, from v1.0.0 through v4.8.0. 29 phases, 84 features, 28 releases.
 icon: lucide/history
 ---
 
 # Changelog
 
 All notable changes to Turing are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/).
+
+---
+
+## v4.8.0: Skills as Command Source { #v480 }
+
+*2026-05-10: The modern `skills/turing/` layout is now the command source, not a mirror.*
+
+- Made `skills/turing/` the editable command source and generate `commands/` as a compatibility tree
+- Added `src/sync-commands-layout.js` as the primary source-to-compatibility sync script, with `sync:skills` retained as an alias
+- Updated installer deployment to read from skill sources while preserving `.claude/commands/turing` runtime paths
+- Enabled model invocation for command skills and aligned router/registry tests with direct sub-command handling
+
+**2037 tests | 74 commands | 93 scripts | 5 commits**
 
 ---
 
