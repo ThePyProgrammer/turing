@@ -152,33 +152,69 @@ def test_installer_copies_registered_commands_and_configs(tmp_path: Path):
 # --- Verify manifest ---
 
 
-def test_verify_commands_cover_install():
-    """verify.js EXPECTED_COMMANDS must cover all registered commands."""
-    registered = set(_registry()["commands"])
+def test_verifier_does_not_define_command_or_config_manifests():
+    """Verifier must consume the registry instead of defining local manifests."""
     content = VERIFY_JS.read_text()
-    commands_match = re.search(r"EXPECTED_COMMANDS\s*=\s*\[(.*?)\]", content, re.DOTALL)
-    assert commands_match, "Could not find EXPECTED_COMMANDS in verify.js"
-    verified_raw = re.findall(r'"([^"]+)"', commands_match.group(1))
-    # verify.js uses paths like "init/SKILL.md" — extract the directory name
-    verified = set()
-    for v in verified_raw:
-        if "/" in v:
-            verified.add(v.split("/")[0])
-        else:
-            verified.add(v.replace(".md", "").replace("SKILL", ""))
-    missing = registered - verified
-    assert missing == set(), f"Commands registered but not verified: {missing}"
+    assert "EXPECTED_COMMANDS" not in content
+    assert "EXPECTED_CONFIG" not in content
+    assert "getExpectedCommandPaths" in content
+    assert "getConfigFiles" in content
 
 
-def test_verify_configs_cover_install():
-    """verify.js EXPECTED_CONFIG must cover all registered runtime config files."""
-    registered = set(_registry()["config_files"]) - {"commands.yaml"}
-    content = VERIFY_JS.read_text()
-    config_match = re.search(r"EXPECTED_CONFIG\s*=\s*\[(.*?)\]", content, re.DOTALL)
-    assert config_match, "Could not find EXPECTED_CONFIG in verify.js"
-    verified = set(re.findall(r'"([^"]+)"', config_match.group(1)))
-    missing = registered - verified
-    assert missing == set(), f"Configs registered but not verified: {missing}"
+def test_verify_reports_missing_registered_command(tmp_path: Path):
+    """Verifier must report missing commands from the registry-derived manifest."""
+    env = os.environ.copy()
+    env["HOME"] = str(tmp_path)
+    install_result = subprocess.run(
+        ["node", str(INSTALL_JS), "--global"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert install_result.returncode == 0, install_result.stderr
+
+    missing_command = tmp_path / ".claude" / "commands" / "turing" / "suggest" / "SKILL.md"
+    missing_command.unlink()
+
+    result = subprocess.run(
+        ["node", str(VERIFY_JS), "--scope", "global"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "commands/suggest/SKILL.md" in result.stdout
+
+
+def test_verify_reports_missing_registered_config(tmp_path: Path):
+    """Verifier must report missing configs from the registry-derived manifest."""
+    env = os.environ.copy()
+    env["HOME"] = str(tmp_path)
+    install_result = subprocess.run(
+        ["node", str(INSTALL_JS), "--global"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    assert install_result.returncode == 0, install_result.stderr
+
+    missing_config = tmp_path / ".claude" / "commands" / "turing" / "config" / "commands.yaml"
+    missing_config.unlink()
+
+    result = subprocess.run(
+        ["node", str(VERIFY_JS), "--scope", "global"],
+        cwd=REPO_ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "config/commands.yaml" in result.stdout
 
 
 def test_verify_checks_full_template_manifest(tmp_path: Path):
